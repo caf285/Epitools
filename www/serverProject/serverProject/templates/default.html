@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8"></meta>
+  <!-- <meta http-equiv="Cache-control" content="no-cache"> -->
+  <title>{% block title %}TGen North{% endblock %}</title>
+  {% block static %}
+    {% load static %}
+    <!-- CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/defaultStyle.css' %}" rel="stylesheet">
+    <link href="{% static 'css/formStyle.css' %}" rel="stylesheet">
+
+    <!-- Javascript -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/defaultScript.js' %}"></script>
+  {% endblock %}
+
+</head>
+<body>
+
+  <div id="container">
+    <div id="header">
+      <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item {% block home %}{% endblock %}"><a class="nav-link" href="/newick/">Home&nbsp</a></li>
+            {% if user.is_authenticated %}
+              <li class="nav-item dropdown {% block samples %}{% endblock %}">
+                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Samples
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="/samples/add/">Add</a>
+                  <a class="dropdown-item" href="/samples/view/">View</a>
+                  <a class="dropdown-item" href="/samples/map/">Map</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown {% block trees %}{% endblock %}">
+                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Trees
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="/trees/add/">Add</a>
+                  <a class="dropdown-item" href="/trees/view/">View</a>
+                  <a class="dropdown-item" href="/trees/map/">Map</a>
+                </div>
+              </li>
+              <li class="nav-item {% block demo %}{% endblock %}"><a class="nav-link" href="/demo/" target="_blank">Demo</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <ul class="navbar-nav ml-auto">
+          {% if request.user.is_superuser %}
+            <li class="nav-item"><a class="nav-link" href="/admin/" target="_blank">Admin</a></li>
+          {% endif %} 
+          {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'logout'%}?next=/newick/">Logout</a></li>
+          {% else %}
+            <li class="nav-item {% block login %}{% endblock %}"><a class="nav-link" href="{% url 'login'%}?next=/newick/">Login</a></li>
+          {% endif %} 
+        </ul>
+      </nav>
+    </div>
+
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+
+    <div class="bg-dark" id="footer">
+      {% if user.is_authenticated %}
+        <div style="float: left; text-transform: lowercase;">{{ user.get_username }}</div>, last login: {{ user.last_login }}
+      {% endif %} 
+      {% block footer %}{% endblock %}
+      <div id="cr"> © All Rights Reserved TGen North</div>
+    </div>
+
+  </div>
+  <script>main();</script>
+
+</body>
+</html>

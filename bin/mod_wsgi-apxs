@@ -1,0 +1,10 @@
+#!/home/cfrench/serverEnv/bin/python3
+# EASY-INSTALL-ENTRY-SCRIPT: 'mod-wsgi-httpd==2.4.27.1','console_scripts','mod_wsgi-apxs'
+__requires__ = 'mod-wsgi-httpd==2.4.27.1'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('mod-wsgi-httpd==2.4.27.1', 'console_scripts', 'mod_wsgi-apxs')()
+    )

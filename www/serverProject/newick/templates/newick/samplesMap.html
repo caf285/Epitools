@@ -1,0 +1,266 @@
+{% extends "newick/samples.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+
+  {% load static %}
+  <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
+  <script src="{% static '/leaflet/leaflet-heat.js' %}"></script>
+  <script src="{% static '/leaflet/leaflet-svgicon/svg-icon.js' %}"></script>
+  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+  <style>
+    .leaflet-container {  /* all maps */
+      width: 100%;
+      height: 800px;
+      z-index: 1;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+  {% leaflet_map "main" %}
+
+  <div style="position:relative">
+    <div style="text-align:center;width:100%;position:absolute;top:-50px;z-index:100;">
+      <div class="controls">
+        <input style="width:300px;" type="range" id="mScale" min="0" max="11">
+      </div>
+      <div id="mScaleLabel"></div>
+    </div>
+    <div style="position:absolute;top:-500px;left:0;z-index:100;">
+      <div id="testPlot" style="width:400px;height:500px;">
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    var tester = document.getElementById("testPlot");
+
+    var colors = ["#A6D96A", "#D9EF8B", "#FEE08B", "#FDAE61", "#E2001A", "#A8121C", "#650D0D"]
+    var countyChance = {"Apache": 10, "Cochise": 1, "Coconino": 100, "Gila": 1, "Graham": 1, "Greenlee": 1, "LaPaz": 1, "Maricopa": 150, "Mohave": 10, "Navajo": 50, "Pima": 1, "Pinal": 1, "SantaCruz": 1, "Yavapai": 1, "Yuma": 1}
+    var countyCoordinates = {"Apache": [35.254,-109.379], "Cochise": [32.240,-109.819], "Coconino": [35.192,-111.654], "Gila": [34,-111.005], "Graham": [33.073,-109.973], "Greenlee": [33.504,-109.259], "LaPaz": [33.912,-113.866], "Maricopa": [33.449,-112.082], "Mohave": [35.209,-114.060], "Navajo": [34.939,-110.214], "Pima": [32.231,-110.939], "Pinal": [32.778,-110.852], "SantaCruz": [31.484,-110.939], "Yavapai": [34.524,-112.478], "Yuma": [32.667,-114.180]}
+    var countySize = {"Apache": 2, "Cochise": 3, "Coconino": 3, "Gila": 2, "Graham": 2, "Greenlee": 1, "LaPaz": 2, "Maricopa": 4, "Mohave": 3, "Navajo": 2, "Pima": 2, "Pinal": 2, "SantaCruz": 1, "Yavapai": 2, "Yuma": 2}
+    var monthChance = {"January": 10, "February": 50, "March": 10, "April": 2, "May": 1, "June": 3, "July": 5, "August": 2, "September": 75, "October": 5, "November": 0, "December": 2}
+    var mTypeChance = {"M1":20, "M4":5, "M12":10, "M28":5, "M59":10, "M60":20, "M81":5, "M82":20, "M89":40, "M90":50, "M92":10, "other":80, "unknown":40}
+
+    var randCoordinates = {};
+    for (var county in countyCoordinates) {
+      randCoordinates[county] = []
+      for (var i = 0; i < Math.ceil(countySize[county] / 2); i++) {
+        var x = Math.random() * [-1, 1][Math.floor(Math.random() * 2)] * 0.05 * countySize[county];
+        var y = Math.random() * [-1, 1][Math.floor(Math.random() * 2)] * 0.05 * countySize[county];
+        randCoordinates[county].push([countyCoordinates[county][0] + x,countyCoordinates[county][1] + y]);
+      }
+    }
+
+    var randCounties = [];
+    for (var county in countyChance) {
+      for (var i = 0; i < countyChance[county]; i++) {
+        randCounties.push(county)
+      }
+    }
+
+    var randMonths = [];
+    for (var month in monthChance) {
+      for (var i = 0; i < monthChance[month]; i++) {
+        randMonths.push(month)
+      }
+    }
+
+    var randMTypes = [];
+    for (var mType in mTypeChance) {
+      for (var i = 0; i < mTypeChance[mType]; i++) {
+        randMTypes.push(mType)
+      }
+    }
+
+    var samples = [];
+    for (var i = 0; i < 150; i++) {
+      var temp = []
+      temp.push(randCounties[Math.floor(Math.random() * randCounties.length)])
+      temp.push(Math.floor(Math.random() * randCoordinates[temp[0]].length))
+      temp.push(randMonths[Math.floor(Math.random() * randMonths.length)])
+      temp.push(randMTypes[Math.floor(Math.random() * randMTypes.length)])
+      samples.push(temp)
+    }
+
+    var sampleMonths = {};
+    for (var month in monthChance) {
+      var tempTotal = 0;
+      sampleMonths[month] = {};
+      sampleMonths[month]["overlay"] = L.layerGroup([]);
+      for (var county in countyChance) {
+        sampleMonths[month][county] = {};
+        for (var i = 0; i < randCoordinates[county].length; i++) {
+          sampleMonths[month][county][i] = {};
+          for (var type in mTypeChance) {
+            sampleMonths[month][county][i][type] = 0;
+          }
+        }
+      }
+    }
+
+    for (var index in samples) {
+      sampleMonths[samples[index][2]][samples[index][0]][samples[index][1]][samples[index][3]] += 1
+    }
+
+    var mType = {"M1":L.layerGroup(), "M4":L.layerGroup(), "M12":L.layerGroup(), "M28":L.layerGroup(), "M59":L.layerGroup(), "M60":L.layerGroup(), "M81":L.layerGroup(), "M82":L.layerGroup(), "M89":L.layerGroup(), "M90":L.layerGroup(), "M92":L.layerGroup(), "other":L.layerGroup(), "unknown":L.layerGroup()}
+
+    var mTypeGraph = {}
+    var thing = []
+    for (var index in mType) {
+      mTypeGraph[index] = {'x': [], 'y': [], 'name': index, 'type': 'bar'}
+      for (month in monthChance) {
+        mTypeGraph[index]['x'].push(month)
+      }
+      thing.push(mTypeGraph[index])
+    }
+
+    var layout = {barmode: 'stack'}
+    Plotly.newPlot(tester, thing, layout)
+
+    window.addEventListener("map:init", function (e) {
+
+      var detail = e.detail;
+
+
+
+      function fillSamples() {
+        for (var month in monthChance) {
+          detail.map.removeLayer(sampleMonths[month]["overlay"]);
+          sampleMonths[month]["overlay"].clearLayers()
+        }
+
+        for (var county in countyChance) {
+          for (var i = 0; i < randCoordinates[county].length; i++) {
+            tempTotal = 0
+            for (var type in mTypeChance) {
+              if (detail.map.hasLayer(mType[type])) {
+                tempTotal += sampleMonths[Object.keys(monthChance)[document.getElementById("mScale").value]][county][i][type];
+              }
+            }
+            if (tempTotal > 0) {
+              sampleMonths[Object.keys(monthChance)[document.getElementById("mScale").value]]["overlay"].addLayer(new L.Marker.SVGMarker(randCoordinates[county][i], { iconOptions: { circleText:tempTotal }}));
+            }
+          }
+
+        }
+        document.getElementById("mScaleLabel").innerHTML = Object.keys(monthChance)[document.getElementById("mScale").value] + ", 2018"
+        detail.map.addLayer(sampleMonths[Object.keys(monthChance)[document.getElementById("mScale").value]]["overlay"])
+      }
+
+      function updateGraph() {
+        var data = [];
+        for (type in mType) {
+          mTypeGraph[type]['y'] = []
+          data = []
+          for (month in sampleMonths) {
+            tempTotal = 0
+            for (var county in countyChance) {
+              for (var i = 0; i < randCoordinates[county].length; i++) {
+                if (detail.map.hasLayer(mType[type])) {
+                  tempTotal += sampleMonths[month][county][i][type];
+                }
+              }
+            }
+            mTypeGraph[type]['y'].push(tempTotal)
+          }
+        }
+        Plotly.redraw(tester)
+      }
+
+      document.getElementById("mScale").value = 0;
+      document.getElementById("mScaleLabel").innerHTML = Object.keys(monthChance)[document.getElementById("mScale").value] + ", 2018"
+
+      for (var type in mType) {
+        detail.map.addLayer(mType[type])
+      }
+      fillSamples();
+      detail.map.addLayer(sampleMonths[Object.keys(monthChance)[document.getElementById("mScale").value]]["overlay"])
+
+      document.getElementById("mScale").addEventListener('input', function(event) {
+        fillSamples()
+      });
+      detail.map.on('overlayadd', function () {
+        fillSamples()
+        updateGraph()
+      })
+      detail.map.on('overlayremove', function () {
+        fillSamples()
+        updateGraph()
+      })
+
+      //var marker = new L.Marker.SVGMarker([35,-109.3], { iconOptions: { circleText:125 }}).addTo(detail.map);
+      //var marker = new L.Marker.SVGMarker([35.1,-109.4], { iconOptions: { circleText:500 }}).addTo(detail.map);
+
+
+      // --------------------( BANNER HEALTH FACILITIES )
+
+/*
+      // Banner Baywood Medical Center
+      var marker = L.marker([33.410604, -111.68806],{title:"Banner Baywood Medical Center",clickable:true}).addTo(detail.map);
+
+      // Banner Boswell Medical Center
+      var marker = L.marker([33.603941, -112.28356],{title:"Banner Boswell Medical Center",clickable:true}).addTo(detail.map); //emm82, 18
+
+      // Banner Del E Webb Medical Center
+      var marker = L.marker([33.659783, -112.373],{title:"Banner Del E Webb Medical Center",clickable:true}).addTo(detail.map);
+
+      // Banner Desert Medical Center
+      var marker = L.marker([33.25561, -111.884167],{title:"Banner Desert Medical Center",clickable:true}).bindPopup("<h4>Banner Desert Medical Center</h4>", {'maxWidth':'600'}).addTo(detail.map); //emm60, 10
+
+      // Banner Estrella Medical Center
+      var marker = L.marker([33.478178, -112.25744],{title:"Banner Estrella Medical Center",clickable:true}).addTo(detail.map);
+
+      // Banner Gateway Medical Center
+      var marker = L.marker([33.450069, -111.71913],{title:"Banner Gateway Medical Center",clickable:true}).addTo(detail.map); //emm59, 23
+
+      // Banner Health Center
+      var marker = L.marker([33.607275, -112.25869],{title:"Banner Health Center",clickable:true}).addTo(detail.map); //emm1, 23
+
+      // Banner Heart Hospital
+      var marker = L.marker([33.41128, -111.68915],{title:"Banner Heart Hospital",clickable:true}).bindPopup("<h4>Weenie Hut General</h4>", {'maxWidth':'600'}).addTo(detail.map); //emm89, 17
+
+      // Banner Thunderbird Medical Center
+      var marker = L.marker([33.609189, -112.17915],{title:"Banner Thunderbird Medical Center",clickable:true}).bindPopup("<h4>Banner Thunderbird Medical Center</h4>", {'maxWidth':'600'}).addTo(detail.map);
+*/
+      // --------------------( TILE LAYERS & OVERLAYS )
+      var baseLayers = {
+        "Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+        "Dark Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+      };
+
+      var County = new L.LayerGroup();
+      var overlays = new Object;
+      // County Polygons
+      for (var i = 0; i < Object.keys(counties).length; i++) {
+        var polygon = L.polygon(counties[Object.keys(counties).sort()[i]], {
+          title: Object.keys(counties).sort()[i],
+          clickable: true,
+          color: 'hsl(0, 100%, 0%)',
+          opacity: 0.7,
+          weight: 1,
+          fillOpacity: 0.0
+        });
+        overlays[Object.keys(counties).sort()[i]] = polygon;
+        detail.map.addLayer(polygon)
+      }
+      L.control.layers(baseLayers, overlays).addTo(detail.map);
+
+      L.control.layers("", mType).addTo(detail.map);
+
+      detail.map.addLayer(baseLayers["Grey"])
+
+      updateGraph()
+    }, false);
+
+
+  </script>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+html, body {
+  background-color: #e3e3e3;
+  color: #333;
+  font-size: 12px;
+  margin: 0px;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+#container {  
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+#header {
+  font-size: 16px;
+  line-height: 25px;
+}
+
+.navbar {
+  background-color: #146379;
+}
+
+#content {
+  flex: 1 1 auto;
+}
+
+#footer {
+  flex: 0 0 30px;
+  line-height: 30px;
+  padding-left: 10px;
+  padding-right: 10px;
+  color: white;
+  background-color: #146379
+}
+
+#cr {
+  float: right;
+}
