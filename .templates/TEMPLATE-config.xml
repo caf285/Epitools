@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<NaspInputData>
+    <Options>
+
+        <!-- M# -->
+        <RunName>=====</RunName>
+
+        <!-- M# -->
+        <OutputFolder>/scratch/GAS/.temp/=====</OutputFolder>
+
+        <!-- M#_ref M#_ref -->
+        <Reference name="=====" path="/scratch/GAS/reference/=====.fasta">
+            <FindDups>True</FindDups>
+        </Reference>
+        <Filters>
+            <ProportionFilter>0.9</ProportionFilter>
+            <CoverageFilter>10</CoverageFilter>
+        </Filters>
+        <JobSubmitter>SLURM</JobSubmitter>
+    </Options>
+    <Files>
+        <!-- /path/to/reads/ -->
+            <!-- sampleName -->
+                <!-- sampleName_R1_001.fastq.gz -->
+                <!-- sampleName_R2_001.fastq.gz -->
+=====
+    </Files>
+    <ExternalApplications>
+        <Index name="Index" path="/packages/nasp/1.1.2/bin">
+            <AdditionalArguments/>
+            <JobParameters name="nasp_index">
+                <MemRequested>2</MemRequested>
+                <NumCPUs>1</NumCPUs>
+                <Walltime>4</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </Index>
+        <MatrixGenerator name="MatrixGenerator" path="/scratch/GAS/bin/dummy.py">
+            <AdditionalArguments/>
+            <JobParameters name="nasp_matrix">
+                <MemRequested>1</MemRequested>
+                <NumCPUs>1</NumCPUs>
+                <Walltime>1</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </MatrixGenerator>
+        <Picard name="Picard" path="/packages/picard-tools/2.0.1/picard.jar">
+            <AdditionalArguments/>
+        </Picard>
+        <Samtools name="Samtools" path="/packages/samtools/0.1.18/samtools">
+            <AdditionalArguments/>
+        </Samtools>
+        <DupFinder name="DupFinder" path="/packages/MUMmer/3.23/nucmer">
+            <AdditionalArguments/>
+            <JobParameters name="">
+                <MemRequested>4</MemRequested>
+                <NumCPUs>1</NumCPUs>
+                <Walltime>4</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </DupFinder>
+        <Aligner name="BWA-mem" path="/packages/bwa/0.7.15-r1142/bwa">
+            <AdditionalArguments/>
+            <JobParameters name="">
+                <MemRequested>10</MemRequested>
+                <NumCPUs>4</NumCPUs>
+                <Walltime>36</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </Aligner>
+        <SNPCaller name="GATK" path="/packages/GenomeAnalysisTK/3.7/GenomeAnalysisTK.jar">
+            <AdditionalArguments>-stand_call_conf 100 -ploidy 1</AdditionalArguments>
+            <JobParameters name="">
+                <MemRequested>10</MemRequested>
+                <NumCPUs>4</NumCPUs>
+                <Walltime>36</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </SNPCaller>
+    </ExternalApplications>
+</NaspInputData>
