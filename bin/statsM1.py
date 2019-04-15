@@ -41,20 +41,19 @@ def main():
   for i in range(len(header)):
     cols[header[i]] = i 
   M1 = {}
-  for line in gas[1:]:
+  for line in gas:
     M1[line.split("\t")[0]] = line
 
   # get sample list of all samples > M1 80% QUALITY_BREADTH
   cutoff = 80
   DIR = "/scratch/GAS/.temp/"
   stats = read(DIR + "M1/statistics/sample_stats.tsv").split("\n")[5::4]
-  output = []
   for line in stats:
+    print(line)
     line = line.split("\t")
-    M1[line[0]] = "\t".join(M1[line[0]].split("\t")[:cols["M1"]] + [line[-7]] + M1[line[0]].split("\t")[cols["M1"]+1:])
+    M1[line[0]] = "\t".join(M1[line[0]].split("\t")[:cols["M1"]] + [line[-7]])
     if float(line[-7][:-1]) >= cutoff:
-      output.append(line[0])
-  print("\n".join(output))
+      subprocess.call("cp " + DIR + "/M1/gatk/" + line[0] + "-bwamem-gatk.vcf /scratch/GAS/nasp/M1/gatk/" + line[0] + "-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
 
   output = ["\t".join(header)]
   for index in sorted(M1.keys()):

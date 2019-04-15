@@ -66,8 +66,9 @@ def main():
     files.append("        </ReadFolder>")
 
   # write M1 config file
-  config = ["M1", "M1", ref, ref, "\n".join(files)]
-  write(DIR + "M1-config.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
+  if files:
+    config = ["M1", "M1", ref, ref, "\n".join(files)]
+    write(DIR + "M1-config.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
 
 if __name__ == "__main__":
   main()

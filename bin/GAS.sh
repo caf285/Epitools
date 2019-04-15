@@ -42,15 +42,12 @@ fi
 
 # run nasp against M1 reference for all new samples
 /scratch/GAS/bin/resolveM1.py
-#module load nasp
-#JOBID=$(sbatch --job-name="M1-nasp" --output="/dev/null" --wrap="nasp --config ${DIR}/M1-config.xml")
-JOBID=$(sbatch --job-name="test" --output="/dev/null" --wrap="echo hello")
-echo ${JOBID##* }
-sbatch  --job-name="test" --dependency=afterany:"${JOBID##* }" --output="/dev/null" --wrap="echo hello"
-# get QUALITY_BREADTH from /scratch/GAS/.temp/M1/statistics/sample_stats.tsv
-#sbatch --job-name="M1-nasp" --dependency=afterany:"${JOBID##* }" --wrap="for sample in $(/scratch/GAS/bin/statsM1.py); do echo ${DIR}/M1/gatk/${sample}-bwamem-gatk.vcf /scratch/GAS/nasp/M1/gatk/${sample}-bwamem-gatk.vcf; done"
-
-
+if [[ -e ${DIR}/M1-config.xml ]]; then
+  module load nasp
+  nasp --config ${DIR}/M1-config.xml
+  JOBID=$(squeue -h -u $(whoami) -n "nasp_matrix" -o "%i")
+  sbatch --job-name="M1-nasp" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/statsM1.py"
+fi
 
 
 # check if file or directory

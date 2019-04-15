@@ -30,6 +30,7 @@ def main():
     printHelp()
   
   gas = read("/scratch/GAS/GAS.tsv").split("\n")
+  tempGas = []
 
   for index in sys.argv:
     # get root fastq location
@@ -61,7 +62,8 @@ def main():
     time = time.stdout.read().split("\n")[0]
 
     # add sample to GAS.tsv
-    if sampleName not in list(map(lambda x: x.split("\t")[0], gas)):
+    if sampleName not in list(map(lambda x: x.split("\t")[0], gas)) and sampleName not in tempGas:
+      tempGas.append(sampleName)
       append("/scratch/GAS/GAS.tsv", "\t".join([sampleName, time, path, r1, r2, "-"]))
 
 if __name__ == "__main__":
