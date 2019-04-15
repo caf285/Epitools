@@ -58,7 +58,7 @@ def main():
   output = ["\t".join(header)]
   for index in sorted(M1.keys()):
     output.append(M1[index])
-  write("/scratch/GAS/GAS.tsv", "\n".join(output))
+  write("/scratch/GAS/GAS.tsv", "\n".join(output) + "\n")
 
 if __name__ == "__main__":
   main()
