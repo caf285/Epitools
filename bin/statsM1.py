@@ -49,7 +49,6 @@ def main():
   DIR = "/scratch/GAS/.temp/"
   stats = read(DIR + "M1/statistics/sample_stats.tsv").split("\n")[5::4]
   for line in stats:
-    print(line)
     line = line.split("\t")
     M1[line[0]] = "\t".join(M1[line[0]].split("\t")[:cols["M1"]] + [line[-7]])
     if float(line[-7][:-1]) >= cutoff:

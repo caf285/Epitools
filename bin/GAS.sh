@@ -46,28 +46,7 @@ if [[ -e ${DIR}/M1-config.xml ]]; then
   module load nasp
   nasp --config ${DIR}/M1-config.xml
   JOBID=$(squeue -h -u $(whoami) -n "nasp_matrix" -o "%i")
-  sbatch --job-name="M1-nasp" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/statsM1.py"
+  sbatch --job-name="M1-nasp" --output="/dev/null" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/statsM1.py"
 fi
 
 
-# check if file or directory
-#if [[ -f $1 ]]
-
-# if exists, flush temp and create config files
-#DIR="/scratch/GAS/.temp"
-#rm -r ${DIR}/*
-#/scratch/GAS/bin/mkConfig.py ${FASTQ}
-
-# run nasp on samples per emm type
-#module load nasp
-#for sample in $(ls ${DIR}); do
-#  for Mtype in $(ls ${DIR}/${sample}); do
-#    echo ${sample} ${Mtype}
-
-    # save job id array for dependancy
-    #JOBID=$(sbatch --job-name="${Mtype}-nasp" --output="/dev/null" --wrap="nasp --config ${DIR}/${sample}/${Mtype}/${Mtype}-config.xml")
-#    ARRAY+=:${JOBID##* }
-#  done
-#done
-
-#sbatch --job-name="ALL-nasp" --dependency=afterany"${ARRAY[@]}" --wrap="echo done"

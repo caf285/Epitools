@@ -38,9 +38,9 @@ def main():
     fastq = fastq.stdout.read().split("\n")[0]
 
     # get sampleName, time, path, and reads
-    if len(fastq.split("/")[-1].split("_R1_")) == 2:
+    if len(fastq.split("/")[-1].split("_R1_")) == 2 and "unpaired" not in fastq:
       sample = fastq.split("/")[-1].split("_R1_")
-    elif len(fastq.split("/")[-1].split("_R2_")) == 2:
+    elif len(fastq.split("/")[-1].split("_R2_")) == 2 and "unpaired" not in fastq:
       sample = fastq.split("/")[-1].split("_R2_")
     else:
       continue
