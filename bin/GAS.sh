@@ -45,7 +45,12 @@ fi
 if [[ -e ${DIR}/M1-config.xml ]]; then
   module load nasp
   nasp --config ${DIR}/M1-config.xml
-  JOBID=$(squeue -h -u $(whoami) -n "nasp_matrix" -o "%i")
+  JOBID=0
+  for id in $(squeue -h -u $(whoami) -n "nasp_matrix" -o "%i"); do
+    if (( ${id} > ${JOBID} )); then
+      JOBID=${id}
+    fi
+  done
   sbatch --job-name="M1-nasp" --output="/dev/null" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/statsM1.py"
 fi
 

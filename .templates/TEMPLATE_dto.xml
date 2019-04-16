@@ -13,6 +13,6 @@
      <files>
 
           <!-- M# M# sampleName  -->
-          <vcf aligner="BWA-mem" name="=====" snpcaller="GATK">/scratch/GAS/temp/=====/=====-bwamem-gatk.vcf</vcf>
+          <vcf aligner="BWA-mem" name="=====" snpcaller="GATK">=====</vcf>
      </files>
 </matrix_data>
