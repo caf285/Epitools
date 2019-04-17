@@ -1,0 +1,3 @@
+[console_scripts]
+nextstrain = nextstrain.cli.__main__:main
+
