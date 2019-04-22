@@ -50,7 +50,7 @@ def main():
   stats = read(DIR + "M1/statistics/sample_stats.tsv").split("\n")[5::4]
   for line in stats:
     line = line.split("\t")
-    M1[line[0]] = "\t".join(M1[line[0]].split("\t")[:cols["M1"]] + [line[-7]])
+    M1[line[0]] = "\t".join(M1[line[0]].split("\t")[:cols["M1"]] + [line[-7]] + M1[line[0]].split("\t")[min(cols["M1"]+1, len(cols)):])
     if float(line[-7][:-1]) >= cutoff:
       subprocess.call("cp " + DIR + "/M1/gatk/" + line[0] + "-bwamem-gatk.vcf /scratch/GAS/nasp/M1/gatk/" + line[0] + "-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
 

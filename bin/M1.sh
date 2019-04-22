@@ -35,23 +35,22 @@ done
 /scratch/GAS/bin/getPath.py $ARRAY
 
 # if exists, flush TEMP and create config files
-DIR="/scratch/GAS/.temp"
-if [[ $(ls ${DIR}) != "" ]]; then
-  rm -r ${DIR}/*
+if [[ $(ls /scratch/GAS/.temp) != "" ]]; then
+  rm -r /scratch/GAS/.temp/*
 fi
 
 # run nasp against M1 reference for all new samples
 /scratch/GAS/bin/resolveM1.py
-if [[ -e ${DIR}/M1-config.xml ]]; then
+if [[ -e /scratch/GAS/.temp/M1-config.xml ]]; then
   module load nasp
-  nasp --config ${DIR}/M1-config.xml
+  nasp --config /scratch/GAS/.temp/M1-config.xml
   JOBID=0
   for id in $(squeue -h -u $(whoami) -n "nasp_matrix" -o "%i"); do
     if (( ${id} > ${JOBID} )); then
       JOBID=${id}
     fi
   done
-  sbatch --job-name="M1-nasp" --output="/dev/null" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/statsM1.py"
+  JOBID=$(sbatch --job-name="M1-nasp" --output="/dev/null" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/statsM1.py")
 fi
 
-
+sbatch --job-name="ALL.sh" --output="/dev/null" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/ALL.sh"

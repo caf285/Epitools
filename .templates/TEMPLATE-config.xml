@@ -19,11 +19,20 @@
         <JobSubmitter>SLURM</JobSubmitter>
     </Options>
     <Files>
+
         <!-- /path/to/reads/ -->
+        <ReadFolder path="=====">
+
             <!-- sampleName -->
+            <ReadPair sample="=====">
+
                 <!-- sampleName_R1_001.fastq.gz -->
+                <Read1Filename>=====</Read1Filename>
+
                 <!-- sampleName_R2_001.fastq.gz -->
-=====
+                <Read2Filename>=====</Read2Filename>
+            </ReadPair>                
+        </ReadFolder>
     </Files>
     <ExternalApplications>
         <Index name="Index" path="/packages/nasp/1.1.2/bin">
@@ -36,12 +45,12 @@
                 <JobSubmitterArgs/>
             </JobParameters>
         </Index>
-        <MatrixGenerator name="MatrixGenerator" path="/scratch/GAS/bin/dummy.py">
+        <MatrixGenerator name="MatrixGenerator" path="/packages/nasp/1.1.2/lib/python3.4/site-packages/nasp/nasptool_linux_64">
             <AdditionalArguments/>
             <JobParameters name="nasp_matrix">
-                <MemRequested>1</MemRequested>
-                <NumCPUs>1</NumCPUs>
-                <Walltime>1</Walltime>
+                <MemRequested>8</MemRequested>
+                <NumCPUs>8</NumCPUs>
+                <Walltime>48</Walltime>
                 <Queue/>
                 <JobSubmitterArgs/>
             </JobParameters>

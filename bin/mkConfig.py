@@ -26,6 +26,8 @@ def main():
   # get all emm types from /scratch/GAS/nasp/
   Mtypes = subprocess.Popen("ls /scratch/GAS/nasp", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
   Mtypes = Mtypes.stdout.read().split("\n")[:-1]
+  while "M1" in Mtypes:
+    Mtypes.remove("M1")
 
   PATH = "/".join(sys.argv[1].split("/")[:-1])
 

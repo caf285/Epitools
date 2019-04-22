@@ -12,7 +12,7 @@
      </parameters>
      <files>
 
-          <!-- M# M# sampleName  -->
-          <vcf aligner="BWA-mem" name="=====" snpcaller="GATK">=====</vcf>
+          <!-- M# sampleName  -->
+          <vcf aligner="BWA-mem" name="=====" snpcaller="GATK">=====-bwamem-gatk.vcf</vcf>
      </files>
 </matrix_data>

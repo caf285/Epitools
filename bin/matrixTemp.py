@@ -40,6 +40,9 @@ def main():
   ref = ref.stdout.read().split("\n")[0].split("/")[-1].split(".fasta")[0]
   vcf = subprocess.Popen("ls /scratch/GAS/nasp/M1/gatk/", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
   vcf = vcf.stdout.read().split("\n")[:-1]
+
+  TEMP = list(map(lambda x: x.split("\t")[0], read("/scratch/cfrench/test/zika-tutorial/data/metadata.tsv").split("\n")))
+
   M1 = {}
   for sample in vcf:
     M1[sample.split("-bwamem-gatk.vcf")[0]] = "".join(["/scratch/GAS/nasp/M1/gatk/", sample])
@@ -47,12 +50,13 @@ def main():
   # get file list for config template
   files = []
   for sample in M1:
-    files.append("          <vcf aligner=\"BWA-mem\" name=\"" + sample + "\" snpcaller=\"GATK\">" + M1[sample] + "</vcf>")
+    if sample in TEMP:
+      files.append("          <vcf aligner=\"BWA-mem\" name=\"" + sample + "\" snpcaller=\"GATK\">" + M1[sample] + "</vcf>")
 
   # write M1 config file
   if files:
     config = [ref, "\n".join(files)]
-    write("/scratch/GAS/nasp/M1/ALL_dto.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
+    write("/scratch/GAS/nasp/M1/M1_dto.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
 
 if __name__ == "__main__":
   main()
