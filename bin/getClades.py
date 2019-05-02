@@ -28,7 +28,7 @@ def main():
     usage()
 
   # parse NWK
-  nwk = read("/scratch/GAS/nasp/M1/M1-newick.nwk")
+  nwk = read("/scratch/GAS/nasp/M1/matrices/ALL.nwk")
   nwk = "_".join(nwk.split(' '))
 
   clades = [[]]
