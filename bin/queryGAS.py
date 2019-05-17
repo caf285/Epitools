@@ -6,8 +6,9 @@ import datetime
 # ==================================================( functions )
 def printHelp():
   print("\nreturns all lines of GAS.tsv that follow arguments given")
-  print("usage: queryGAS.py [-h] [-n | -d | -l | -m ]")
+  print("usage: queryGAS.py [-h] [-n | -e | -d | -l | -m ]")
   print("\t-n\tSample Name")
+  print("\t-e\tExclude Name")
   print("\t-t\tType")
   print("\t-d\tDate")
   print("\t-l\tLocation")
@@ -25,7 +26,8 @@ def read(fileName):
 def main():
 
   # check args
-  args = {"-n":[], "-d":[], "-l":[], "-m":[]}
+  # fill dictionary for all accepted args
+  args = {"-n":[], "-e":[], "-d":[], "-l":[], "-m":[]}
   flag = ""
   for arg in sys.argv:
     if arg[0] == "-":
@@ -37,6 +39,9 @@ def main():
       args[flag].append(arg)
 
   # correct date args
+  # if a single date is given, only get that date
+  # if a single year is given, get all for that entire year
+  # if multiple dates ate given, get all between lowest and highest date range
   best = [datetime.datetime.now(), datetime.datetime(1,1,1)]
   if not args["-d"]:
     args["-d"] = [[best[1], best[0]]]
@@ -66,9 +71,14 @@ def main():
     args["-d"][1] = datetime.datetime.now()
 
   # correct M1
+  # expected input is a number between 0 and 100, or _ which signifies empty M1 data
+  # the % symbol is also pruned away if it exists
+  # if multiple values are passed, take the lowest, _ is prioritized before all else
   best = 100
   if not args["-m"]:
     args["-m"] = 0
+  elif "_" in "".join(args["-m"]):
+    args["-m"] = "_"
   else:
     for i in range(len(args["-m"])):
       try:
@@ -83,30 +93,61 @@ def main():
         pass
     args["-m"] = best
 
-  # get all samples within passed arguments
+  # build dictionary of columns
+  # this allows for dynamic column checks by name so GAS.tsv is free for expansion
   gas = read("/scratch/GAS/GAS.tsv").split("\n")[:-1]
   header = gas.pop(0).split("\t")
   cols = {}
   for i in range(len(header)):
     cols[header[i]] = i
 
-  query = []
+  # check query args
+  # if the line servives to the end, it added to the output
+  # GOOD LUCK DATA!! may the odds be ever in your favor!
+  query = ["\t".join(header)]
   for sample in gas:
     sample = sample.split("\t")
+
     # check sampleName
-    if len(args["-n"]) and args["-n"][0] not in sample[cols["SampleName"]]:
+    # trigger used to include all names for -n flag, but exclude all names for -e flag
+    nameTrigger = True
+    for i in range(len(args["-n"])):
+      if args["-n"][i].lower() == sample[cols["SampleName"]].lower():
+        nameTrigger = False
+    if len(args["-n"]) and nameTrigger == True:
       continue
+    else:
+      nameTrigger = False
+    for i in range(len(args["-e"])):
+      if args["-e"][i].lower() in sample[cols["SampleName"]].lower():
+        nameTrigger = True
+    if len(args["-e"]) and nameTrigger == True:
+      continue
+
     # check date
     date = sample[cols["Date"]].split("-")
     date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]))
     if date < args["-d"][0] or date > args["-d"][1]:
       continue
+
     # check location
-    if len(args["-l"]) and args["-l"][0].lower() not in "".join([sample[cols["Facility"]], sample[cols["City"]], sample[cols["County"]], sample[cols["State"]]]).lower():
-      continue
+    if len(args["-l"]):
+      if args["-l"][0] == "ALL":
+        if "".join([sample[cols["Facility"]], sample[cols["City"]], sample[cols["County"]], sample[cols["State"]]]).lower() == "____":
+          continue
+      elif args["-l"][0].lower() not in "".join([sample[cols["Facility"]], sample[cols["City"]], sample[cols["County"]], sample[cols["State"]]]).lower():
+        continue
+
     # check mType
-    if args["-m"] > float(sample[cols["M1"]][:-1]):
-      continue
+    if args["-m"] != []:
+      if args["-m"] == "_":
+        if sample[cols["M1"]] != "_":
+          continue
+      elif args["-m"] > float(sample[cols["M1"]][:-1]):
+        continue
+
+    # CONGRATULATIONS!!! you have fought bravely and now receive the grand honor of being printed to the screen!
+    # Will you be destined to waste away in the endess walls of text, or will your journey continue after piping into another script?
     query.append("\t".join(sample))
   print("\n".join(query))
 
