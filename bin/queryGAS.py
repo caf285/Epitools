@@ -95,7 +95,7 @@ def main():
 
   # build dictionary of columns
   # this allows for dynamic column checks by name so GAS.tsv is free for expansion
-  gas = read("/scratch/GAS/GAS.tsv").split("\n")[:-1]
+  gas = read("/scratch/GAS/GAS.tsv").strip().split("\n")
   header = gas.pop(0).split("\t")
   cols = {}
   for i in range(len(header)):
@@ -143,7 +143,7 @@ def main():
       if args["-m"] == "_":
         if sample[cols["M1"]] != "_":
           continue
-      elif args["-m"] > float(sample[cols["M1"]][:-1]):
+      elif sample[cols["M1"]] == "_" or args["-m"] > float(sample[cols["M1"]][:-1]):
         continue
 
     # CONGRATULATIONS!!! you have fought bravely and now receive the grand honor of being printed to the screen!

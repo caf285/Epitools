@@ -2,6 +2,7 @@
 
 import sys
 import os
+from time import sleep
 import subprocess
 
 # ==================================================( functions )
@@ -16,6 +17,11 @@ def read(fileName):
   file = f.read().strip()
   f.close
   return file
+
+def write(fileName, output):
+  f = open(fileName, 'w')
+  f.write(output + "\n")
+  f.close()
 
 def append(fileName, output):
   f = open(fileName, 'a')
@@ -64,7 +70,7 @@ def main():
     # add sample to GAS.tsv
     if sampleName not in list(map(lambda x: x.split("\t")[0], gas)) and sampleName not in tempGas:
       tempGas.append(sampleName)
-      append("/scratch/GAS/GAS.tsv", "\t".join([sampleName, time, path, r1, r2, "-"]))
+      append("/scratch/GAS/GAS.tsv", "\t".join([sampleName, "GAS", time, "_", "_", "_", "_", path, r1, r2, "_"]))
 
 if __name__ == "__main__":
   main()

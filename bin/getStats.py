@@ -46,18 +46,19 @@ def main():
 
   # get sample list of all samples > M1 80% QUALITY_BREADTH
   cutoff = 80
-  DIR = "/scratch/GAS/.temp/"
-  stats = read(DIR + "M1/statistics/sample_stats.tsv").split("\n")[5::4]
+  DIR = "/scratch/GAS/.temp/" + sys.argv[1]
+  stats = read(DIR + "/statistics/sample_stats.tsv").split("\n")[5::4]
   for line in stats:
     line = line.split("\t")
     M1[line[0]] = "\t".join(M1[line[0]].split("\t")[:cols["M1"]] + [line[-7]] + M1[line[0]].split("\t")[min(cols["M1"]+1, len(cols)):])
     if float(line[-7][:-1]) >= cutoff:
-      subprocess.call("cp " + DIR + "/M1/gatk/" + line[0] + "-bwamem-gatk.vcf /scratch/GAS/nasp/M1/gatk/" + line[0] + "-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+      subprocess.call("cp " + DIR + "/gatk/" + line[0] + "-bwamem-gatk.vcf /scratch/GAS/nasp/M1/gatk/" + line[0] + "-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
 
   output = ["\t".join(header)]
   for index in sorted(M1.keys()):
     output.append(M1[index])
-  write("/scratch/GAS/GAS.tsv", "\n".join(output) + "\n")
+  print("\n".join(output))
+  write("/scratch/GAS/GAS.tsv", "\n".join(output))
 
 if __name__ == "__main__":
   main()

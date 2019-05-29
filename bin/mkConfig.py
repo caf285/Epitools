@@ -8,11 +8,13 @@ import random
 
 # ==================================================( functions )
 def printHelp():
-  print("\ncreates a NASP style config file in /scratch/GAS/.temp/<ref>/<ref>-config.xml")
+  print("\ncreates a NASP config file in /scratch/GAS/.temp/<ref>-<rand>-config.xml")
+  print("<rand>:\t10 digit alpha numeric string")
+  print("<ref>:\treference file name")
   print("usage: mkConfig.py [-h] REFERENCE GAS")
   print("\tREFERENCE\tNasp run reference file")
   print("\tGAS\tqueryGAS.py arguments")
-  print("example:\n\t./mkConfig.py /scratch/GAS/reference/M1-ASM678v2.fasta\n")
+  print("example:\n\t./mkConfig.py /scratch/GAS/reference/M1-ASM678v2-is8swne7rd7.fasta\n")
   exit(0)
 
 def read(fileName):
@@ -70,10 +72,10 @@ def main():
   # write M1 config file
   if files:
     config = [ref + "-" + randStr, ref + "-" + randStr, ref, ref, "\n".join(files)]
-    print(DIR + ref + "-" + randStr + "-config.xml")
+    print(ref + "-" + randStr + "-config.xml")
 
     write(DIR + ref + "-" + randStr + "-config.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
-    subprocess.call("module load nasp; nasp --config " + DIR + ref + "-" + randStr + "-config.xml", universal_newlines=True, shell=True)
+    #subprocess.call("module load nasp; nasp --config " + DIR + ref + "-" + randStr + "-config.xml", universal_newlines=True, shell=True)
 
 if __name__ == "__main__":
   main()
