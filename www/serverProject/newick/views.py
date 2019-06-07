@@ -20,48 +20,37 @@ class InitView(generic.ListView):
 class IndexView(LoginRequiredMixin, generic.ListView):
 #class IndexView(generic.ListView):
   template_name = 'newick/index.html'
-  context_object_name = 'index'
+  context_object_name = 'indexList'
+  def get_queryset(self):
+    return ""
+
+class DemoAntibiogramView(LoginRequiredMixin, generic.ListView):
+  template_name = 'demo/demoAntibiogram.html'
+  context_object_name = 'demoAntibiogram'
+  def get_queryset(self):
+    return ""
+
+class DemoQueryView(LoginRequiredMixin, generic.ListView):
+  template_name = 'demo/demoQuery.html'
+  context_object_name = 'demoQueryList'
   def get_queryset(self):
     query = {}
     query["sample"] = Sample.objects.all()
-    return query
+    query["year"] = self.getYear()
+    queryList = [query]
+    return queryList
   def getYear(self):
     return str(datetime.datetime.now().year)
 
-class SamplesAddView(LoginRequiredMixin, generic.ListView):
-  template_name = 'newick/samplesAdd.html'
-  context_object_name = 'samplesAdd'
-  def get_queryset(self):
-    query = {}
-    query["pathogens"] = Pathogen.objects.all()
-    return query
-
-class SamplesViewView(LoginRequiredMixin, generic.ListView):
-  template_name = 'newick/samplesView.html'
-  context_object_name = 'samplesView'
+class DemoEmmtypeView(LoginRequiredMixin, generic.ListView):
+  template_name = 'demo/demoEmmtype.html'
+  context_object_name = 'demoEmmtype'
   def get_queryset(self):
     return ""
 
-class SamplesMapView(LoginRequiredMixin, generic.ListView):
-  template_name = 'newick/samplesMap.html'
-  context_object_name = 'samplesMap'
+class TestView(LoginRequiredMixin, generic.ListView):
+#class IndexView(generic.ListView):
+  template_name = 'newick/test.html'
   def get_queryset(self):
     return ""
 
-class TreesAddView(LoginRequiredMixin, generic.ListView):
-  template_name = 'newick/treesAdd.html'
-  context_object_name = 'index'
-  def get_queryset(self):
-    return ""
-
-class TreesViewView(LoginRequiredMixin, generic.ListView):
-  template_name = 'newick/treesView.html'
-  context_object_name = 'index'
-  def get_queryset(self):
-    return ""
-
-class TreesMapView(LoginRequiredMixin, generic.ListView):
-  template_name = 'newick/treesMap.html'
-  context_object_name = 'index'
-  def get_queryset(self):
-    return ""

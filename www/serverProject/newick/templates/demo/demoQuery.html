@@ -1,0 +1,39 @@
+{% extends "demo/demo.html" %}
+
+{% block content %}
+
+  <b>Class:</b></br>
+  <ul>
+    class DemoQueryView(LoginRequiredMixin, generic.ListView):</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;template_name = 'demo/demoQuery.html'</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;context_object_name = 'demoQueryList'</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;def get_queryset(self):</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;query = {}</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;query["sample"] = Sample.objects.all()</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;query["year"] = self.getYear()</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queryList = [query]</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return queryList</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;def getYear(self):</br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return str(datetime.datetime.now().year)
+  </ul>
+  <b>Query List:</b>
+  <ul>
+    <li>{{ demoQueryList }}</li>
+    {% for line in demoQueryList %}
+      <li>Year: {{ line.year }}, Sample: {{ line.sample }}</li>
+      <b>Indeces:</b>
+      <ul>
+        {% for value in line.items %}
+          <li>{{ value }}, {{ value.0 }}: {{ value.1 }}</li>
+        {% endfor %}
+      </ul>
+      <b>Key, Value Pairs:</b>
+      <ul>
+        {% for value in line.items %}
+          <li>{{ value }}, {{ value.0 }}: {{ value.1 }}</li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  </ul>
+
+{% endblock %}

@@ -34,25 +34,15 @@
             {% if user.is_authenticated %}
               <li class="nav-item dropdown {% block samples %}{% endblock %}">
                 <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Samples
+                  Demo
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="/samples/add/">Add</a>
-                  <a class="dropdown-item" href="/samples/view/">View</a>
-                  <a class="dropdown-item" href="/samples/map/">Map</a>
+                  <a class="dropdown-item" href="/demo/antibiogram/">Antibiogram</a>
+                  <a class="dropdown-item" href="/demo/query/">Query</a>
+                  <a class="dropdown-item" href="/demo/emmtype/">Emmtype Map</a>
                 </div>
               </li>
-              <li class="nav-item dropdown {% block trees %}{% endblock %}">
-                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Trees
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="/trees/add/">Add</a>
-                  <a class="dropdown-item" href="/trees/view/">View</a>
-                  <a class="dropdown-item" href="/trees/map/">Map</a>
-                </div>
-              </li>
-              <li class="nav-item {% block demo %}{% endblock %}"><a class="nav-link" href="/demo/" target="_blank">Demo</a></li>
+              <!-- <li class="nav-item {% block demo %}{% endblock %}"><a class="nav-link" href="/demo/" target="_blank">Demo</a></li> -->
             {% endif %}
           </ul>
         </div>
