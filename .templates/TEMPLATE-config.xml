@@ -2,13 +2,13 @@
 <NaspInputData>
     <Options>
 
-        <!-- M# -->
+        <!-- <ref>-<randStr> -->
         <RunName>=====</RunName>
 
-        <!-- M# -->
+        <!-- <ref>-<randStr> -->
         <OutputFolder>/scratch/GAS/.temp/=====</OutputFolder>
 
-        <!-- M#_ref M#_ref -->
+        <!-- ref ref -->
         <Reference name="=====" path="/scratch/GAS/reference/=====.fasta">
             <FindDups>True</FindDups>
         </Reference>
@@ -19,20 +19,11 @@
         <JobSubmitter>SLURM</JobSubmitter>
     </Options>
     <Files>
-
         <!-- /path/to/reads/ -->
-        <ReadFolder path="=====">
-
             <!-- sampleName -->
-            <ReadPair sample="=====">
-
                 <!-- sampleName_R1_001.fastq.gz -->
-                <Read1Filename>=====</Read1Filename>
-
                 <!-- sampleName_R2_001.fastq.gz -->
-                <Read2Filename>=====</Read2Filename>
-            </ReadPair>                
-        </ReadFolder>
+=====
     </Files>
     <ExternalApplications>
         <Index name="Index" path="/packages/nasp/1.1.2/bin">

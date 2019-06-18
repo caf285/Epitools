@@ -2,17 +2,17 @@
 <matrix_data>
      <parameters>
 
-          <!-- M# M# M# M# -->
-          <reference-fasta>/scratch/GAS/nasp/=====/reference/reference.fasta</reference-fasta>
-          <matrix-folder>/scratch/GAS/nasp/=====/matrices</matrix-folder>
-          <stats-folder>/scratch/GAS/nasp/=====/statistics</stats-folder>
-          <reference-dups>/scratch/GAS/nasp/=====/reference/duplicates.txt</reference-dups>
+          <!-- DIR DIR DIR DIR -->
+          <reference-fasta>=====/reference/reference.fasta</reference-fasta>
+          <matrix-folder>=====/matrices</matrix-folder>
+          <stats-folder>=====/statistics</stats-folder>
+          <reference-dups>=====/reference/duplicates.txt</reference-dups>
           <minimum-coverage>10</minimum-coverage>
           <minimum-proportion>0.5</minimum-proportion>
      </parameters>
      <files>
 
-          <!-- M# sampleName  -->
-          <vcf aligner="BWA-mem" name="=====" snpcaller="GATK">=====-bwamem-gatk.vcf</vcf>
+          <!-- sampleName path -->
+=====
      </files>
 </matrix_data>
