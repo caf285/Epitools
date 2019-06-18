@@ -14,7 +14,7 @@ def printHelp():
   print("usage: mkConfig.py [-h] REFERENCE GAS")
   print("\tREFERENCE\tNasp run reference file")
   print("\tGAS\tqueryGAS.py arguments")
-  print("example:\n\t./mkConfig.py /scratch/GAS/reference/M1-ASM678v2-is8swne7rd7.fasta\n")
+  print("example:\n\t./mkConfig.py /scratch/GAS/reference/M1-TG92300.fasta -m 80\n")
   exit(0)
 
 def read(fileName):

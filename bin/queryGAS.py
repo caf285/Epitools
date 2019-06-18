@@ -112,7 +112,7 @@ def main():
     # trigger used to include all names for -n flag, but exclude all names for -e flag
     nameTrigger = True
     for i in range(len(args["-n"])):
-      if args["-n"][i].lower() == sample[cols["SampleName"]].lower():
+      if args["-n"][i].lower() in sample[cols["SampleName"]].lower():
         nameTrigger = False
     if len(args["-n"]) and nameTrigger == True:
       continue

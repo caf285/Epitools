@@ -6,9 +6,10 @@ import subprocess
 
 # ==================================================( functions )
 def printHelp():
-  print("\nget all M1 vcf files and make nasp matrix file")
-  print("usage: matrixM1.py [-h]")
-  print("example:\n\t./matrixM1.py\n")
+  print("\ncreates a nasp matrix dto-file in DIR argument")
+  print("usage: mkMatrix.py [-h] DIR")
+  print("\tDIR\tlocation of nasp run")
+  print("example:\n\t./mkMatrix.py /scratch/GAS/nasp/All/")
   exit(0)
 
 def read(fileName):
@@ -31,28 +32,39 @@ def append(fileName, output):
 def main():
 
   # check args
-  if "-h" in sys.argv:
+  if "-h" in sys.argv or len(sys.argv) < 2:
     printHelp()
+  else:
+    DIR = sys.argv[1]
+    gas = " ".join(sys.argv[2:])
+
+  if not os.path.exists(DIR):
+    printHelp()
+  else:
+    DIR = os.path.abspath(DIR)
+
+  # get all samples with no M1 data
+  gas = subprocess.Popen("/scratch/GAS/bin/queryGAS.py " + gas, universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+  gas = list(map(lambda x: x.split("\t")[0], gas.stdout.read().split("\n")[1:-1]))
 
   # get template, reference, and vcf file names
-  template = read("/scratch/GAS/.templates/TEMPLATE_M1_dto.xml").split("=====")
-  ref = subprocess.Popen("ls /scratch/GAS/reference/M1-*", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
-  ref = ref.stdout.read().split("\n")[0].split("/")[-1].split(".fasta")[0]
-  vcf = subprocess.Popen("ls /scratch/GAS/nasp/M1/gatk/", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+  template = read("/scratch/GAS/.templates/TEMPLATE_dto.xml").split("=====")
+  vcf = subprocess.Popen("ls " + DIR + "/gatk/*-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
   vcf = vcf.stdout.read().split("\n")[:-1]
-  M1 = {}
-  for sample in vcf:
-    M1[sample.split("-bwamem-gatk.vcf")[0]] = "".join(["/scratch/GAS/nasp/M1/gatk/", sample])
+
+  print(vcf)
+  print(gas)
 
   # get file list for config template
   files = []
-  for sample in M1:
-    files.append("          <vcf aligner=\"BWA-mem\" name=\"" + sample + "\" snpcaller=\"GATK\">" + M1[sample] + "</vcf>")
+  for sample in vcf:
+    if sample.split("/")[-1].split("-bwamem-gatk.vcf")[0] in gas:
+      files.append("          <vcf aligner=\"BWA-mem\" name=\"" + sample.split("/")[-1].split("-bwamem-gatk.vcf")[0] + "\" snpcaller=\"GATK\">" + os.path.abspath(sample) + "</vcf>")
 
   # write M1 config file
   if files:
-    config = [ref, "\n".join(files)]
-    write("/scratch/GAS/nasp/M1/ALL_dto.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
+    config = [DIR, DIR, DIR, DIR, "\n".join(files)]
+    write(DIR + "/matrix_dto.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
 
 if __name__ == "__main__":
   main()
