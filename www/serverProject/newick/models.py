@@ -9,6 +9,17 @@ import datetime
 from django.db import models
 from django.utils import timezone
 
+class PCA(models.Model):
+  id = models.PositiveSmallIntegerField('PcaNumber', primary_key=True)
+
+class County(models.Model):
+  id = models.CharField('CountyName', max_length=50, primary_key=True)
+  polygon = models.TextField('Polygon', max_length=10000, default='[]')
+
+class MPC(models.Model):
+  id = models.CharField('MajorPopulationCenter', max_length=50, primary_key=True)
+
+'''
 class Pathogen(models.Model):
   id = models.AutoField(primary_key=True) 
   name = models.CharField('pathogen name', max_length=100)
@@ -34,6 +45,7 @@ class Tree(models.Model):
   svg = models.CharField('image file', max_length=250)
   dataFile = models.CharField('newick file', max_length=250)
   samples = models.ManyToManyField(Sample)
+'''
 
 '''
 class Question(models.Model):

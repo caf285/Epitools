@@ -1,0 +1,1127 @@
+{% extends "demo/demo.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+
+  {% load static %}
+  <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
+  <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
+  <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
+  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+  <style>
+    .leaflet-container {  /* all maps */
+      width: 60%;
+      height: 800px;
+      z-index: 1;
+      margin-left: 40%;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+  {% leaflet_map "main" %}
+  <div style="position:relative;">
+    <div style="text-align:center;width:100%;position:absolute;top:-50px;z-index:100;">
+      <div style="position: relative;top:-36px">
+        <div id="yearScaleLabel" style="width:60%;margin-left:40%;font-size:36px;"></div>
+        <div class="controls" style="width:60%;margin-left:40%;">
+          <input style="width:300px;" type="range" id="yearScale" min="0" max="5">
+        </div>
+      </div>
+    </div>
+    <div style="width:40%;position:absolute;top:-800px;left:0;z-index:100;">
+      <div id="testPlot" style="width:100%;height:800px;">
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    var tester = document.getElementById("testPlot");
+
+    var colors = ["#A6D96A", "#D9EF8B", "#FEE08B", "#FDAE61", "#E2001A", "#A8121C", "#650D0D"]
+    var countyCoordinates = {"Apache": [36.1,-109.479], "Cochise": [31.89,-109.72], "Coconino": [35.9,-111.654], "Gila": [33.7,-110.55], "Graham": [32.9,-109.9], "Greenlee": [33.35,-109.259], "LaPaz": [33.8,-113.9], "Maricopa": [33.55,-112.4], "Mohave": [35.4,-113.85], "Navajo": [34.939,-110.25], "Pima": [32.1,-111.8], "Pinal": [32.8,-111.3], "SantaCruz": [31.5,-110.81], "Yavapai": [34.524,-112.478], "Yuma": [32.7,-113.9]}
+    var years = ["2013", "2014", "2015", "2016", "2017", "2018"]
+    var pathogens = ["MRSA, Oxicillin resistant", "VRE, E. faecium Vancomycin resistant", "VRE, E. faecalis Vancomycin resistant", "ESBL, K. pneumoniae ESBL-positive", "ESBL, K. oxytoca ESBL-positive", "ESBL, E. coli ESBL-positive", "CRE, E. coli carbapenum resistant", "CRE, K. pneumoniae carbapenum resistant", "C. diff, #Pos/#tested"]
+
+    var sampleYears = {};
+    for (var i in years) {
+      sampleYears[years[i]] = {};
+      sampleYears[years[i]]["overlay"] = L.layerGroup([]);
+      for (var county in countyCoordinates) {
+        sampleYears[years[i]][county] = {};
+        for (var j in pathogens) {
+          sampleYears[years[i]][county][pathogens[j]] = {"n": 0, "%": 0}
+        };
+      };
+    };
+
+sampleYears["2013"]["Apache"]["C. diff, #Pos/#tested"] = {"n": 391, "%": 12 }
+sampleYears["2014"]["Apache"]["C. diff, #Pos/#tested"] = {"n": 163, "%": 8 }
+sampleYears["2015"]["Apache"]["C. diff, #Pos/#tested"] = {"n": 391, "%": 10 }
+sampleYears["2016"]["Apache"]["C. diff, #Pos/#tested"] = {"n": 619, "%": 9 }
+sampleYears["2017"]["Apache"]["C. diff, #Pos/#tested"] = {"n": 847, "%": 10 }
+sampleYears["2018"]["Apache"]["C. diff, #Pos/#tested"] = {"n": 1075, "%": 10 }
+sampleYears["2013"]["Cochise"]["C. diff, #Pos/#tested"] = {"n": 349, "%": 9 }
+sampleYears["2014"]["Cochise"]["C. diff, #Pos/#tested"] = {"n": 298, "%": 10 }
+sampleYears["2015"]["Cochise"]["C. diff, #Pos/#tested"] = {"n": 349, "%": 10 }
+sampleYears["2016"]["Cochise"]["C. diff, #Pos/#tested"] = {"n": 400, "%": 10 }
+sampleYears["2017"]["Cochise"]["C. diff, #Pos/#tested"] = {"n": 452, "%": 10 }
+sampleYears["2018"]["Cochise"]["C. diff, #Pos/#tested"] = {"n": 503, "%": 10 }
+sampleYears["2013"]["Coconino"]["C. diff, #Pos/#tested"] = {"n": 367, "%": 8 }
+sampleYears["2014"]["Coconino"]["C. diff, #Pos/#tested"] = {"n": 313, "%": 9 }
+sampleYears["2015"]["Coconino"]["C. diff, #Pos/#tested"] = {"n": 367, "%": 9 }
+sampleYears["2016"]["Coconino"]["C. diff, #Pos/#tested"] = {"n": 421, "%": 9 }
+sampleYears["2017"]["Coconino"]["C. diff, #Pos/#tested"] = {"n": 475, "%": 9 }
+sampleYears["2018"]["Coconino"]["C. diff, #Pos/#tested"] = {"n": 529, "%": 9 }
+sampleYears["2013"]["Gila"]["C. diff, #Pos/#tested"] = {"n": 142, "%": 10 }
+sampleYears["2014"]["Gila"]["C. diff, #Pos/#tested"] = {"n": 121, "%": 11 }
+sampleYears["2015"]["Gila"]["C. diff, #Pos/#tested"] = {"n": 142, "%": 11 }
+sampleYears["2016"]["Gila"]["C. diff, #Pos/#tested"] = {"n": 163, "%": 11 }
+sampleYears["2017"]["Gila"]["C. diff, #Pos/#tested"] = {"n": 184, "%": 11 }
+sampleYears["2018"]["Gila"]["C. diff, #Pos/#tested"] = {"n": 205, "%": 11 }
+sampleYears["2013"]["Graham"]["C. diff, #Pos/#tested"] = {"n": 95, "%": 8 }
+sampleYears["2014"]["Graham"]["C. diff, #Pos/#tested"] = {"n": 81, "%": 9 }
+sampleYears["2015"]["Graham"]["C. diff, #Pos/#tested"] = {"n": 95, "%": 9 }
+sampleYears["2016"]["Graham"]["C. diff, #Pos/#tested"] = {"n": 109, "%": 9 }
+sampleYears["2017"]["Graham"]["C. diff, #Pos/#tested"] = {"n": 123, "%": 9 }
+sampleYears["2018"]["Graham"]["C. diff, #Pos/#tested"] = {"n": 137, "%": 9 }
+sampleYears["2013"]["Greenlee"]["C. diff, #Pos/#tested"] = {"n": 21, "%": 10 }
+sampleYears["2014"]["Greenlee"]["C. diff, #Pos/#tested"] = {"n": 18, "%": 11 }
+sampleYears["2015"]["Greenlee"]["C. diff, #Pos/#tested"] = {"n": 21, "%": 11 }
+sampleYears["2016"]["Greenlee"]["C. diff, #Pos/#tested"] = {"n": 24, "%": 11 }
+sampleYears["2017"]["Greenlee"]["C. diff, #Pos/#tested"] = {"n": 27, "%": 11 }
+sampleYears["2018"]["Greenlee"]["C. diff, #Pos/#tested"] = {"n": 31, "%": 11 }
+sampleYears["2013"]["LaPaz"]["C. diff, #Pos/#tested"] = {"n": 55, "%": 10 }
+sampleYears["2014"]["LaPaz"]["C. diff, #Pos/#tested"] = {"n": 47, "%": 8 }
+sampleYears["2015"]["LaPaz"]["C. diff, #Pos/#tested"] = {"n": 55, "%": 9 }
+sampleYears["2016"]["LaPaz"]["C. diff, #Pos/#tested"] = {"n": 63, "%": 9 }
+sampleYears["2017"]["LaPaz"]["C. diff, #Pos/#tested"] = {"n": 71, "%": 9 }
+sampleYears["2018"]["LaPaz"]["C. diff, #Pos/#tested"] = {"n": 79, "%": 9 }
+sampleYears["2013"]["Maricopa"]["C. diff, #Pos/#tested"] = {"n": 10894, "%": 12 }
+sampleYears["2014"]["Maricopa"]["C. diff, #Pos/#tested"] = {"n": 9288, "%": 8 }
+sampleYears["2015"]["Maricopa"]["C. diff, #Pos/#tested"] = {"n": 10894, "%": 10 }
+sampleYears["2016"]["Maricopa"]["C. diff, #Pos/#tested"] = {"n": 12501, "%": 9 }
+sampleYears["2017"]["Maricopa"]["C. diff, #Pos/#tested"] = {"n": 14107, "%": 10 }
+sampleYears["2018"]["Maricopa"]["C. diff, #Pos/#tested"] = {"n": 15714, "%": 10 }
+sampleYears["2013"]["Mohave"]["C. diff, #Pos/#tested"] = {"n": 1370, "%": 12 }
+sampleYears["2014"]["Mohave"]["C. diff, #Pos/#tested"] = {"n": 1026, "%": 13 }
+sampleYears["2015"]["Mohave"]["C. diff, #Pos/#tested"] = {"n": 1370, "%": 13 }
+sampleYears["2016"]["Mohave"]["C. diff, #Pos/#tested"] = {"n": 1714, "%": 13 }
+sampleYears["2017"]["Mohave"]["C. diff, #Pos/#tested"] = {"n": 2058, "%": 13 }
+sampleYears["2018"]["Mohave"]["C. diff, #Pos/#tested"] = {"n": 2402, "%": 13 }
+sampleYears["2013"]["Navajo"]["C. diff, #Pos/#tested"] = {"n": 172, "%": 8 }
+sampleYears["2014"]["Navajo"]["C. diff, #Pos/#tested"] = {"n": 259, "%": 12 }
+sampleYears["2015"]["Navajo"]["C. diff, #Pos/#tested"] = {"n": 346, "%": 10 }
+sampleYears["2016"]["Navajo"]["C. diff, #Pos/#tested"] = {"n": 433, "%": 11 }
+sampleYears["2017"]["Navajo"]["C. diff, #Pos/#tested"] = {"n": 520, "%": 11 }
+sampleYears["2018"]["Navajo"]["C. diff, #Pos/#tested"] = {"n": 607, "%": 11 }
+sampleYears["2013"]["Pima"]["C. diff, #Pos/#tested"] = {"n": 2739, "%": 11 }
+sampleYears["2014"]["Pima"]["C. diff, #Pos/#tested"] = {"n": 2335, "%": 9 }
+sampleYears["2015"]["Pima"]["C. diff, #Pos/#tested"] = {"n": 2739, "%": 10 }
+sampleYears["2016"]["Pima"]["C. diff, #Pos/#tested"] = {"n": 3143, "%": 10 }
+sampleYears["2017"]["Pima"]["C. diff, #Pos/#tested"] = {"n": 3547, "%": 10 }
+sampleYears["2018"]["Pima"]["C. diff, #Pos/#tested"] = {"n": 3951, "%": 10 }
+sampleYears["2013"]["Pinal"]["C. diff, #Pos/#tested"] = {"n": 887, "%": 9 }
+sampleYears["2014"]["Pinal"]["C. diff, #Pos/#tested"] = {"n": 756, "%": 9 }
+sampleYears["2015"]["Pinal"]["C. diff, #Pos/#tested"] = {"n": 887, "%": 9 }
+sampleYears["2016"]["Pinal"]["C. diff, #Pos/#tested"] = {"n": 1018, "%": 9 }
+sampleYears["2017"]["Pinal"]["C. diff, #Pos/#tested"] = {"n": 1149, "%": 9 }
+sampleYears["2018"]["Pinal"]["C. diff, #Pos/#tested"] = {"n": 1280, "%": 9 }
+sampleYears["2013"]["SantaCruz"]["C. diff, #Pos/#tested"] = {"n": 117, "%": 8 }
+sampleYears["2014"]["SantaCruz"]["C. diff, #Pos/#tested"] = {"n": 100, "%": 10 }
+sampleYears["2015"]["SantaCruz"]["C. diff, #Pos/#tested"] = {"n": 117, "%": 9 }
+sampleYears["2016"]["SantaCruz"]["C. diff, #Pos/#tested"] = {"n": 134, "%": 10 }
+sampleYears["2017"]["SantaCruz"]["C. diff, #Pos/#tested"] = {"n": 151, "%": 10 }
+sampleYears["2018"]["SantaCruz"]["C. diff, #Pos/#tested"] = {"n": 169, "%": 10 }
+sampleYears["2013"]["Yavapai"]["C. diff, #Pos/#tested"] = {"n": 581, "%": 10 }
+sampleYears["2014"]["Yavapai"]["C. diff, #Pos/#tested"] = {"n": 495, "%": 10 }
+sampleYears["2015"]["Yavapai"]["C. diff, #Pos/#tested"] = {"n": 581, "%": 10 }
+sampleYears["2016"]["Yavapai"]["C. diff, #Pos/#tested"] = {"n": 666, "%": 10 }
+sampleYears["2017"]["Yavapai"]["C. diff, #Pos/#tested"] = {"n": 752, "%": 10 }
+sampleYears["2018"]["Yavapai"]["C. diff, #Pos/#tested"] = {"n": 837, "%": 10 }
+sampleYears["2013"]["Yuma"]["C. diff, #Pos/#tested"] = {"n": 520, "%": 9 }
+sampleYears["2014"]["Yuma"]["C. diff, #Pos/#tested"] = {"n": 444, "%": 11 }
+sampleYears["2015"]["Yuma"]["C. diff, #Pos/#tested"] = {"n": 520, "%": 10 }
+sampleYears["2016"]["Yuma"]["C. diff, #Pos/#tested"] = {"n": 597, "%": 11 }
+sampleYears["2017"]["Yuma"]["C. diff, #Pos/#tested"] = {"n": 674, "%": 11 }
+sampleYears["2018"]["Yuma"]["C. diff, #Pos/#tested"] = {"n": 674, "%": 11 }
+sampleYears["2013"]["Apache"]["CRE, E. coli carbapenum resistant"] = {"n": 2426, "%": 0 }
+sampleYears["2014"]["Apache"]["CRE, E. coli carbapenum resistant"] = {"n": 3037, "%": 0 }
+sampleYears["2015"]["Apache"]["CRE, E. coli carbapenum resistant"] = {"n": 3648, "%": 0 }
+sampleYears["2016"]["Apache"]["CRE, E. coli carbapenum resistant"] = {"n": 4259, "%": 0 }
+sampleYears["2017"]["Apache"]["CRE, E. coli carbapenum resistant"] = {"n": 4870, "%": 0 }
+sampleYears["2018"]["Apache"]["CRE, E. coli carbapenum resistant"] = {"n": 5481, "%": 0 }
+sampleYears["2013"]["Cochise"]["CRE, E. coli carbapenum resistant"] = {"n": 2156, "%": 0 }
+sampleYears["2014"]["Cochise"]["CRE, E. coli carbapenum resistant"] = {"n": 2040, "%": 0 }
+sampleYears["2015"]["Cochise"]["CRE, E. coli carbapenum resistant"] = {"n": 2156, "%": 0 }
+sampleYears["2016"]["Cochise"]["CRE, E. coli carbapenum resistant"] = {"n": 2272, "%": 0 }
+sampleYears["2017"]["Cochise"]["CRE, E. coli carbapenum resistant"] = {"n": 2389, "%": 0 }
+sampleYears["2018"]["Cochise"]["CRE, E. coli carbapenum resistant"] = {"n": 2505, "%": 0 }
+sampleYears["2013"]["Coconino"]["CRE, E. coli carbapenum resistant"] = {"n": 2267, "%": 0 }
+sampleYears["2014"]["Coconino"]["CRE, E. coli carbapenum resistant"] = {"n": 2144, "%": 0 }
+sampleYears["2015"]["Coconino"]["CRE, E. coli carbapenum resistant"] = {"n": 2267, "%": 0 }
+sampleYears["2016"]["Coconino"]["CRE, E. coli carbapenum resistant"] = {"n": 2390, "%": 0 }
+sampleYears["2017"]["Coconino"]["CRE, E. coli carbapenum resistant"] = {"n": 2512, "%": 0 }
+sampleYears["2018"]["Coconino"]["CRE, E. coli carbapenum resistant"] = {"n": 2635, "%": 0 }
+sampleYears["2013"]["Gila"]["CRE, E. coli carbapenum resistant"] = {"n": 877, "%": 0 }
+sampleYears["2014"]["Gila"]["CRE, E. coli carbapenum resistant"] = {"n": 829, "%": 0 }
+sampleYears["2015"]["Gila"]["CRE, E. coli carbapenum resistant"] = {"n": 877, "%": 0 }
+sampleYears["2016"]["Gila"]["CRE, E. coli carbapenum resistant"] = {"n": 924, "%": 0 }
+sampleYears["2017"]["Gila"]["CRE, E. coli carbapenum resistant"] = {"n": 972, "%": 0 }
+sampleYears["2018"]["Gila"]["CRE, E. coli carbapenum resistant"] = {"n": 1019, "%": 0 }
+sampleYears["2013"]["Graham"]["CRE, E. coli carbapenum resistant"] = {"n": 586, "%": 0 }
+sampleYears["2014"]["Graham"]["CRE, E. coli carbapenum resistant"] = {"n": 555, "%": 0 }
+sampleYears["2015"]["Graham"]["CRE, E. coli carbapenum resistant"] = {"n": 586, "%": 0 }
+sampleYears["2016"]["Graham"]["CRE, E. coli carbapenum resistant"] = {"n": 618, "%": 0 }
+sampleYears["2017"]["Graham"]["CRE, E. coli carbapenum resistant"] = {"n": 650, "%": 0 }
+sampleYears["2018"]["Graham"]["CRE, E. coli carbapenum resistant"] = {"n": 682, "%": 0 }
+sampleYears["2013"]["Greenlee"]["CRE, E. coli carbapenum resistant"] = {"n": 131, "%": 0 }
+sampleYears["2014"]["Greenlee"]["CRE, E. coli carbapenum resistant"] = {"n": 124, "%": 1 }
+sampleYears["2015"]["Greenlee"]["CRE, E. coli carbapenum resistant"] = {"n": 131, "%": 1 }
+sampleYears["2016"]["Greenlee"]["CRE, E. coli carbapenum resistant"] = {"n": 138, "%": 1 }
+sampleYears["2017"]["Greenlee"]["CRE, E. coli carbapenum resistant"] = {"n": 145, "%": 1 }
+sampleYears["2018"]["Greenlee"]["CRE, E. coli carbapenum resistant"] = {"n": 152, "%": 1 }
+sampleYears["2013"]["LaPaz"]["CRE, E. coli carbapenum resistant"] = {"n": 340, "%": 0 }
+sampleYears["2014"]["LaPaz"]["CRE, E. coli carbapenum resistant"] = {"n": 322, "%": 0 }
+sampleYears["2015"]["LaPaz"]["CRE, E. coli carbapenum resistant"] = {"n": 340, "%": 0 }
+sampleYears["2016"]["LaPaz"]["CRE, E. coli carbapenum resistant"] = {"n": 359, "%": 0 }
+sampleYears["2017"]["LaPaz"]["CRE, E. coli carbapenum resistant"] = {"n": 377, "%": 0 }
+sampleYears["2018"]["LaPaz"]["CRE, E. coli carbapenum resistant"] = {"n": 395, "%": 0 }
+sampleYears["2013"]["Maricopa"]["CRE, E. coli carbapenum resistant"] = {"n": 67294, "%": 0 }
+sampleYears["2014"]["Maricopa"]["CRE, E. coli carbapenum resistant"] = {"n": 63650, "%": 0 }
+sampleYears["2015"]["Maricopa"]["CRE, E. coli carbapenum resistant"] = {"n": 67294, "%": 0 }
+sampleYears["2016"]["Maricopa"]["CRE, E. coli carbapenum resistant"] = {"n": 70938, "%": 0 }
+sampleYears["2017"]["Maricopa"]["CRE, E. coli carbapenum resistant"] = {"n": 74581, "%": 0 }
+sampleYears["2018"]["Maricopa"]["CRE, E. coli carbapenum resistant"] = {"n": 78225, "%": 0 }
+sampleYears["2013"]["Mohave"]["CRE, E. coli carbapenum resistant"] = {"n": 1494, "%": 0 }
+sampleYears["2014"]["Mohave"]["CRE, E. coli carbapenum resistant"] = {"n": 1396, "%": 0 }
+sampleYears["2015"]["Mohave"]["CRE, E. coli carbapenum resistant"] = {"n": 1494, "%": 0 }
+sampleYears["2016"]["Mohave"]["CRE, E. coli carbapenum resistant"] = {"n": 1592, "%": 0 }
+sampleYears["2017"]["Mohave"]["CRE, E. coli carbapenum resistant"] = {"n": 1690, "%": 0 }
+sampleYears["2018"]["Mohave"]["CRE, E. coli carbapenum resistant"] = {"n": 1788, "%": 0 }
+sampleYears["2013"]["Navajo"]["CRE, E. coli carbapenum resistant"] = {"n": 2011, "%": 0 }
+sampleYears["2014"]["Navajo"]["CRE, E. coli carbapenum resistant"] = {"n": 1775, "%": 0 }
+sampleYears["2015"]["Navajo"]["CRE, E. coli carbapenum resistant"] = {"n": 2011, "%": 0 }
+sampleYears["2016"]["Navajo"]["CRE, E. coli carbapenum resistant"] = {"n": 2247, "%": 0 }
+sampleYears["2017"]["Navajo"]["CRE, E. coli carbapenum resistant"] = {"n": 2483, "%": 0 }
+sampleYears["2018"]["Navajo"]["CRE, E. coli carbapenum resistant"] = {"n": 2719, "%": 0 }
+sampleYears["2013"]["Pima"]["CRE, E. coli carbapenum resistant"] = {"n": 16919, "%": 0 }
+sampleYears["2014"]["Pima"]["CRE, E. coli carbapenum resistant"] = {"n": 16003, "%": 0 }
+sampleYears["2015"]["Pima"]["CRE, E. coli carbapenum resistant"] = {"n": 16919, "%": 0 }
+sampleYears["2016"]["Pima"]["CRE, E. coli carbapenum resistant"] = {"n": 17836, "%": 0 }
+sampleYears["2017"]["Pima"]["CRE, E. coli carbapenum resistant"] = {"n": 18752, "%": 0 }
+sampleYears["2018"]["Pima"]["CRE, E. coli carbapenum resistant"] = {"n": 19668, "%": 0 }
+sampleYears["2013"]["Pinal"]["CRE, E. coli carbapenum resistant"] = {"n": 5480, "%": 0 }
+sampleYears["2014"]["Pinal"]["CRE, E. coli carbapenum resistant"] = {"n": 5184, "%": 0 }
+sampleYears["2015"]["Pinal"]["CRE, E. coli carbapenum resistant"] = {"n": 5480, "%": 0 }
+sampleYears["2016"]["Pinal"]["CRE, E. coli carbapenum resistant"] = {"n": 5777, "%": 0 }
+sampleYears["2017"]["Pinal"]["CRE, E. coli carbapenum resistant"] = {"n": 6074, "%": 0 }
+sampleYears["2018"]["Pinal"]["CRE, E. coli carbapenum resistant"] = {"n": 6371, "%": 0 }
+sampleYears["2013"]["SantaCruz"]["CRE, E. coli carbapenum resistant"] = {"n": 723, "%": 0 }
+sampleYears["2014"]["SantaCruz"]["CRE, E. coli carbapenum resistant"] = {"n": 683, "%": 0 }
+sampleYears["2015"]["SantaCruz"]["CRE, E. coli carbapenum resistant"] = {"n": 723, "%": 0 }
+sampleYears["2016"]["SantaCruz"]["CRE, E. coli carbapenum resistant"] = {"n": 762, "%": 0 }
+sampleYears["2017"]["SantaCruz"]["CRE, E. coli carbapenum resistant"] = {"n": 801, "%": 0 }
+sampleYears["2018"]["SantaCruz"]["CRE, E. coli carbapenum resistant"] = {"n": 840, "%": 0 }
+sampleYears["2013"]["Yavapai"]["CRE, E. coli carbapenum resistant"] = {"n": 3586, "%": 0 }
+sampleYears["2014"]["Yavapai"]["CRE, E. coli carbapenum resistant"] = {"n": 3392, "%": 0 }
+sampleYears["2015"]["Yavapai"]["CRE, E. coli carbapenum resistant"] = {"n": 3586, "%": 0 }
+sampleYears["2016"]["Yavapai"]["CRE, E. coli carbapenum resistant"] = {"n": 3780, "%": 0 }
+sampleYears["2017"]["Yavapai"]["CRE, E. coli carbapenum resistant"] = {"n": 3974, "%": 0 }
+sampleYears["2018"]["Yavapai"]["CRE, E. coli carbapenum resistant"] = {"n": 4169, "%": 0 }
+sampleYears["2013"]["Yuma"]["CRE, E. coli carbapenum resistant"] = {"n": 3214, "%": 0 }
+sampleYears["2014"]["Yuma"]["CRE, E. coli carbapenum resistant"] = {"n": 3040, "%": 0 }
+sampleYears["2015"]["Yuma"]["CRE, E. coli carbapenum resistant"] = {"n": 3214, "%": 0 }
+sampleYears["2016"]["Yuma"]["CRE, E. coli carbapenum resistant"] = {"n": 3388, "%": 0 }
+sampleYears["2017"]["Yuma"]["CRE, E. coli carbapenum resistant"] = {"n": 3562, "%": 0 }
+sampleYears["2018"]["Yuma"]["CRE, E. coli carbapenum resistant"] = {"n": 3562, "%": 0 }
+sampleYears["2013"]["Apache"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 382, "%": 0 }
+sampleYears["2014"]["Apache"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 462, "%": 0 }
+sampleYears["2015"]["Apache"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 542, "%": 0 }
+sampleYears["2016"]["Apache"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 622, "%": 0 }
+sampleYears["2017"]["Apache"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 702, "%": 0 }
+sampleYears["2018"]["Apache"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 782, "%": 0 }
+sampleYears["2013"]["Cochise"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 358, "%": 1 }
+sampleYears["2014"]["Cochise"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 295, "%": 1 }
+sampleYears["2015"]["Cochise"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 358, "%": 1 }
+sampleYears["2016"]["Cochise"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 421, "%": 1 }
+sampleYears["2017"]["Cochise"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 483, "%": 1 }
+sampleYears["2018"]["Cochise"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 546, "%": 1 }
+sampleYears["2013"]["Coconino"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 376, "%": 1 }
+sampleYears["2014"]["Coconino"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 310, "%": 0 }
+sampleYears["2015"]["Coconino"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 376, "%": 1 }
+sampleYears["2016"]["Coconino"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 442, "%": 1 }
+sampleYears["2017"]["Coconino"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 507, "%": 1 }
+sampleYears["2018"]["Coconino"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 573, "%": 1 }
+sampleYears["2013"]["Gila"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 145, "%": 0 }
+sampleYears["2014"]["Gila"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 120, "%": 1 }
+sampleYears["2015"]["Gila"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 145, "%": 1 }
+sampleYears["2016"]["Gila"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 171, "%": 1 }
+sampleYears["2017"]["Gila"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 196, "%": 1 }
+sampleYears["2018"]["Gila"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 221, "%": 1 }
+sampleYears["2013"]["Graham"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 97, "%": 0 }
+sampleYears["2014"]["Graham"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 80, "%": 2 }
+sampleYears["2015"]["Graham"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 97, "%": 1 }
+sampleYears["2016"]["Graham"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 114, "%": 2 }
+sampleYears["2017"]["Graham"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 131, "%": 2 }
+sampleYears["2018"]["Graham"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 148, "%": 2 }
+sampleYears["2013"]["Greenlee"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 22, "%": 0 }
+sampleYears["2014"]["Greenlee"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 18, "%": 0 }
+sampleYears["2015"]["Greenlee"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 22, "%": 0 }
+sampleYears["2016"]["Greenlee"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 25, "%": 0 }
+sampleYears["2017"]["Greenlee"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 29, "%": 0 }
+sampleYears["2018"]["Greenlee"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 33, "%": 0 }
+sampleYears["2013"]["LaPaz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 56, "%": 2 }
+sampleYears["2014"]["LaPaz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 47, "%": 2 }
+sampleYears["2015"]["LaPaz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 56, "%": 2 }
+sampleYears["2016"]["LaPaz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 66, "%": 2 }
+sampleYears["2017"]["LaPaz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 76, "%": 2 }
+sampleYears["2018"]["LaPaz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 86, "%": 2 }
+sampleYears["2013"]["Maricopa"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 11161, "%": 0 }
+sampleYears["2014"]["Maricopa"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 9216, "%": 0 }
+sampleYears["2015"]["Maricopa"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 11161, "%": 0 }
+sampleYears["2016"]["Maricopa"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 13107, "%": 0 }
+sampleYears["2017"]["Maricopa"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 15052, "%": 0 }
+sampleYears["2018"]["Maricopa"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 16997, "%": 0 }
+sampleYears["2013"]["Mohave"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 258, "%": 2 }
+sampleYears["2014"]["Mohave"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 340, "%": 2 }
+sampleYears["2015"]["Mohave"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 422, "%": 2 }
+sampleYears["2016"]["Mohave"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 504, "%": 2 }
+sampleYears["2017"]["Mohave"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 586, "%": 2 }
+sampleYears["2018"]["Mohave"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 668, "%": 2 }
+sampleYears["2013"]["Navajo"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 302, "%": 0 }
+sampleYears["2014"]["Navajo"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 257, "%": 0 }
+sampleYears["2015"]["Navajo"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 302, "%": 0 }
+sampleYears["2016"]["Navajo"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 347, "%": 0 }
+sampleYears["2017"]["Navajo"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 392, "%": 0 }
+sampleYears["2018"]["Navajo"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 437, "%": 0 }
+sampleYears["2013"]["Pima"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 2806, "%": 1 }
+sampleYears["2014"]["Pima"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 2317, "%": 0 }
+sampleYears["2015"]["Pima"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 2806, "%": 1 }
+sampleYears["2016"]["Pima"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 3295, "%": 1 }
+sampleYears["2017"]["Pima"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 3784, "%": 1 }
+sampleYears["2018"]["Pima"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 4274, "%": 1 }
+sampleYears["2013"]["Pinal"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 909, "%": 2 }
+sampleYears["2014"]["Pinal"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 751, "%": 0 }
+sampleYears["2015"]["Pinal"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 909, "%": 1 }
+sampleYears["2016"]["Pinal"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 1067, "%": 1 }
+sampleYears["2017"]["Pinal"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 1226, "%": 1 }
+sampleYears["2018"]["Pinal"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 1384, "%": 1 }
+sampleYears["2013"]["SantaCruz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 120, "%": 1 }
+sampleYears["2014"]["SantaCruz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 99, "%": 1 }
+sampleYears["2015"]["SantaCruz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 120, "%": 1 }
+sampleYears["2016"]["SantaCruz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 141, "%": 1 }
+sampleYears["2017"]["SantaCruz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 162, "%": 1 }
+sampleYears["2018"]["SantaCruz"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 183, "%": 1 }
+sampleYears["2013"]["Yavapai"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 595, "%": 1 }
+sampleYears["2014"]["Yavapai"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 491, "%": 1 }
+sampleYears["2015"]["Yavapai"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 595, "%": 1 }
+sampleYears["2016"]["Yavapai"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 698, "%": 1 }
+sampleYears["2017"]["Yavapai"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 802, "%": 1 }
+sampleYears["2018"]["Yavapai"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 906, "%": 1 }
+sampleYears["2013"]["Yuma"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 533, "%": 0 }
+sampleYears["2014"]["Yuma"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 440, "%": 1 }
+sampleYears["2015"]["Yuma"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 533, "%": 1 }
+sampleYears["2016"]["Yuma"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 626, "%": 1 }
+sampleYears["2017"]["Yuma"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 719, "%": 1 }
+sampleYears["2018"]["Yuma"]["CRE, K. pneumoniae carbapenum resistant"] = {"n": 719, "%": 1 }
+sampleYears["2013"]["Apache"]["ESBL, E. coli ESBL-positive"] = {"n": 1532, "%": 2 }
+sampleYears["2014"]["Apache"]["ESBL, E. coli ESBL-positive"] = {"n": 3037, "%": 2 }
+sampleYears["2015"]["Apache"]["ESBL, E. coli ESBL-positive"] = {"n": 4542, "%": 2 }
+sampleYears["2016"]["Apache"]["ESBL, E. coli ESBL-positive"] = {"n": 6047, "%": 2 }
+sampleYears["2017"]["Apache"]["ESBL, E. coli ESBL-positive"] = {"n": 7552, "%": 2 }
+sampleYears["2018"]["Apache"]["ESBL, E. coli ESBL-positive"] = {"n": 9057, "%": 2 }
+sampleYears["2013"]["Cochise"]["ESBL, E. coli ESBL-positive"] = {"n": 2156, "%": 1 }
+sampleYears["2014"]["Cochise"]["ESBL, E. coli ESBL-positive"] = {"n": 2040, "%": 1 }
+sampleYears["2015"]["Cochise"]["ESBL, E. coli ESBL-positive"] = {"n": 2156, "%": 1 }
+sampleYears["2016"]["Cochise"]["ESBL, E. coli ESBL-positive"] = {"n": 2272, "%": 1 }
+sampleYears["2017"]["Cochise"]["ESBL, E. coli ESBL-positive"] = {"n": 2389, "%": 1 }
+sampleYears["2018"]["Cochise"]["ESBL, E. coli ESBL-positive"] = {"n": 2505, "%": 1 }
+sampleYears["2013"]["Coconino"]["ESBL, E. coli ESBL-positive"] = {"n": 2267, "%": 1 }
+sampleYears["2014"]["Coconino"]["ESBL, E. coli ESBL-positive"] = {"n": 2144, "%": 1 }
+sampleYears["2015"]["Coconino"]["ESBL, E. coli ESBL-positive"] = {"n": 2267, "%": 1 }
+sampleYears["2016"]["Coconino"]["ESBL, E. coli ESBL-positive"] = {"n": 2390, "%": 1 }
+sampleYears["2017"]["Coconino"]["ESBL, E. coli ESBL-positive"] = {"n": 2512, "%": 1 }
+sampleYears["2018"]["Coconino"]["ESBL, E. coli ESBL-positive"] = {"n": 2635, "%": 1 }
+sampleYears["2013"]["Gila"]["ESBL, E. coli ESBL-positive"] = {"n": 877, "%": 7 }
+sampleYears["2014"]["Gila"]["ESBL, E. coli ESBL-positive"] = {"n": 829, "%": 3 }
+sampleYears["2015"]["Gila"]["ESBL, E. coli ESBL-positive"] = {"n": 877, "%": 5 }
+sampleYears["2016"]["Gila"]["ESBL, E. coli ESBL-positive"] = {"n": 924, "%": 4 }
+sampleYears["2017"]["Gila"]["ESBL, E. coli ESBL-positive"] = {"n": 972, "%": 5 }
+sampleYears["2018"]["Gila"]["ESBL, E. coli ESBL-positive"] = {"n": 1019, "%": 5 }
+sampleYears["2013"]["Graham"]["ESBL, E. coli ESBL-positive"] = {"n": 586, "%": 3 }
+sampleYears["2014"]["Graham"]["ESBL, E. coli ESBL-positive"] = {"n": 555, "%": 2 }
+sampleYears["2015"]["Graham"]["ESBL, E. coli ESBL-positive"] = {"n": 586, "%": 3 }
+sampleYears["2016"]["Graham"]["ESBL, E. coli ESBL-positive"] = {"n": 618, "%": 3 }
+sampleYears["2017"]["Graham"]["ESBL, E. coli ESBL-positive"] = {"n": 650, "%": 3 }
+sampleYears["2018"]["Graham"]["ESBL, E. coli ESBL-positive"] = {"n": 682, "%": 3 }
+sampleYears["2013"]["Greenlee"]["ESBL, E. coli ESBL-positive"] = {"n": 131, "%": 1 }
+sampleYears["2014"]["Greenlee"]["ESBL, E. coli ESBL-positive"] = {"n": 124, "%": 2 }
+sampleYears["2015"]["Greenlee"]["ESBL, E. coli ESBL-positive"] = {"n": 131, "%": 2 }
+sampleYears["2016"]["Greenlee"]["ESBL, E. coli ESBL-positive"] = {"n": 138, "%": 2 }
+sampleYears["2017"]["Greenlee"]["ESBL, E. coli ESBL-positive"] = {"n": 145, "%": 2 }
+sampleYears["2018"]["Greenlee"]["ESBL, E. coli ESBL-positive"] = {"n": 152, "%": 2 }
+sampleYears["2013"]["LaPaz"]["ESBL, E. coli ESBL-positive"] = {"n": 340, "%": 2 }
+sampleYears["2014"]["LaPaz"]["ESBL, E. coli ESBL-positive"] = {"n": 322, "%": 2 }
+sampleYears["2015"]["LaPaz"]["ESBL, E. coli ESBL-positive"] = {"n": 340, "%": 2 }
+sampleYears["2016"]["LaPaz"]["ESBL, E. coli ESBL-positive"] = {"n": 359, "%": 2 }
+sampleYears["2017"]["LaPaz"]["ESBL, E. coli ESBL-positive"] = {"n": 377, "%": 2 }
+sampleYears["2018"]["LaPaz"]["ESBL, E. coli ESBL-positive"] = {"n": 395, "%": 2 }
+sampleYears["2013"]["Maricopa"]["ESBL, E. coli ESBL-positive"] = {"n": 67294, "%": 4 }
+sampleYears["2014"]["Maricopa"]["ESBL, E. coli ESBL-positive"] = {"n": 63650, "%": 2 }
+sampleYears["2015"]["Maricopa"]["ESBL, E. coli ESBL-positive"] = {"n": 67294, "%": 3 }
+sampleYears["2016"]["Maricopa"]["ESBL, E. coli ESBL-positive"] = {"n": 70938, "%": 3 }
+sampleYears["2017"]["Maricopa"]["ESBL, E. coli ESBL-positive"] = {"n": 74581, "%": 3 }
+sampleYears["2018"]["Maricopa"]["ESBL, E. coli ESBL-positive"] = {"n": 78225, "%": 3 }
+sampleYears["2013"]["Mohave"]["ESBL, E. coli ESBL-positive"] = {"n": 899, "%": 10 }
+sampleYears["2014"]["Mohave"]["ESBL, E. coli ESBL-positive"] = {"n": 1515, "%": 6 }
+sampleYears["2015"]["Mohave"]["ESBL, E. coli ESBL-positive"] = {"n": 2131, "%": 8 }
+sampleYears["2016"]["Mohave"]["ESBL, E. coli ESBL-positive"] = {"n": 2747, "%": 7 }
+sampleYears["2017"]["Mohave"]["ESBL, E. coli ESBL-positive"] = {"n": 3363, "%": 8 }
+sampleYears["2018"]["Mohave"]["ESBL, E. coli ESBL-positive"] = {"n": 3979, "%": 8 }
+sampleYears["2013"]["Navajo"]["ESBL, E. coli ESBL-positive"] = {"n": 2011, "%": 2 }
+sampleYears["2014"]["Navajo"]["ESBL, E. coli ESBL-positive"] = {"n": 1775, "%": 1 }
+sampleYears["2015"]["Navajo"]["ESBL, E. coli ESBL-positive"] = {"n": 2011, "%": 2 }
+sampleYears["2016"]["Navajo"]["ESBL, E. coli ESBL-positive"] = {"n": 2247, "%": 2 }
+sampleYears["2017"]["Navajo"]["ESBL, E. coli ESBL-positive"] = {"n": 2483, "%": 2 }
+sampleYears["2018"]["Navajo"]["ESBL, E. coli ESBL-positive"] = {"n": 2719, "%": 2 }
+sampleYears["2013"]["Pima"]["ESBL, E. coli ESBL-positive"] = {"n": 16919, "%": 6 }
+sampleYears["2014"]["Pima"]["ESBL, E. coli ESBL-positive"] = {"n": 16003, "%": 2 }
+sampleYears["2015"]["Pima"]["ESBL, E. coli ESBL-positive"] = {"n": 16919, "%": 4 }
+sampleYears["2016"]["Pima"]["ESBL, E. coli ESBL-positive"] = {"n": 17836, "%": 3 }
+sampleYears["2017"]["Pima"]["ESBL, E. coli ESBL-positive"] = {"n": 18752, "%": 4 }
+sampleYears["2018"]["Pima"]["ESBL, E. coli ESBL-positive"] = {"n": 19668, "%": 4 }
+sampleYears["2013"]["Pinal"]["ESBL, E. coli ESBL-positive"] = {"n": 5480, "%": 3 }
+sampleYears["2014"]["Pinal"]["ESBL, E. coli ESBL-positive"] = {"n": 5184, "%": 1 }
+sampleYears["2015"]["Pinal"]["ESBL, E. coli ESBL-positive"] = {"n": 5480, "%": 2 }
+sampleYears["2016"]["Pinal"]["ESBL, E. coli ESBL-positive"] = {"n": 5777, "%": 2 }
+sampleYears["2017"]["Pinal"]["ESBL, E. coli ESBL-positive"] = {"n": 6074, "%": 2 }
+sampleYears["2018"]["Pinal"]["ESBL, E. coli ESBL-positive"] = {"n": 6371, "%": 2 }
+sampleYears["2013"]["SantaCruz"]["ESBL, E. coli ESBL-positive"] = {"n": 723, "%": 2 }
+sampleYears["2014"]["SantaCruz"]["ESBL, E. coli ESBL-positive"] = {"n": 683, "%": 3 }
+sampleYears["2015"]["SantaCruz"]["ESBL, E. coli ESBL-positive"] = {"n": 723, "%": 3 }
+sampleYears["2016"]["SantaCruz"]["ESBL, E. coli ESBL-positive"] = {"n": 762, "%": 3 }
+sampleYears["2017"]["SantaCruz"]["ESBL, E. coli ESBL-positive"] = {"n": 801, "%": 3 }
+sampleYears["2018"]["SantaCruz"]["ESBL, E. coli ESBL-positive"] = {"n": 840, "%": 3 }
+sampleYears["2013"]["Yavapai"]["ESBL, E. coli ESBL-positive"] = {"n": 3586, "%": 3 }
+sampleYears["2014"]["Yavapai"]["ESBL, E. coli ESBL-positive"] = {"n": 3392, "%": 1 }
+sampleYears["2015"]["Yavapai"]["ESBL, E. coli ESBL-positive"] = {"n": 3586, "%": 2 }
+sampleYears["2016"]["Yavapai"]["ESBL, E. coli ESBL-positive"] = {"n": 3780, "%": 2 }
+sampleYears["2017"]["Yavapai"]["ESBL, E. coli ESBL-positive"] = {"n": 3974, "%": 2 }
+sampleYears["2018"]["Yavapai"]["ESBL, E. coli ESBL-positive"] = {"n": 4169, "%": 2 }
+sampleYears["2013"]["Yuma"]["ESBL, E. coli ESBL-positive"] = {"n": 3214, "%": 4 }
+sampleYears["2014"]["Yuma"]["ESBL, E. coli ESBL-positive"] = {"n": 3040, "%": 1 }
+sampleYears["2015"]["Yuma"]["ESBL, E. coli ESBL-positive"] = {"n": 3214, "%": 3 }
+sampleYears["2016"]["Yuma"]["ESBL, E. coli ESBL-positive"] = {"n": 3388, "%": 2 }
+sampleYears["2017"]["Yuma"]["ESBL, E. coli ESBL-positive"] = {"n": 3562, "%": 3 }
+sampleYears["2018"]["Yuma"]["ESBL, E. coli ESBL-positive"] = {"n": 3562, "%": 3 }
+sampleYears["2013"]["Apache"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 33, "%": 0 }
+sampleYears["2014"]["Apache"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 104, "%": 8 }
+sampleYears["2015"]["Apache"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 175, "%": 4 }
+sampleYears["2016"]["Apache"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 246, "%": 6 }
+sampleYears["2017"]["Apache"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 317, "%": 5 }
+sampleYears["2018"]["Apache"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 388, "%": 6 }
+sampleYears["2013"]["Cochise"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 38, "%": 0 }
+sampleYears["2014"]["Cochise"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 26, "%": 4 }
+sampleYears["2015"]["Cochise"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 38, "%": 2 }
+sampleYears["2016"]["Cochise"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 50, "%": 3 }
+sampleYears["2017"]["Cochise"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 61, "%": 3 }
+sampleYears["2018"]["Cochise"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 73, "%": 3 }
+sampleYears["2013"]["Coconino"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 40, "%": 1 }
+sampleYears["2014"]["Coconino"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 28, "%": 4 }
+sampleYears["2015"]["Coconino"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 40, "%": 3 }
+sampleYears["2016"]["Coconino"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 52, "%": 4 }
+sampleYears["2017"]["Coconino"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 64, "%": 4 }
+sampleYears["2018"]["Coconino"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 77, "%": 4 }
+sampleYears["2013"]["Gila"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 15, "%": 0 }
+sampleYears["2014"]["Gila"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 11, "%": 10 }
+sampleYears["2015"]["Gila"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 15, "%": 5 }
+sampleYears["2016"]["Gila"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 20, "%": 8 }
+sampleYears["2017"]["Gila"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 25, "%": 7 }
+sampleYears["2018"]["Gila"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 30, "%": 8 }
+sampleYears["2013"]["Graham"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 10, "%": 10 }
+sampleYears["2014"]["Graham"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 7, "%": 0 }
+sampleYears["2015"]["Graham"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 10, "%": 5 }
+sampleYears["2016"]["Graham"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 14, "%": 3 }
+sampleYears["2017"]["Graham"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 17, "%": 4 }
+sampleYears["2018"]["Graham"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 20, "%": 4 }
+sampleYears["2013"]["Greenlee"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 2, "%": 0 }
+sampleYears["2014"]["Greenlee"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 2, "%": 0 }
+sampleYears["2015"]["Greenlee"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 2, "%": 0 }
+sampleYears["2016"]["Greenlee"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 3, "%": 0 }
+sampleYears["2017"]["Greenlee"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 4, "%": 0 }
+sampleYears["2018"]["Greenlee"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 4, "%": 0 }
+sampleYears["2013"]["LaPaz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 6, "%": 0 }
+sampleYears["2014"]["LaPaz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 4, "%": 0 }
+sampleYears["2015"]["LaPaz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 6, "%": 0 }
+sampleYears["2016"]["LaPaz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 8, "%": 0 }
+sampleYears["2017"]["LaPaz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 10, "%": 0 }
+sampleYears["2018"]["LaPaz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 12, "%": 0 }
+sampleYears["2013"]["Maricopa"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 1187, "%": 2 }
+sampleYears["2014"]["Maricopa"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 825, "%": 2 }
+sampleYears["2015"]["Maricopa"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 1187, "%": 2 }
+sampleYears["2016"]["Maricopa"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 1550, "%": 2 }
+sampleYears["2017"]["Maricopa"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 1913, "%": 2 }
+sampleYears["2018"]["Maricopa"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 2275, "%": 2 }
+sampleYears["2013"]["Mohave"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 54, "%": 9 }
+sampleYears["2014"]["Mohave"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 43, "%": 7 }
+sampleYears["2015"]["Mohave"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 54, "%": 8 }
+sampleYears["2016"]["Mohave"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 65, "%": 8 }
+sampleYears["2017"]["Mohave"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 76, "%": 8 }
+sampleYears["2018"]["Mohave"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 87, "%": 8 }
+sampleYears["2013"]["Navajo"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 67, "%": 1 }
+sampleYears["2014"]["Navajo"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 23, "%": 0 }
+sampleYears["2015"]["Navajo"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 67, "%": 1 }
+sampleYears["2016"]["Navajo"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 111, "%": 1 }
+sampleYears["2017"]["Navajo"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 155, "%": 1 }
+sampleYears["2018"]["Navajo"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 199, "%": 1 }
+sampleYears["2013"]["Pima"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 299, "%": 2 }
+sampleYears["2014"]["Pima"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 207, "%": 1 }
+sampleYears["2015"]["Pima"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 299, "%": 2 }
+sampleYears["2016"]["Pima"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 390, "%": 2 }
+sampleYears["2017"]["Pima"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 481, "%": 2 }
+sampleYears["2018"]["Pima"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 572, "%": 2 }
+sampleYears["2013"]["Pinal"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 97, "%": 1 }
+sampleYears["2014"]["Pinal"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 67, "%": 3 }
+sampleYears["2015"]["Pinal"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 97, "%": 2 }
+sampleYears["2016"]["Pinal"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 126, "%": 3 }
+sampleYears["2017"]["Pinal"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 156, "%": 3 }
+sampleYears["2018"]["Pinal"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 185, "%": 3 }
+sampleYears["2013"]["SantaCruz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 13, "%": 0 }
+sampleYears["2014"]["SantaCruz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 9, "%": 10 }
+sampleYears["2015"]["SantaCruz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 13, "%": 5 }
+sampleYears["2016"]["SantaCruz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 17, "%": 8 }
+sampleYears["2017"]["SantaCruz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 21, "%": 7 }
+sampleYears["2018"]["SantaCruz"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 24, "%": 8 }
+sampleYears["2013"]["Yavapai"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 63, "%": 5 }
+sampleYears["2014"]["Yavapai"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 44, "%": 2 }
+sampleYears["2015"]["Yavapai"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 63, "%": 4 }
+sampleYears["2016"]["Yavapai"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 83, "%": 3 }
+sampleYears["2017"]["Yavapai"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 102, "%": 4 }
+sampleYears["2018"]["Yavapai"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 121, "%": 4 }
+sampleYears["2013"]["Yuma"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 57, "%": 5 }
+sampleYears["2014"]["Yuma"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 39, "%": 0 }
+sampleYears["2015"]["Yuma"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 57, "%": 3 }
+sampleYears["2016"]["Yuma"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 74, "%": 2 }
+sampleYears["2017"]["Yuma"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 91, "%": 3 }
+sampleYears["2018"]["Yuma"]["ESBL, K. oxytoca ESBL-positive"] = {"n": 91, "%": 3 }
+sampleYears["2013"]["Apache"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 260, "%": 2 }
+sampleYears["2014"]["Apache"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 462, "%": 1 }
+sampleYears["2015"]["Apache"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 664, "%": 2 }
+sampleYears["2016"]["Apache"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 866, "%": 2 }
+sampleYears["2017"]["Apache"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1068, "%": 2 }
+sampleYears["2018"]["Apache"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1270, "%": 2 }
+sampleYears["2013"]["Cochise"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 185, "%": 1 }
+sampleYears["2014"]["Cochise"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 295, "%": 1 }
+sampleYears["2015"]["Cochise"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 406, "%": 1 }
+sampleYears["2016"]["Cochise"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 516, "%": 1 }
+sampleYears["2017"]["Cochise"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 626, "%": 1 }
+sampleYears["2018"]["Cochise"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 737, "%": 1 }
+sampleYears["2013"]["Coconino"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 194, "%": 1 }
+sampleYears["2014"]["Coconino"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 310, "%": 1 }
+sampleYears["2015"]["Coconino"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 427, "%": 1 }
+sampleYears["2016"]["Coconino"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 543, "%": 1 }
+sampleYears["2017"]["Coconino"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 660, "%": 1 }
+sampleYears["2018"]["Coconino"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 776, "%": 1 }
+sampleYears["2013"]["Gila"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 75, "%": 1 }
+sampleYears["2014"]["Gila"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 120, "%": 2 }
+sampleYears["2015"]["Gila"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 165, "%": 2 }
+sampleYears["2016"]["Gila"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 210, "%": 2 }
+sampleYears["2017"]["Gila"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 255, "%": 2 }
+sampleYears["2018"]["Gila"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 300, "%": 2 }
+sampleYears["2013"]["Graham"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 50, "%": 0 }
+sampleYears["2014"]["Graham"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 80, "%": 3 }
+sampleYears["2015"]["Graham"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 110, "%": 2 }
+sampleYears["2016"]["Graham"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 141, "%": 3 }
+sampleYears["2017"]["Graham"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 171, "%": 3 }
+sampleYears["2018"]["Graham"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 201, "%": 3 }
+sampleYears["2013"]["Greenlee"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 11, "%": 0 }
+sampleYears["2014"]["Greenlee"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 18, "%": 8 }
+sampleYears["2015"]["Greenlee"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 25, "%": 4 }
+sampleYears["2016"]["Greenlee"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 31, "%": 6 }
+sampleYears["2017"]["Greenlee"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 38, "%": 5 }
+sampleYears["2018"]["Greenlee"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 45, "%": 6 }
+sampleYears["2013"]["LaPaz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 29, "%": 2 }
+sampleYears["2014"]["LaPaz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 47, "%": 2 }
+sampleYears["2015"]["LaPaz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 64, "%": 2 }
+sampleYears["2016"]["LaPaz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 82, "%": 2 }
+sampleYears["2017"]["LaPaz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 99, "%": 2 }
+sampleYears["2018"]["LaPaz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 116, "%": 2 }
+sampleYears["2013"]["Maricopa"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 5759, "%": 4 }
+sampleYears["2014"]["Maricopa"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 9216, "%": 2 }
+sampleYears["2015"]["Maricopa"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 12673, "%": 3 }
+sampleYears["2016"]["Maricopa"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 16130, "%": 3 }
+sampleYears["2017"]["Maricopa"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 19587, "%": 3 }
+sampleYears["2018"]["Maricopa"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 23044, "%": 3 }
+sampleYears["2013"]["Mohave"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 256, "%": 7 }
+sampleYears["2014"]["Mohave"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 339, "%": 1 }
+sampleYears["2015"]["Mohave"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 422, "%": 4 }
+sampleYears["2016"]["Mohave"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 505, "%": 3 }
+sampleYears["2017"]["Mohave"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 588, "%": 4 }
+sampleYears["2018"]["Mohave"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 671, "%": 4 }
+sampleYears["2013"]["Navajo"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 195, "%": 2 }
+sampleYears["2014"]["Navajo"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 257, "%": 2 }
+sampleYears["2015"]["Navajo"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 319, "%": 2 }
+sampleYears["2016"]["Navajo"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 381, "%": 2 }
+sampleYears["2017"]["Navajo"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 443, "%": 2 }
+sampleYears["2018"]["Navajo"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 505, "%": 2 }
+sampleYears["2013"]["Pima"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1448, "%": 3 }
+sampleYears["2014"]["Pima"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 2317, "%": 1 }
+sampleYears["2015"]["Pima"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 3186, "%": 2 }
+sampleYears["2016"]["Pima"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 4056, "%": 2 }
+sampleYears["2017"]["Pima"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 4925, "%": 2 }
+sampleYears["2018"]["Pima"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 5794, "%": 2 }
+sampleYears["2013"]["Pinal"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 469, "%": 3 }
+sampleYears["2014"]["Pinal"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 751, "%": 2 }
+sampleYears["2015"]["Pinal"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1032, "%": 3 }
+sampleYears["2016"]["Pinal"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1314, "%": 3 }
+sampleYears["2017"]["Pinal"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1595, "%": 3 }
+sampleYears["2018"]["Pinal"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1877, "%": 3 }
+sampleYears["2013"]["SantaCruz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 62, "%": 1 }
+sampleYears["2014"]["SantaCruz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 99, "%": 2 }
+sampleYears["2015"]["SantaCruz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 136, "%": 2 }
+sampleYears["2016"]["SantaCruz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 173, "%": 2 }
+sampleYears["2017"]["SantaCruz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 210, "%": 2 }
+sampleYears["2018"]["SantaCruz"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 247, "%": 2 }
+sampleYears["2013"]["Yavapai"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 307, "%": 2 }
+sampleYears["2014"]["Yavapai"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 491, "%": 1 }
+sampleYears["2015"]["Yavapai"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 675, "%": 2 }
+sampleYears["2016"]["Yavapai"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 860, "%": 2 }
+sampleYears["2017"]["Yavapai"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1044, "%": 2 }
+sampleYears["2018"]["Yavapai"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 1228, "%": 2 }
+sampleYears["2013"]["Yuma"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 275, "%": 2 }
+sampleYears["2014"]["Yuma"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 440, "%": 1 }
+sampleYears["2015"]["Yuma"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 605, "%": 2 }
+sampleYears["2016"]["Yuma"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 770, "%": 2 }
+sampleYears["2017"]["Yuma"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 935, "%": 2 }
+sampleYears["2018"]["Yuma"]["ESBL, K. pneumoniae ESBL-positive"] = {"n": 935, "%": 2 }
+sampleYears["2013"]["Apache"]["MRSA, Oxicillin resistant"] = {"n": 504, "%": 50 }
+sampleYears["2014"]["Apache"]["MRSA, Oxicillin resistant"] = {"n": 642, "%": 28 }
+sampleYears["2015"]["Apache"]["MRSA, Oxicillin resistant"] = {"n": 780, "%": 39 }
+sampleYears["2016"]["Apache"]["MRSA, Oxicillin resistant"] = {"n": 918, "%": 34 }
+sampleYears["2017"]["Apache"]["MRSA, Oxicillin resistant"] = {"n": 1056, "%": 37 }
+sampleYears["2018"]["Apache"]["MRSA, Oxicillin resistant"] = {"n": 1194, "%": 36 }
+sampleYears["2013"]["Cochise"]["MRSA, Oxicillin resistant"] = {"n": 793, "%": 46 }
+sampleYears["2014"]["Cochise"]["MRSA, Oxicillin resistant"] = {"n": 640, "%": 42 }
+sampleYears["2015"]["Cochise"]["MRSA, Oxicillin resistant"] = {"n": 793, "%": 44 }
+sampleYears["2016"]["Cochise"]["MRSA, Oxicillin resistant"] = {"n": 946, "%": 43 }
+sampleYears["2017"]["Cochise"]["MRSA, Oxicillin resistant"] = {"n": 1099, "%": 44 }
+sampleYears["2018"]["Cochise"]["MRSA, Oxicillin resistant"] = {"n": 1252, "%": 44 }
+sampleYears["2013"]["Coconino"]["MRSA, Oxicillin resistant"] = {"n": 834, "%": 44 }
+sampleYears["2014"]["Coconino"]["MRSA, Oxicillin resistant"] = {"n": 396, "%": 34 }
+sampleYears["2015"]["Coconino"]["MRSA, Oxicillin resistant"] = {"n": 834, "%": 39 }
+sampleYears["2016"]["Coconino"]["MRSA, Oxicillin resistant"] = {"n": 1272, "%": 37 }
+sampleYears["2017"]["Coconino"]["MRSA, Oxicillin resistant"] = {"n": 1710, "%": 38 }
+sampleYears["2018"]["Coconino"]["MRSA, Oxicillin resistant"] = {"n": 2148, "%": 38 }
+sampleYears["2013"]["Gila"]["MRSA, Oxicillin resistant"] = {"n": 323, "%": 52 }
+sampleYears["2014"]["Gila"]["MRSA, Oxicillin resistant"] = {"n": 260, "%": 48 }
+sampleYears["2015"]["Gila"]["MRSA, Oxicillin resistant"] = {"n": 323, "%": 50 }
+sampleYears["2016"]["Gila"]["MRSA, Oxicillin resistant"] = {"n": 386, "%": 49 }
+sampleYears["2017"]["Gila"]["MRSA, Oxicillin resistant"] = {"n": 449, "%": 50 }
+sampleYears["2018"]["Gila"]["MRSA, Oxicillin resistant"] = {"n": 512, "%": 50 }
+sampleYears["2013"]["Graham"]["MRSA, Oxicillin resistant"] = {"n": 216, "%": 38 }
+sampleYears["2014"]["Graham"]["MRSA, Oxicillin resistant"] = {"n": 174, "%": 37 }
+sampleYears["2015"]["Graham"]["MRSA, Oxicillin resistant"] = {"n": 216, "%": 38 }
+sampleYears["2016"]["Graham"]["MRSA, Oxicillin resistant"] = {"n": 258, "%": 38 }
+sampleYears["2017"]["Graham"]["MRSA, Oxicillin resistant"] = {"n": 300, "%": 38 }
+sampleYears["2018"]["Graham"]["MRSA, Oxicillin resistant"] = {"n": 342, "%": 38 }
+sampleYears["2013"]["Greenlee"]["MRSA, Oxicillin resistant"] = {"n": 48, "%": 50 }
+sampleYears["2014"]["Greenlee"]["MRSA, Oxicillin resistant"] = {"n": 39, "%": 42 }
+sampleYears["2015"]["Greenlee"]["MRSA, Oxicillin resistant"] = {"n": 48, "%": 46 }
+sampleYears["2016"]["Greenlee"]["MRSA, Oxicillin resistant"] = {"n": 57, "%": 44 }
+sampleYears["2017"]["Greenlee"]["MRSA, Oxicillin resistant"] = {"n": 66, "%": 45 }
+sampleYears["2018"]["Greenlee"]["MRSA, Oxicillin resistant"] = {"n": 75, "%": 45 }
+sampleYears["2013"]["LaPaz"]["MRSA, Oxicillin resistant"] = {"n": 125, "%": 44 }
+sampleYears["2014"]["LaPaz"]["MRSA, Oxicillin resistant"] = {"n": 101, "%": 40 }
+sampleYears["2015"]["LaPaz"]["MRSA, Oxicillin resistant"] = {"n": 125, "%": 42 }
+sampleYears["2016"]["LaPaz"]["MRSA, Oxicillin resistant"] = {"n": 149, "%": 41 }
+sampleYears["2017"]["LaPaz"]["MRSA, Oxicillin resistant"] = {"n": 173, "%": 42 }
+sampleYears["2018"]["LaPaz"]["MRSA, Oxicillin resistant"] = {"n": 197, "%": 42 }
+sampleYears["2013"]["Maricopa"]["MRSA, Oxicillin resistant"] = {"n": 24756, "%": 39 }
+sampleYears["2014"]["Maricopa"]["MRSA, Oxicillin resistant"] = {"n": 19995, "%": 42 }
+sampleYears["2015"]["Maricopa"]["MRSA, Oxicillin resistant"] = {"n": 24756, "%": 41 }
+sampleYears["2016"]["Maricopa"]["MRSA, Oxicillin resistant"] = {"n": 29517, "%": 42 }
+sampleYears["2017"]["Maricopa"]["MRSA, Oxicillin resistant"] = {"n": 34278, "%": 42 }
+sampleYears["2018"]["Maricopa"]["MRSA, Oxicillin resistant"] = {"n": 39039, "%": 42 }
+sampleYears["2013"]["Mohave"]["MRSA, Oxicillin resistant"] = {"n": 292, "%": 57 }
+sampleYears["2014"]["Mohave"]["MRSA, Oxicillin resistant"] = {"n": 543, "%": 60 }
+sampleYears["2015"]["Mohave"]["MRSA, Oxicillin resistant"] = {"n": 794, "%": 59 }
+sampleYears["2016"]["Mohave"]["MRSA, Oxicillin resistant"] = {"n": 1045, "%": 60 }
+sampleYears["2017"]["Mohave"]["MRSA, Oxicillin resistant"] = {"n": 1296, "%": 60 }
+sampleYears["2018"]["Mohave"]["MRSA, Oxicillin resistant"] = {"n": 1547, "%": 60 }
+sampleYears["2013"]["Navajo"]["MRSA, Oxicillin resistant"] = {"n": 710, "%": 41 }
+sampleYears["2014"]["Navajo"]["MRSA, Oxicillin resistant"] = {"n": 697, "%": 37 }
+sampleYears["2015"]["Navajo"]["MRSA, Oxicillin resistant"] = {"n": 710, "%": 39 }
+sampleYears["2016"]["Navajo"]["MRSA, Oxicillin resistant"] = {"n": 723, "%": 38 }
+sampleYears["2017"]["Navajo"]["MRSA, Oxicillin resistant"] = {"n": 736, "%": 39 }
+sampleYears["2018"]["Navajo"]["MRSA, Oxicillin resistant"] = {"n": 749, "%": 39 }
+sampleYears["2013"]["Pima"]["MRSA, Oxicillin resistant"] = {"n": 6224, "%": 42 }
+sampleYears["2014"]["Pima"]["MRSA, Oxicillin resistant"] = {"n": 5027, "%": 45 }
+sampleYears["2015"]["Pima"]["MRSA, Oxicillin resistant"] = {"n": 6224, "%": 44 }
+sampleYears["2016"]["Pima"]["MRSA, Oxicillin resistant"] = {"n": 7421, "%": 45 }
+sampleYears["2017"]["Pima"]["MRSA, Oxicillin resistant"] = {"n": 8618, "%": 45 }
+sampleYears["2018"]["Pima"]["MRSA, Oxicillin resistant"] = {"n": 9815, "%": 45 }
+sampleYears["2013"]["Pinal"]["MRSA, Oxicillin resistant"] = {"n": 2016, "%": 50 }
+sampleYears["2014"]["Pinal"]["MRSA, Oxicillin resistant"] = {"n": 1628, "%": 53 }
+sampleYears["2015"]["Pinal"]["MRSA, Oxicillin resistant"] = {"n": 2016, "%": 52 }
+sampleYears["2016"]["Pinal"]["MRSA, Oxicillin resistant"] = {"n": 2404, "%": 53 }
+sampleYears["2017"]["Pinal"]["MRSA, Oxicillin resistant"] = {"n": 2792, "%": 53 }
+sampleYears["2018"]["Pinal"]["MRSA, Oxicillin resistant"] = {"n": 3180, "%": 53 }
+sampleYears["2013"]["SantaCruz"]["MRSA, Oxicillin resistant"] = {"n": 266, "%": 43 }
+sampleYears["2014"]["SantaCruz"]["MRSA, Oxicillin resistant"] = {"n": 215, "%": 48 }
+sampleYears["2015"]["SantaCruz"]["MRSA, Oxicillin resistant"] = {"n": 266, "%": 46 }
+sampleYears["2016"]["SantaCruz"]["MRSA, Oxicillin resistant"] = {"n": 317, "%": 47 }
+sampleYears["2017"]["SantaCruz"]["MRSA, Oxicillin resistant"] = {"n": 368, "%": 47 }
+sampleYears["2018"]["SantaCruz"]["MRSA, Oxicillin resistant"] = {"n": 419, "%": 47 }
+sampleYears["2013"]["Yavapai"]["MRSA, Oxicillin resistant"] = {"n": 1319, "%": 47 }
+sampleYears["2014"]["Yavapai"]["MRSA, Oxicillin resistant"] = {"n": 848, "%": 43 }
+sampleYears["2015"]["Yavapai"]["MRSA, Oxicillin resistant"] = {"n": 1319, "%": 45 }
+sampleYears["2016"]["Yavapai"]["MRSA, Oxicillin resistant"] = {"n": 1790, "%": 44 }
+sampleYears["2017"]["Yavapai"]["MRSA, Oxicillin resistant"] = {"n": 2261, "%": 45 }
+sampleYears["2018"]["Yavapai"]["MRSA, Oxicillin resistant"] = {"n": 2732, "%": 45 }
+sampleYears["2013"]["Yuma"]["MRSA, Oxicillin resistant"] = {"n": 1183, "%": 53 }
+sampleYears["2014"]["Yuma"]["MRSA, Oxicillin resistant"] = {"n": 955, "%": 55 }
+sampleYears["2015"]["Yuma"]["MRSA, Oxicillin resistant"] = {"n": 1183, "%": 54 }
+sampleYears["2016"]["Yuma"]["MRSA, Oxicillin resistant"] = {"n": 1411, "%": 55 }
+sampleYears["2017"]["Yuma"]["MRSA, Oxicillin resistant"] = {"n": 1639, "%": 55 }
+sampleYears["2018"]["Yuma"]["MRSA, Oxicillin resistant"] = {"n": 1639, "%": 55 }
+sampleYears["2013"]["Apache"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 125, "%": 1 }
+sampleYears["2014"]["Apache"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 151, "%": 3 }
+sampleYears["2015"]["Apache"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 177, "%": 2 }
+sampleYears["2016"]["Apache"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 203, "%": 3 }
+sampleYears["2017"]["Apache"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 229, "%": 3 }
+sampleYears["2018"]["Apache"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 255, "%": 3 }
+sampleYears["2013"]["Cochise"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 140, "%": 2 }
+sampleYears["2014"]["Cochise"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 138, "%": 2 }
+sampleYears["2015"]["Cochise"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 140, "%": 2 }
+sampleYears["2016"]["Cochise"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 142, "%": 2 }
+sampleYears["2017"]["Cochise"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 144, "%": 2 }
+sampleYears["2018"]["Cochise"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 146, "%": 2 }
+sampleYears["2013"]["Coconino"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 147, "%": 1 }
+sampleYears["2014"]["Coconino"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 78, "%": 3 }
+sampleYears["2015"]["Coconino"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 147, "%": 2 }
+sampleYears["2016"]["Coconino"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 216, "%": 3 }
+sampleYears["2017"]["Coconino"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 285, "%": 3 }
+sampleYears["2018"]["Coconino"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 354, "%": 3 }
+sampleYears["2013"]["Gila"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 57, "%": 2 }
+sampleYears["2014"]["Gila"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 56, "%": 2 }
+sampleYears["2015"]["Gila"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 57, "%": 2 }
+sampleYears["2016"]["Gila"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 58, "%": 2 }
+sampleYears["2017"]["Gila"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 58, "%": 2 }
+sampleYears["2018"]["Gila"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 59, "%": 2 }
+sampleYears["2013"]["Graham"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 38, "%": 0 }
+sampleYears["2014"]["Graham"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 37, "%": 3 }
+sampleYears["2015"]["Graham"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 38, "%": 2 }
+sampleYears["2016"]["Graham"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 39, "%": 3 }
+sampleYears["2017"]["Graham"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 39, "%": 3 }
+sampleYears["2018"]["Graham"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 40, "%": 3 }
+sampleYears["2013"]["Greenlee"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 8, "%": 0 }
+sampleYears["2014"]["Greenlee"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 8, "%": 0 }
+sampleYears["2015"]["Greenlee"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 8, "%": 0 }
+sampleYears["2016"]["Greenlee"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 9, "%": 0 }
+sampleYears["2017"]["Greenlee"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 9, "%": 0 }
+sampleYears["2018"]["Greenlee"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 9, "%": 0 }
+sampleYears["2013"]["LaPaz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 22, "%": 0 }
+sampleYears["2014"]["LaPaz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 22, "%": 0 }
+sampleYears["2015"]["LaPaz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 22, "%": 0 }
+sampleYears["2016"]["LaPaz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 22, "%": 0 }
+sampleYears["2017"]["LaPaz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 23, "%": 0 }
+sampleYears["2018"]["LaPaz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 23, "%": 0 }
+sampleYears["2013"]["Maricopa"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 4364, "%": 3 }
+sampleYears["2014"]["Maricopa"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 4303, "%": 4 }
+sampleYears["2015"]["Maricopa"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 4364, "%": 4 }
+sampleYears["2016"]["Maricopa"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 4424, "%": 4 }
+sampleYears["2017"]["Maricopa"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 4484, "%": 4 }
+sampleYears["2018"]["Maricopa"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 4545, "%": 4 }
+sampleYears["2013"]["Mohave"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 207, "%": 5 }
+sampleYears["2014"]["Mohave"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 193, "%": 3 }
+sampleYears["2015"]["Mohave"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 207, "%": 4 }
+sampleYears["2016"]["Mohave"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 221, "%": 4 }
+sampleYears["2017"]["Mohave"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 235, "%": 4 }
+sampleYears["2018"]["Mohave"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 249, "%": 4 }
+sampleYears["2013"]["Navajo"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 105, "%": 2 }
+sampleYears["2014"]["Navajo"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 120, "%": 1 }
+sampleYears["2015"]["Navajo"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 135, "%": 2 }
+sampleYears["2016"]["Navajo"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 150, "%": 2 }
+sampleYears["2017"]["Navajo"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 165, "%": 2 }
+sampleYears["2018"]["Navajo"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 180, "%": 2 }
+sampleYears["2013"]["Pima"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 1097, "%": 2 }
+sampleYears["2014"]["Pima"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 1082, "%": 3 }
+sampleYears["2015"]["Pima"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 1097, "%": 3 }
+sampleYears["2016"]["Pima"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 1112, "%": 3 }
+sampleYears["2017"]["Pima"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 1128, "%": 3 }
+sampleYears["2018"]["Pima"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 1143, "%": 3 }
+sampleYears["2013"]["Pinal"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 355, "%": 2 }
+sampleYears["2014"]["Pinal"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 350, "%": 1 }
+sampleYears["2015"]["Pinal"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 355, "%": 2 }
+sampleYears["2016"]["Pinal"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 360, "%": 2 }
+sampleYears["2017"]["Pinal"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 365, "%": 2 }
+sampleYears["2018"]["Pinal"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 370, "%": 2 }
+sampleYears["2013"]["SantaCruz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 47, "%": 2 }
+sampleYears["2014"]["SantaCruz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 46, "%": 2 }
+sampleYears["2015"]["SantaCruz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 47, "%": 2 }
+sampleYears["2016"]["SantaCruz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 48, "%": 2 }
+sampleYears["2017"]["SantaCruz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 48, "%": 2 }
+sampleYears["2018"]["SantaCruz"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 49, "%": 2 }
+sampleYears["2013"]["Yavapai"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 233, "%": 1 }
+sampleYears["2014"]["Yavapai"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 306, "%": 6 }
+sampleYears["2015"]["Yavapai"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 379, "%": 4 }
+sampleYears["2016"]["Yavapai"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 453, "%": 5 }
+sampleYears["2017"]["Yavapai"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 526, "%": 5 }
+sampleYears["2018"]["Yavapai"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 600, "%": 5 }
+sampleYears["2013"]["Yuma"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 208, "%": 1 }
+sampleYears["2014"]["Yuma"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 206, "%": 1 }
+sampleYears["2015"]["Yuma"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 208, "%": 1 }
+sampleYears["2016"]["Yuma"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 211, "%": 1 }
+sampleYears["2017"]["Yuma"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 214, "%": 1 }
+sampleYears["2018"]["Yuma"]["VRE, E. faecalis Vancomycin resistant"] = {"n": 214, "%": 1 }
+sampleYears["2013"]["Apache"]["VRE, E. faecium Vancomycin resistant"] = {"n": 14, "%": 43 }
+sampleYears["2014"]["Apache"]["VRE, E. faecium Vancomycin resistant"] = {"n": 3, "%": 0 }
+sampleYears["2015"]["Apache"]["VRE, E. faecium Vancomycin resistant"] = {"n": 14, "%": 22 }
+sampleYears["2016"]["Apache"]["VRE, E. faecium Vancomycin resistant"] = {"n": 25, "%": 11 }
+sampleYears["2017"]["Apache"]["VRE, E. faecium Vancomycin resistant"] = {"n": 36, "%": 17 }
+sampleYears["2018"]["Apache"]["VRE, E. faecium Vancomycin resistant"] = {"n": 47, "%": 14 }
+sampleYears["2013"]["Cochise"]["VRE, E. faecium Vancomycin resistant"] = {"n": 43, "%": 52 }
+sampleYears["2014"]["Cochise"]["VRE, E. faecium Vancomycin resistant"] = {"n": 24, "%": 50 }
+sampleYears["2015"]["Cochise"]["VRE, E. faecium Vancomycin resistant"] = {"n": 43, "%": 51 }
+sampleYears["2016"]["Cochise"]["VRE, E. faecium Vancomycin resistant"] = {"n": 62, "%": 51 }
+sampleYears["2017"]["Cochise"]["VRE, E. faecium Vancomycin resistant"] = {"n": 81, "%": 51 }
+sampleYears["2018"]["Cochise"]["VRE, E. faecium Vancomycin resistant"] = {"n": 100, "%": 51 }
+sampleYears["2013"]["Coconino"]["VRE, E. faecium Vancomycin resistant"] = {"n": 45, "%": 51 }
+sampleYears["2014"]["Coconino"]["VRE, E. faecium Vancomycin resistant"] = {"n": 23, "%": 52 }
+sampleYears["2015"]["Coconino"]["VRE, E. faecium Vancomycin resistant"] = {"n": 45, "%": 52 }
+sampleYears["2016"]["Coconino"]["VRE, E. faecium Vancomycin resistant"] = {"n": 67, "%": 52 }
+sampleYears["2017"]["Coconino"]["VRE, E. faecium Vancomycin resistant"] = {"n": 89, "%": 52 }
+sampleYears["2018"]["Coconino"]["VRE, E. faecium Vancomycin resistant"] = {"n": 111, "%": 52 }
+sampleYears["2013"]["Gila"]["VRE, E. faecium Vancomycin resistant"] = {"n": 17, "%": 59 }
+sampleYears["2014"]["Gila"]["VRE, E. faecium Vancomycin resistant"] = {"n": 10, "%": 60 }
+sampleYears["2015"]["Gila"]["VRE, E. faecium Vancomycin resistant"] = {"n": 17, "%": 60 }
+sampleYears["2016"]["Gila"]["VRE, E. faecium Vancomycin resistant"] = {"n": 25, "%": 60 }
+sampleYears["2017"]["Gila"]["VRE, E. faecium Vancomycin resistant"] = {"n": 33, "%": 60 }
+sampleYears["2018"]["Gila"]["VRE, E. faecium Vancomycin resistant"] = {"n": 40, "%": 60 }
+sampleYears["2013"]["Graham"]["VRE, E. faecium Vancomycin resistant"] = {"n": 12, "%": 67 }
+sampleYears["2014"]["Graham"]["VRE, E. faecium Vancomycin resistant"] = {"n": 7, "%": 57 }
+sampleYears["2015"]["Graham"]["VRE, E. faecium Vancomycin resistant"] = {"n": 12, "%": 62 }
+sampleYears["2016"]["Graham"]["VRE, E. faecium Vancomycin resistant"] = {"n": 17, "%": 60 }
+sampleYears["2017"]["Graham"]["VRE, E. faecium Vancomycin resistant"] = {"n": 22, "%": 61 }
+sampleYears["2018"]["Graham"]["VRE, E. faecium Vancomycin resistant"] = {"n": 27, "%": 61 }
+sampleYears["2013"]["Greenlee"]["VRE, E. faecium Vancomycin resistant"] = {"n": 3, "%": 67 }
+sampleYears["2014"]["Greenlee"]["VRE, E. faecium Vancomycin resistant"] = {"n": 1, "%": 0 }
+sampleYears["2015"]["Greenlee"]["VRE, E. faecium Vancomycin resistant"] = {"n": 3, "%": 34 }
+sampleYears["2016"]["Greenlee"]["VRE, E. faecium Vancomycin resistant"] = {"n": 4, "%": 17 }
+sampleYears["2017"]["Greenlee"]["VRE, E. faecium Vancomycin resistant"] = {"n": 5, "%": 26 }
+sampleYears["2018"]["Greenlee"]["VRE, E. faecium Vancomycin resistant"] = {"n": 6, "%": 22 }
+sampleYears["2013"]["LaPaz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 7, "%": 57 }
+sampleYears["2014"]["LaPaz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 4, "%": 75 }
+sampleYears["2015"]["LaPaz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 7, "%": 66 }
+sampleYears["2016"]["LaPaz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 10, "%": 71 }
+sampleYears["2017"]["LaPaz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 13, "%": 69 }
+sampleYears["2018"]["LaPaz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 16, "%": 70 }
+sampleYears["2013"]["Maricopa"]["VRE, E. faecium Vancomycin resistant"] = {"n": 1336, "%": 42 }
+sampleYears["2014"]["Maricopa"]["VRE, E. faecium Vancomycin resistant"] = {"n": 753, "%": 45 }
+sampleYears["2015"]["Maricopa"]["VRE, E. faecium Vancomycin resistant"] = {"n": 1336, "%": 44 }
+sampleYears["2016"]["Maricopa"]["VRE, E. faecium Vancomycin resistant"] = {"n": 1919, "%": 45 }
+sampleYears["2017"]["Maricopa"]["VRE, E. faecium Vancomycin resistant"] = {"n": 2501, "%": 45 }
+sampleYears["2018"]["Maricopa"]["VRE, E. faecium Vancomycin resistant"] = {"n": 3084, "%": 45 }
+sampleYears["2013"]["Mohave"]["VRE, E. faecium Vancomycin resistant"] = {"n": 6, "%": 87 }
+sampleYears["2014"]["Mohave"]["VRE, E. faecium Vancomycin resistant"] = {"n": 56, "%": 79 }
+sampleYears["2015"]["Mohave"]["VRE, E. faecium Vancomycin resistant"] = {"n": 106, "%": 83 }
+sampleYears["2016"]["Mohave"]["VRE, E. faecium Vancomycin resistant"] = {"n": 156, "%": 81 }
+sampleYears["2017"]["Mohave"]["VRE, E. faecium Vancomycin resistant"] = {"n": 206, "%": 82 }
+sampleYears["2018"]["Mohave"]["VRE, E. faecium Vancomycin resistant"] = {"n": 256, "%": 82 }
+sampleYears["2013"]["Navajo"]["VRE, E. faecium Vancomycin resistant"] = {"n": 20, "%": 70 }
+sampleYears["2014"]["Navajo"]["VRE, E. faecium Vancomycin resistant"] = {"n": 21, "%": 62 }
+sampleYears["2015"]["Navajo"]["VRE, E. faecium Vancomycin resistant"] = {"n": 22, "%": 66 }
+sampleYears["2016"]["Navajo"]["VRE, E. faecium Vancomycin resistant"] = {"n": 23, "%": 64 }
+sampleYears["2017"]["Navajo"]["VRE, E. faecium Vancomycin resistant"] = {"n": 24, "%": 65 }
+sampleYears["2018"]["Navajo"]["VRE, E. faecium Vancomycin resistant"] = {"n": 25, "%": 65 }
+sampleYears["2013"]["Pima"]["VRE, E. faecium Vancomycin resistant"] = {"n": 336, "%": 49 }
+sampleYears["2014"]["Pima"]["VRE, E. faecium Vancomycin resistant"] = {"n": 189, "%": 60 }
+sampleYears["2015"]["Pima"]["VRE, E. faecium Vancomycin resistant"] = {"n": 336, "%": 55 }
+sampleYears["2016"]["Pima"]["VRE, E. faecium Vancomycin resistant"] = {"n": 482, "%": 58 }
+sampleYears["2017"]["Pima"]["VRE, E. faecium Vancomycin resistant"] = {"n": 629, "%": 57 }
+sampleYears["2018"]["Pima"]["VRE, E. faecium Vancomycin resistant"] = {"n": 775, "%": 58 }
+sampleYears["2013"]["Pinal"]["VRE, E. faecium Vancomycin resistant"] = {"n": 109, "%": 52 }
+sampleYears["2014"]["Pinal"]["VRE, E. faecium Vancomycin resistant"] = {"n": 61, "%": 67 }
+sampleYears["2015"]["Pinal"]["VRE, E. faecium Vancomycin resistant"] = {"n": 109, "%": 60 }
+sampleYears["2016"]["Pinal"]["VRE, E. faecium Vancomycin resistant"] = {"n": 156, "%": 64 }
+sampleYears["2017"]["Pinal"]["VRE, E. faecium Vancomycin resistant"] = {"n": 204, "%": 62 }
+sampleYears["2018"]["Pinal"]["VRE, E. faecium Vancomycin resistant"] = {"n": 251, "%": 63 }
+sampleYears["2013"]["SantaCruz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 14, "%": 57 }
+sampleYears["2014"]["SantaCruz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 8, "%": 75 }
+sampleYears["2015"]["SantaCruz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 14, "%": 66 }
+sampleYears["2016"]["SantaCruz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 21, "%": 71 }
+sampleYears["2017"]["SantaCruz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 27, "%": 69 }
+sampleYears["2018"]["SantaCruz"]["VRE, E. faecium Vancomycin resistant"] = {"n": 33, "%": 70 }
+sampleYears["2013"]["Yavapai"]["VRE, E. faecium Vancomycin resistant"] = {"n": 71, "%": 69 }
+sampleYears["2014"]["Yavapai"]["VRE, E. faecium Vancomycin resistant"] = {"n": 40, "%": 75 }
+sampleYears["2015"]["Yavapai"]["VRE, E. faecium Vancomycin resistant"] = {"n": 71, "%": 72 }
+sampleYears["2016"]["Yavapai"]["VRE, E. faecium Vancomycin resistant"] = {"n": 102, "%": 74 }
+sampleYears["2017"]["Yavapai"]["VRE, E. faecium Vancomycin resistant"] = {"n": 133, "%": 73 }
+sampleYears["2018"]["Yavapai"]["VRE, E. faecium Vancomycin resistant"] = {"n": 164, "%": 74 }
+sampleYears["2013"]["Yuma"]["VRE, E. faecium Vancomycin resistant"] = {"n": 64, "%": 75 }
+sampleYears["2014"]["Yuma"]["VRE, E. faecium Vancomycin resistant"] = {"n": 36, "%": 67 }
+sampleYears["2015"]["Yuma"]["VRE, E. faecium Vancomycin resistant"] = {"n": 64, "%": 71 }
+sampleYears["2016"]["Yuma"]["VRE, E. faecium Vancomycin resistant"] = {"n": 92, "%": 69 }
+sampleYears["2017"]["Yuma"]["VRE, E. faecium Vancomycin resistant"] = {"n": 119, "%": 70 }
+sampleYears["2018"]["Yuma"]["VRE, E. faecium Vancomycin resistant"] = {"n": 119, "%": 70 }
+
+    var pathogenType = {"MRSA, Oxicillin resistant":L.layerGroup(), "VRE, E. faecium Vancomycin resistant":L.layerGroup(), "VRE, E. faecalis Vancomycin resistant":L.layerGroup(), "ESBL, K. pneumoniae ESBL-positive":L.layerGroup(), "ESBL, K. oxytoca ESBL-positive":L.layerGroup(), "ESBL, E. coli ESBL-positive":L.layerGroup(), "CRE, E. coli carbapenum resistant":L.layerGroup(), "CRE, K. pneumoniae carbapenum resistant":L.layerGroup(), "C. diff, #Pos/#tested":L.layerGroup()}
+    var colorType = {"n":L.layerGroup(),"%":L.layerGroup()}
+
+    var pathogenGraph = {}
+    var thing = []
+    for (var index in pathogenType) {
+      pathogenGraph[index] = {'x': [], 'y': [], 'name': index, 'type': 'bar'}
+      for (county in countyCoordinates) {
+        pathogenGraph[index]['x'].push(county)
+      }
+      thing.push(pathogenGraph[index])
+    }
+
+    var layout = {barmode: 'stack', legend: {x: -0.2, y: 1.4}}
+    Plotly.newPlot(tester, thing, layout)
+
+    window.addEventListener("map:init", function (e) {
+
+      var detail = e.detail;
+
+      // --------------------( TILE LAYERS & OVERLAYS )
+      var baseLayers = {
+        "Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+        "Dark Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+      };
+
+      var overlays = new Object;
+      // PCA Polygons
+      for (var i = 0; i < Object.keys(pca).length; i++) {
+        if (Object.keys(pca).sort()[i] == "Navajo Nation") {
+
+
+
+          var polygonFill1 = L.polygon(pca[Object.keys(pca).sort()[i]]["Fill1"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            fillColor: 'hsl(50, 0%, 50%)',
+            color: 'hsl(50, 0%, 50%)',
+            opacity: 0.7,
+            weight: 0.5,
+            fillOpacity: 0.7
+          });
+
+
+          var polygonLine1 = L.polygon(pca[Object.keys(pca).sort()[i]]["Line1"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            color: 'hsl(50, 100%, 0%)',
+            opacity: 0.7,
+            weight: 1,
+            fillOpacity: 0.0
+          });
+          var polygonLine2 = L.polygon(pca[Object.keys(pca).sort()[i]]["Line2"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            color: 'hsl(50, 100%, 0%)',
+            opacity: 0.7,
+            weight: 1,
+            fillOpacity: 0.0
+          });
+          var polygonLine3 = L.polygon(pca[Object.keys(pca).sort()[i]]["Line3"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            color: 'hsl(50, 100%, 0%)',
+            opacity: 0.7,
+            weight: 1,
+            fillOpacity: 0.0
+          });
+
+          group = new L.FeatureGroup();
+          group.addLayer(polygonFill1);
+          group.addLayer(polygonLine1);
+          group.addLayer(polygonLine2);
+          group.addLayer(polygonLine3);
+          overlays[Object.keys(pca).sort()[i]] = group
+          detail.map.addLayer(group)
+
+        } else if (Object.keys(pca).sort()[i] == "Hopi Tribe") {
+
+
+
+          var polygonFill1 = L.polygon(pca[Object.keys(pca).sort()[i]]["Fill1"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            fillColor: 'hsl(50, 0%, 50%)',
+            color: 'hsl(50, 0%, 50%)',
+            opacity: 0.7,
+            weight: 1,
+            fillOpacity: 0.7
+          });
+          var polygonFill2 = L.polygon(pca[Object.keys(pca).sort()[i]]["Fill2"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            fillColor: 'hsl(50, 0%, 50%)',
+            color: 'hsl(50, 0%, 50%)',
+            opacity: 0.7,
+            weight: 1,
+            fillOpacity: 0.7
+          });
+
+
+          var polygonLine1 = L.polygon(pca[Object.keys(pca).sort()[i]]["Line1"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            color: 'hsl(50, 100%, 0%)',
+            opacity: 0.7,
+            weight: 1,
+            fillOpacity: 0.0
+          });
+          var polygonLine2 = L.polygon(pca[Object.keys(pca).sort()[i]]["Line2"], {
+            title: Object.keys(pca).sort()[i],
+            clickable: true,
+            color: 'hsl(50, 100%, 0%)',
+            opacity: 0.7,
+            weight: 1,
+            fillOpacity: 0.0
+          });
+
+
+
+          group = new L.FeatureGroup();
+          group.addLayer(polygonFill1);
+          group.addLayer(polygonFill2);
+          group.addLayer(polygonLine1);
+          group.addLayer(polygonLine2);
+          overlays[Object.keys(pca).sort()[i]] = group
+          detail.map.addLayer(group)
+
+        } else {
+        var polygon = L.polygon(pca[Object.keys(pca).sort()[i]], {
+          title: Object.keys(pca).sort()[i],
+          clickable: true,
+          fillColor: 'hsl(50, 0%, 50%)',
+          color: 'hsl(50, 100%, 0%)',
+          opacity: 0.7,
+          weight: 1,
+          fillOpacity: 0.7
+        });
+        overlays[Object.keys(pca).sort()[i]] = polygon;
+        detail.map.addLayer(polygon)
+        }
+      }
+      // County Polygons
+      for (var i = 0; i < Object.keys(counties).length; i++) {
+        var polygon = L.polygon(counties[Object.keys(counties).sort()[i]], {
+          title: Object.keys(counties).sort()[i],
+          clickable: true,
+          color: 'hsl(50, 100%, 0%)',
+          opacity: 0.7,
+          weight: 1,
+          fillOpacity: 0.7
+        });
+        overlays[Object.keys(counties).sort()[i]] = polygon;
+        detail.map.addLayer(polygon)
+      }
+      L.control.layers(baseLayers, overlays).addTo(detail.map);
+      L.control.layers(pathogenType).addTo(detail.map);
+      L.control.layers(colorType).addTo(detail.map);
+
+      detail.map.addLayer(baseLayers["Grey"])
+      detail.map.addLayer(pathogenType["MRSA, Oxicillin resistant"])
+      detail.map.addLayer(colorType["%"])
+
+      function fillSamples() {
+        for (var i in years) {
+          detail.map.removeLayer(sampleYears[years[i]]["overlay"]);
+          sampleYears[years[i]]["overlay"].clearLayers()
+        }
+
+        for (var county in countyCoordinates) {
+          for (var type in pathogenType) {
+            if (detail.map.hasLayer(pathogenType[type]) && detail.map.hasLayer(overlays[county])) {
+
+              if (detail.map.hasLayer(colorType["%"])) {
+                let newColor = 100-parseInt(sampleYears[years[document.getElementById("yearScale").value]][county][type]["%"])
+                overlays[county].setStyle({fillColor:"hsl(" + newColor + ",100%,50%)"})
+              } else if (detail.map.hasLayer(colorType["n"])) {
+                let newColor = parseInt(parseInt(sampleYears[years[document.getElementById("yearScale").value]][county][type]["n"])/10)
+                if (newColor > 100) {
+                  newColor = 100
+                } else if (newColor < 0) {
+                  newColor = 0
+                }
+                newColor = 100 - newColor
+                overlays[county].setStyle({fillColor:"hsl(" + newColor + ",100%,50%)"})
+              }
+
+              document.getElementById("yearScaleLabel").innerHTML = type + " (" + years[document.getElementById("yearScale").value] + ")"
+              sampleYears[years[document.getElementById("yearScale").value]]["overlay"].addLayer(new L.Marker.SVGMarker(countyCoordinates[county], { iconOptions: { circleText: sampleYears[years[document.getElementById("yearScale").value]][county][type]["n"] + " (" + sampleYears[years[document.getElementById("yearScale").value]][county][type]["%"] + "%)", iconSize:  100}}));
+            }
+          }
+        }
+        detail.map.addLayer(sampleYears[years[document.getElementById("yearScale").value]]["overlay"])
+
+        //console.log(overlays)
+        //detail.map.removeLayer(overlays["Apache"])
+        detail.map.addLayer(overlays["Flagstaff"])
+      }
+
+      function updateGraph() {
+        var data = [];
+        for (type in pathogenType) {
+          pathogenGraph[type]['y'] = []
+          data = []
+          for (var county in countyCoordinates) {
+            pathogenGraph[type]['y'].push(sampleYears[years[document.getElementById("yearScale").value]][county][type]["n"])
+          }
+        }
+        Plotly.redraw(tester)
+
+        detail.map.addLayer(overlays["Flagstaff"])
+      }
+
+      document.getElementById("yearScale").value = 0;
+      document.getElementById("yearScaleLabel").innerHTML = years[document.getElementById("yearScale").value]
+
+      fillSamples();
+      detail.map.addLayer(sampleYears[years[document.getElementById("yearScale").value]]["overlay"])
+
+      document.getElementById("yearScale").addEventListener('input', function(event) {
+        fillSamples()
+        updateGraph()
+      });
+      detail.map.on('baselayerchange', function () {
+        fillSamples()
+        updateGraph()
+      })
+      detail.map.on('overlayadd', function () {
+        fillSamples()
+        updateGraph()
+      })
+      detail.map.on('overlayremove', function () {
+        fillSamples()
+        updateGraph()
+      })
+
+      //var marker = new L.marker([37.003239, -110.754389]).addTo(detail.map);
+      //var marker = new L.marker([36.409949, -110.750698]).addTo(detail.map);
+
+      //var marker = new L.marker([36.078683, -111.082517]).addTo(detail.map);
+      //var marker = new L.marker([36.074419, -110.750696]).addTo(detail.map);
+      //var marker = new L.Marker.SVGMarker([35.1,-109.4], { iconOptions: { circleText:500 }}).addTo(detail.map);
+
+
+
+      updateGraph()
+      fillSamples()
+    }, false);
+
+
+  </script>
+
+{% endblock %}

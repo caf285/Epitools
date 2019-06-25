@@ -5,8 +5,8 @@ from django.views import generic
 from django.utils import timezone
 
 #from .models import Question
-from .models import Sample
-from .models import Pathogen
+#from .models import Sample
+#from .models import Pathogen
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -30,6 +30,7 @@ class DemoAntibiogramView(LoginRequiredMixin, generic.ListView):
   def get_queryset(self):
     return ""
 
+'''
 class DemoQueryView(LoginRequiredMixin, generic.ListView):
   template_name = 'demo/demoQuery.html'
   context_object_name = 'demoQueryList'
@@ -41,10 +42,17 @@ class DemoQueryView(LoginRequiredMixin, generic.ListView):
     return queryList
   def getYear(self):
     return str(datetime.datetime.now().year)
+'''
 
 class DemoEmmtypeView(LoginRequiredMixin, generic.ListView):
   template_name = 'demo/demoEmmtype.html'
   context_object_name = 'demoEmmtype'
+  def get_queryset(self):
+    return ""
+
+class DemoPCAView(LoginRequiredMixin, generic.ListView):
+  template_name = 'demo/demoPCA.html'
+  context_object_name = 'demoPCA'
   def get_queryset(self):
     return ""
 

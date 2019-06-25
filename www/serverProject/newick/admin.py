@@ -1,8 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Pathogen, Sample, Tree
+from .models import PCA, County, MPC
 
-admin.site.register(Pathogen)
-admin.site.register(Sample)
-admin.site.register(Tree)
+admin.site.register(PCA)
+admin.site.register(County)
+admin.site.register(MPC)

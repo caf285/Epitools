@@ -13,9 +13,10 @@
   <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
   <style>
     .leaflet-container {  /* all maps */
-      width: 100%;
+      width: 80%;
       height: 800px;
       z-index: 1;
+      margin-left: 20%;
     }
   </style>
 {% endblock %}
@@ -31,8 +32,8 @@
       </div>
       <div id="mScaleLabel"></div>
     </div>
-    <div style="position:absolute;top:-500px;left:0;z-index:100;">
-      <div id="testPlot" style="width:400px;height:500px;">
+    <div style="position:absolute;top:-600px;left:0;z-index:100;">
+      <div id="testPlot" style="width:400px;height:600px;">
       </div>
     </div>
   </div>
