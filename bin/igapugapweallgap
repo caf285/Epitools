@@ -1,0 +1,951 @@
+#!/bin/bash
+#
+# Create an assembly from a pair of read files:
+#   ugap R1_FASTQ R2_FASTQ
+#
+# Download and run with a small test dataset from the European Nucleotide Archive:
+#   ugap test
+#
+# TODO: move blast output to a directory
+# TODO: add a default help/usage message
+# TODO: for each stage, test what happens if the output files already exist.
+
+[[ "${DEBUG-}" = true ]] && set -x
+set -euo pipefail
+shopt -s nullglob
+
+# TODO: add sysinfo subcommand. This should log relevant information about the environment and dependency versions.
+# Do not assume the shell is bash. Test in sh, dash, bash, zsh, csh, ...?
+# http://wiki.bash-hackers.org/syntax/shellvars
+
+# TODO: print sysinfo (uname -a?) and batch scheduler version.
+
+if [[ "${1-}" == -h ]] || [[ "${1-}" == --help ]]; then
+    # TODO: extract usage message as print_usage function
+    cat <<EOF
+
+BASH_VERSINFO: ${BASH_VERSINFO[*]}"
+
+*** DEVELOPMENT RELEASE ***
+author: Jason Travis <jtravis@tgen.org>
+url: https://github.com/TGenNorth/UGAP (restricted access)
+version: v0.1.1
+
+Pipeline Synopsis:
+  ugap will create an assembly fasta from a set of paired end fastq.
+
+  (deplete reads) - discard reads that do not align to a reference fasta
+  ▼
+  subsample reads to <= 20,000,000
+  ▼
+  trimmomatic - trim adapter sequences
+  ▼
+  (usearch)   - filter PhiX (DISABLED in v0.0.4 due to 32bit constraint)
+  ▼
+  spades      - assemble reads
+  ▼
+  pilon       - improve assembly
+  ▼
+  BEDTools    - coverage statistics
+  ▼
+  blastn      - assign taxonomy
+
+Each read pair creates the following output file structure:
+
+    \${sample_name}.ugap
+    ├── \${sample_name}_coverage.txt
+    ├── \$blast_report
+    ├── \$blast_query
+    ├── \${sample_name}.R1.subsample.fq.gz
+    ├── \${sample_name}.R2.subsample.fq.gz
+    ├── \${sample_name}.trimmomatic
+    │   ├── \${sample_name}.F.paired.fq.gz
+    │   └── \${sample_name}.R.paired.fq.gz
+    ├── \${sample_name}.spades
+    │   ├── The structure of the spades output is copied for reference from the spades v3.10.1 manual
+    |   |   See http://cab.spbu.ru/software/spades/
+    │   ├── scaffolds.fasta      – resulting scaffolds (recommended for use as resulting sequences)
+    │   ├── contigs.fasta        – resulting contigs
+    │   ├── assembly_graph.fastg – assembly graph
+    │   ├── contigs.paths        – contigs paths in the assembly graph
+    │   ├── scaffolds.paths      – scaffolds paths in the assembly graph
+    │   ├── before_rr.fasta      – contigs before repeat resolution
+    │   ├── corrected/           – files from read error correction
+    │   |   ├── configs/         – configuration files for read error correction
+    │   |   ├── corrected.yaml   – internal configuration file
+    │   |   └── Output files with corrected reads
+    │   ├── params.txt           – information about SPAdes parameters in this run
+    │   ├── spades.log           – SPAdes log
+    │   ├── dataset.info         – internal configuration file
+    │   ├── input_dataset.yaml   – internal YAML data set file
+    │   └── K<##>/               – directory containing intermediate files from the run with K=<##>.
+    |                              These files should not be used as assembly results; use resulting contigs/scaffolds
+    └── \${sample_name}.pilon
+        ├── \${sample_name}.pilon.bam
+        ├── \${sample_name}.pilon.bam.bai
+        ├── \${sample_name}.pilon.fasta
+        ├── \${sample_name}.pilon.fasta.amb
+        ├── \${sample_name}.pilon.fasta.ann
+        ├── \${sample_name}.pilon.fasta.bwt
+        ├── \${sample_name}.pilon.fasta.pac
+        └── \${sample_name}.pilon.fasta.sa
+
+Single Usage:
+
+  When run with positional arguments, the script runs the pipeline to build an
+  assembly from the given pair of fastq files.
+
+  ugap R1_FASTQ R2_FASTQ [REFERENCE_FASTA]
+
+Batch Usage:
+
+  When run without positional arguments, the script prints a batch script that
+  will run the pipeline on each pair of fastq files in the current directory.
+
+  The batch script can be executed immediately:
+
+      SLURM:  sbatch <( /path/to/ugap )
+      TORQUE: /path/to/ugap | qsub
+      Bash:   bash <( /path/to/ugap )
+  
+  Alternatively, the script can be saved before submitting which could be
+  useful if you need to match the log ouput back to the input files:
+
+      /path/to/ugap > ugap.batch
+
+      SLURM:  sbatch ugap.batch
+      TORQUE: qsub   ugap.batch
+      Bash:   bash   ugap.batch
+
+  The script assumes the directory contains .fastq.gz or fq.gz files that:
+    - are all paired reads
+    - follow the SRA or Illumina naming conventions
+    - can be grouped alphanumerically by filename
+      (The forward read always preceeds the reverse read when the files are listed)
+
+EOF
+    exit 0
+fi
+
+
+################################################################################
+# Print a job scheduler array batch script to run the pipeline on each pair of
+# fastq files in the current directory.
+# Globals:
+#   BASH_SOURCE
+#   PWD
+# Arguments:
+#   None
+# Returns:
+#   A job scheduler batch script if a sbatch or qsub command are found on the PATH
+#   fallingback to a for-loop shell script.
+################################################################################
+print_batch_script () {
+    # The command that generate the batch script 'reads' variable formats
+    # its output into 3 evenly spaced columns.
+    #   - The first column is the forward read file
+    #   - The second column is the reverse read file
+    #   - The third column is a comment for the job array index to make it
+    #     easier to figure out which input files belong to the output logs.
+    #
+    # $( awk '{print "\t" $0 "\t# " NR-1 }' <(printf "\"%s\"\t\"%s\"\n" ${fastqs[@]}) | column -s$'\t' -t | sed  's/^/\t/' )
+    #   - 'sed' is used to indents all the lines
+    #   - 'column' is used to format the lines into evenly spaced columns
+    #   - 'printf' is used to join the fastq array into pairs of reads (the first two columns)
+    #   - 'awk' is used to append a count to each line (the third comment column)
+    #
+    # Example output:
+    #     reads=(
+    #         "A_R1.fq.gz"    "A_R2.fq.gz"    # 0
+    #         "B_R1.fq.gz"    "B_R2.fq.gz"    # 1
+    #         "C_R1.fq.gz"    "C_R2.fq.gz"    # 2
+    #     )
+
+    # FIXME: reference should be a command line flag.
+    # reference is the first fasta found in the directory
+    local reference=""
+    local -a fastas=( *.fasta )
+    #if [[ "${#fastas:?}" -gt 0 ]]; then
+    #    reference="$PWD/${fastas[0]}"
+    #fi
+
+    local -a fastqs=( *.fastq.gz *.fq.gz )
+    local -i n_reads="${#fastqs[@]}"
+
+    local script=$(readlink -e ${BASH_SOURCE[0]})
+    local script_dir="${script%/*}"
+
+    [[ "$n_reads" -eq 0 ]] && {
+        printf "no fastq files found in $PWD\n"
+        exit 1
+    } >&2
+
+    [[ $(( n_reads % 2 )) -ne 0 ]] && {
+        printf "expected paired reads, found an odd number of fastq files: %d\n" "$n_reads"
+        exit 1
+    } >&2
+
+    if command -v sbatch &>/dev/null; then
+
+        # SC2068: Double quote array expansions to avoid re-splitting elements.
+        # shellcheck disable=SC2068
+        cat <<EOF
+#!/bin/bash
+#SBATCH --job-name ugap
+#SBATCH --array=0-$(( n_reads/2 - 1 ))%8
+#SBATCH --workdir=$PWD
+#SBATCH --cpus-per-task=16
+
+set -euo pipefail
+
+module load BEDtools blast+ bwa pigz samtools spades
+
+reads=(
+$( awk '{print "\t" $0 "\t# " NR-1 }' <(printf "\"%s\"\t\"%s\"\n" ${fastqs[@]}) | column -s$'\t' -t | sed  's/^/\t/' )
+)
+
+SLURM_ARRAY_TASK_ID=\${SLURM_ARRAY_TASK_ID?undefined}
+r1=\$(( SLURM_ARRAY_TASK_ID*2 ))
+r2=\$(( SLURM_ARRAY_TASK_ID*2 + 1))
+
+DEBUG=true NCPU=\$SLURM_CPUS_ON_NODE $script $PWD/\${reads[\$r1]} $PWD/\${reads[\$r2]} $reference
+EOF
+
+    elif command -v qsub &>/dev/null; then
+        # SC2068: Double quote array expansions to avoid re-splitting elements.
+        # shellcheck disable=SC2068
+        cat <<EOF
+#!/bin/bash
+#PBS -N ugap
+#PBS -t 0-$(( n_reads/2 - 1 ))
+#PBS -d $PWD
+#PBS -l nodes=1:ppn=16
+
+set -euo pipefail
+
+module load BEDtools blast+ bwa pigz samtools spades
+
+reads=(
+$( awk '{print "\t" $0 "\t# " NR-1 }' <(printf "\"%s\"\t\"%s\"\n" ${fastqs[@]}) | column -s$'\t' -t | sed  's/^/\t/' )
+)
+
+PBS_ARRAYID=\${PBS_ARRAYID?undefined}
+r1=\$(( PBS_ARRAYID*2 ))
+r2=\$(( PBS_ARRAYID*2 + 1))
+
+DEBUG=true NCPU=\$PBS_NUM_PPN NO_USEARCH=true $script $PWD/\${reads[\$r1]} $PWD/\${reads[\$r2]} $reference
+EOF
+
+    else
+        # SC2068: Double quote array expansions to avoid re-splitting elements.
+        # shellcheck disable=SC2068
+        cat <<EOF
+#!/bin/bash
+
+set -euo pipefail
+
+module load BEDtools blast+ bwa pigz samtools spades
+
+reads=(
+$( awk '{print "\t" $0 "\t# " NR-1 }' <(printf "\"%s\"\t\"%s\"\n" ${fastqs[@]}) | column -s$'\t' -t | sed  's/^/\t/' )
+)
+
+# TODO: document how this command runs the script on each pair of fastqs
+# TODO: add optional parameter for using the xargs -P flag to run more than one pipeline at a time.
+# TODO: remove --show-limits it is a GNU extension
+printf "%s\0" "${fastqs[@]}" \\
+    | xargs -0 -L 2 -P 1 -t --show-limits -- \\
+    bash -c 'DEBUG=true NCPU=$(nproc || 1) $script $PWD/\$1 $PWD/\$2 $reference'
+EOF
+    fi
+}
+
+[[ "$#" -eq 0 ]] && print_batch_script && exit 0
+
+# Run with a test data set.
+declare test_monkey_patch=""
+if [[ "$#" -eq 1 ]] && [[ "$1" = "test" ]]; then
+	reference="ftp://ftp.ensembl.org/pub/current_fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz"
+	R1="ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR507/SRR507778/SRR507778_1.fastq.gz"
+	R2="ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR507/SRR507778/SRR507778_2.fastq.gz"
+
+	#shellcheck "${BASH_SOURCE[0]:-$0}"
+
+	if [[ ! -f "reference.fasta" ]] || [[ ! -f "${R1##*/}" ]] || [[ ! -f "${R2##*/}" ]]; then
+		printf "Downloading truncated dataset from ensembl.org.\nAn error code 23 from curl is expected indicating only a portion of the read files were downloaded.\n"
+		# TODO: add curl --connect-timeout and/or --max-time
+		# One application of this is on a compute node not attached
+		# to the network. The program (may) hang indefinitely.
+		# Catch the timeout exit status and print an error explaining
+		# why the download/test was cancelled.
+		# TODO: allow the download/test to be run separately.
+		curl -Ss "$R1" | gzip -d | head -100000 | gzip > "${R1##*/}" &
+		curl -Ss "$R2" | gzip -d | head -100000 | gzip > "${R2##*/}" &
+		curl -Ss "$reference" | gzip -d > reference.fasta \
+		&& printf "Waiting for downloads to complete..." \
+		&& wait \
+		&& echo "done"
+	fi
+
+	# Set positional arguments as if the user called the script as:
+	# ugap SRR507778_R1.fastq.gz SRR507778_R2.fastq.gz
+	echo "Replacing positional argument '$1' with: ${R1##*/} ${R2##*/}"
+	set -- "${R1##*/}" "${R2##*/}"
+
+	test_monkey_patch="-k 23"
+
+	# FIXME: A reference fasta is downloaded but not used. Test the read depletion step.
+fi
+
+declare -i keep_n_bases=200 # TODO: parameterize keep_n_bases
+# FIXME: nproc may not be available. Check alternatives.
+declare -i NCPU=${NCPU:-$(nproc || 1)}
+
+# Input filenames
+declare R1="${1?missing forward read parameter}"
+declare R2="${2?missing reverse read parameter}"
+declare reference="${3-}"
+
+# Guess the sample name from the R1 filename.
+# The R1 filename is trimmed piecewise assuming it matches one of the
+# following naming conventions:
+#
+# filename:    NA10831_ATCACG_L002_R1_001.fastq.gz
+# sample name: NA10831_ATCACG_L002
+#
+# filename:    SRR507778_1.fq.gz
+# sample name: SRR507778
+#
+# Illumina Fastq naming convention:
+# https://support.illumina.com/help/SequencingAnalysisWorkflow/Content/Vault/Informatics/Sequencing_Analysis/CASAVA/swSEQ_mCA_FASTQFiles.htm
+#
+# TODO: add explicit sample name parameter. Guess the sample name only as a default value.
+declare sample_name="${R1##*/}"
+sample_name="${sample_name%.gz}"
+sample_name="${sample_name%.fastq}"
+sample_name="${sample_name%.fq}"
+sample_name=${sample_name%_1}
+sample_name=${sample_name%_R1*}
+
+# Output directories
+declare ugap_workdir="${sample_name}.ugap"
+declare trimmomatic_workdir="$ugap_workdir/${sample_name}.trimmomatic"
+declare spades_workdir="$ugap_workdir/${sample_name}.spades"
+declare pilon_workdir="$ugap_workdir/${sample_name}.pilon"
+
+# Output files
+declare r1_subsample_fastq="$ugap_workdir/${sample_name}.R1.subsample.fq.gz"
+declare r2_subsample_fastq="$ugap_workdir/${sample_name}.R2.subsample.fq.gz"
+declare f_deplete_fq="$ugap_workdir/${sample_name}.F.deplete.fq.gz"
+declare r_deplete_fq="$ugap_workdir/${sample_name}.R.deplete.fq.gz"
+declare f_paired_fq="$trimmomatic_workdir/${sample_name}.F.paired.fq.gz"
+declare r_paired_fq="$trimmomatic_workdir/${sample_name}.R.paired.fq.gz"
+declare spades_assembly="$spades_workdir/contigs.fasta"
+declare spades_bam="$spades_workdir/${sample_name}.bam"
+declare pilon_assembly="$pilon_workdir/${sample_name}.fasta"
+declare pilon_bam="$pilon_workdir/${sample_name}.bam"
+declare bedtools_coverage="$ugap_workdir/${sample_name}.coverage"
+declare blast_query="$ugap_workdir/${sample_name}.query.fasta"
+declare blast_report="$ugap_workdir/${sample_name}.blast"
+declare ugap_summary="$ugap_workdir/${sample_name}.blast.ugap"
+declare ugap_species_list="$ugap_workdir/${sample_name}.species.ugap"
+
+# Dependencies
+# TODO: extract dependency paths as config
+declare script_dir="$(readlink -e "${BASH_SOURCE[0]%/*}")"
+
+# FIXME: extract hardcoded path; search CLASSPATH with a fallback assuming
+# - a shell script wrapper (see bioconda example)
+# - an optional parameter specifying the path to the jar
+# - include a trimmomatic jar
+#
+# org.usadellab.trimmomatic.Trimmomatic
+declare trimmomatic="/packages/trimmomatic/0.36/trimmomatic-0.36.jar"
+declare trimmomatic_adapters="${trimmomatic%/*}"/adapters/TruSeq3-PE.fa
+# org.broadinstitute.pilon.Pilon
+declare pilon="$script_dir/pilon-1.22.jar"
+declare picard="$script_dir/picard.jar"
+command -v bwa >/dev/null || { echo >&2 "command not found: bwa"; exit 1; }
+#command -v samtools >/dev/null || { echo >&2 "command not found: samtools"; exit 1; }
+samtools --version >/dev/null 2>&1 || { echo >&2 "samtools >= v1.0 is required"; exit 1; }
+# TODO: log spades.py --version
+command -v spades.py >/dev/null || { echo >&2 "command not found: spades.py"; exit 1; }
+command -v genomeCoverageBed >/dev/null || { echo >&2 "command not found: genomeCoverageBed"; exit 1; }
+command -v fastaFromBed >/dev/null || { echo >&2 "command not found: fastaFromBed"; exit 1; }
+# TODO: replace usearch with an alterative PHIx filter
+#command -v usearch >/dev/null || { echo >&2 "command not found: usearch"; exit 1; }
+
+#if [[ -n "$blastdb" ]]; then
+#	command -v blastdbcmd >/dev/null || {
+#        # FIXME: This 
+#        echo >&2 "command not found: blastdbcmd -- failed to validate blastdb: $blastdb"
+#        exit 1
+#    }
+#	blastdbcmd -db "$blastdb" -info > /dev/null || { echo >&2 "blastdb not found: $blastdb"; exit 1; }
+#	command -v blastn >/dev/null || { echo >&2 "command not found: blastn"; exit 1; }
+#else
+#	echo >&2 "optional blastdb undefined -- taxonomy assignment will be skipped"
+#fi
+#
+# TODO: add advanced option to opt-out of BLAST
+# BLAST is implicitly optional in Jason Sahl's UGAP. As a result it is easy for
+# a run to fail and need to repeat the analysis. To avoid this frustration,
+# BLAST is required in this implementation.
+if [[ -z "${BLASTDB:-}" ]]; then
+    if [[ -d /scratch/blastdb ]]; then
+        # Guess Aspen path
+        export BLASTDB=/scratch/blastdb
+    elif [[ -d /common/contrib/databases/genbank ]]; then
+        # Guess Monsoon path
+        export BLASTDB=/common/contrib/databases/genbank
+    fi
+fi
+command -v blastdbcmd >/dev/null || { echo >&2 "command not found: blastdbcmd"; exit 1; }
+blastdbcmd -info >/dev/null 2>&1 \
+    || {
+        echo "blastdbcmd -info returned a non-zero exit status: $?"
+        echo "Is the BLASTDB environment variable set and exported?: $BLASTDB"
+        echo "https://www.ncbi.nlm.nih.gov/books/NBK52640/#_chapter1_Configuration_"
+        exit 1
+    } >&2
+blastdbcmd -info -db nt > /dev/null 2>&1
+command -v blastn >/dev/null || { echo >&2 "command not found: blastn"; exit 1; }
+
+# TODO: log dependency versions
+#bwa 2>&1 | grep "Version" | cut -d' ' -f 2-
+
+# Check arguments
+[[ -n "$reference" ]] && [[ ! -f "$reference" ]] && >&2 echo "file not found: $reference" && exit 1
+[[ -n "$R1" ]] && [[ ! -f "$R1" ]] && >&2 echo "file not found: $R1" && exit 1
+[[ -n "$R2" ]] && [[ ! -f "$R2" ]] && >&2 echo "file not found: $R2" && exit 1
+
+# Canonicalize/dereference paths.
+# This is primarily important if using pigz because it will not work with symbolic links.
+reference=$(readlink -e "$reference" || true)
+R1=$(readlink -e "$R1")
+R2=$(readlink -e "$R2")
+
+# Create directory structure.
+mkdir -pv "$trimmomatic_workdir" "$pilon_workdir"
+
+echo "Pardon our dust, the output is incomplete. If it is not running, check the logs for errors." > $ugap_workdir/INCOMPLETE
+function at_exit {
+	# A common issue is for users to be confused by an empty output directory
+	# while the program is still running.
+	# TODO: Create a "UGAP is still running" file and delete it on exit.
+	#rm -rf "$scratch"
+    mv $pilon_assembly $ugap_workdir
+    rm -r "$trimmomatic_workdir" "$spades_workdir" "$pilon_workdir" "$blast_query"
+    rm $ugap_workdir/INCOMPLETE
+}
+trap at_exit EXIT
+
+echo "reference: $reference"
+echo "R1: $R1"
+echo "R2: $R2"
+echo "sample_name: $sample_name"
+
+# TODO: document this program and/or move it into the subsample function.
+# EOF is quoted to prevent parameter expansion of the awk variables.
+# 
+# https://github.com/koalaman/shellcheck/wiki/SC2162
+read -r -d '' awk_subsample_fastq << 'EOF' || true # Note that read will have an exit code of 1 in this situation; the '|| true' ignores this error for 'set -e'
+# Read the first read_number from STDIN and convert it to a line_number.
+# The line_number equation assumes each read is composed of 4 lines.
+BEGIN {
+  # FIXME: The program will hang if nothing is piped to stdin.
+  # Is it possible to raise an error if nothing is piped to stdin?
+  # The following test did not work because the program hung waiting for input: if (getline read_number < "-" == 0) exit
+  getline read_number < "-"
+  if (read_number !~ /^[[:digit:]]/) print "value read from STDIN is not a positive integer: '" read_number "'"> "/dev/stderr"
+  line_number = (read_number*4) - 3
+}
+
+# line_number should be the first line of a read.
+# For each matching line_number, print the 4 consecutive lines representing a read.
+# The program should exit when there are no more reads numbers in STDIN.
+# The program should never exit because it ran out of reads in the fastq.
+# TODO: should there be a check for early termination? Can this be done in the END clause?
+# TODO: FNR vs NR, does it matter which is used? Probably not. NR should always equal FNR.
+NR == line_number {
+  print $0
+  for(i=0; i<3; i++) { getline; print $0 }
+  if (getline read_number < "-" == 0) exit
+  line_number = (read_number*4) - 3
+}
+EOF
+
+# subsample will select n random read pairs.
+#
+# subsample takes a set of Paired End fastq files and returns a set of
+# Paired End fastq files with up to N reads subsampled from the input
+# fastq files.
+# This program returns a subsampled fastq given:
+# - a sorted list of numbers reads from STDIN representing the read numbers to extract
+# - a fastq file.
+#
+# The fastq is assumed to be an Illumina Fastq
+# https://support.illumina.com/help/SequencingAnalysisWorkflow/Content/Vault/Informatics/Sequencing_Analysis/CASAVA/swSEQ_mCA_FASTQFiles.htm
+#
+# Assuming every four lines is a read, the number of reads is determined
+# by counting the fastq lines and dividing by 4.
+# The number of reads is needed to set max range of random numbers.
+#
+# `shuf` is used to generate a random list of numbers.
+# `sort` is used to sort the list numerically for efficiency.
+# `tee` is used so the same list of numbers is used to subsample both fastq files.
+#
+# FIXME: the {r1,r2}_subsample_fastq variable is read as a global variable and modified by this function. Bad voodoo.
+# inputs/outputs should be explicit
+subsample() {
+	local r1 r2
+	r1=$(readlink -e "${1?missing parameter}")
+	r2=$(readlink -e "${2?missing parameter}")
+	local -i max_reads="20000000"
+	local -i n_reads=$(( $(gzip -cd < "$r1" | wc -l) / 4 ))
+	if [[ "$n_reads" -gt "$max_reads" ]]; then
+		shuf -i 1-$n_reads -n "$max_reads" | sort -n \
+			| tee >(awk "$awk_subsample_fastq" <(gzip -cd < "$r1") | gzip > "$r1_subsample_fastq") \
+			| awk "$awk_subsample_fastq" <(gzip -cd < "$r2") | gzip > "$r2_subsample_fastq"
+	else
+		r1_subsample_fastq="$r1"
+		r2_subsample_fastq="$r2"
+	fi
+}
+
+#######################################
+# Remove all sequences from the fasta below the min_sequence_length threshold.
+# Globals:
+#   PWD
+# Arguments:
+#   assembly
+#   min_sequence_length
+# Returns:
+#   None
+#######################################
+filter_assembly() {
+	local assembly=${1?missing parameter}
+	local min_sequence_length=${2?missing parameter}
+	# mktemp: too few X's in template
+	tmpfile=$(mktemp -q -t "$PWD/tmp.XXXXXX" 2>/dev/null || mktemp -q --tmpdir="$PWD")
+	samtools faidx "$assembly"
+	fastaFromBed \
+		-fi "$assembly" \
+		-bed <(awk -v min_sequence_length="$min_sequence_length" '$2 >= min_sequence_length { print $1 "\t0\t" $2 "\t" $1 }' "$assembly.fai") \
+		-name \
+		-fo "$tmpfile"
+	mv "$tmpfile" "$assembly"
+	rm "$assembly.fai"
+}
+
+#######################################
+# Align reads to assembly with bwa aligner.
+# Globals:
+#   NCPU
+# Arguments:
+#   bam
+#   assembly
+#   R1
+#   R2
+# Returns:
+#   None
+#######################################
+align_reads() {
+	local bam="${1?missing parameter}"
+	local assembly="${2?missing parameter}"
+	local R1="${3?missing parameter}"
+	local R2="${4?missing parameter}"
+	local NCPU=$NCPU
+	bwa index "$assembly"
+
+    # samtools sort v0.1.19
+    # Usage:   samtools sort [options] <in.bam> <out.prefix>
+    #
+    # Options: -n        sort by read name
+    #          -f        use <out.prefix> as full file name instead of prefix
+    #          -o        final output to stdout
+    #          -l INT    compression level, from 0 to 9 [-1]
+    #          -@ INT    number of sorting and compression threads [1]
+    #          -m INT    max memory per thread; suffix K/M/G recognized [768M]
+
+    # samtools sort v1.5
+    # Usage: samtools sort [options...] [in.bam]
+    # Options:
+    #   -l INT     Set compression level, from 0 (uncompressed) to 9 (best)
+    #   -m INT     Set maximum memory per thread; suffix K/M/G recognized [768M]
+    #   -n         Sort by read name
+    #   -t TAG     Sort by value of TAG. Uses position as secondary index (or read name if -n is set)
+    #   -o FILE    Write final output to FILE rather than standard output
+    #   -T PREFIX  Write temporary files to PREFIX.nnnn.bam
+    #       --input-fmt-option OPT[=VAL]
+    #                Specify a single input file format option in the form
+    #                of OPTION or OPTION=VALUE
+    #   -O, --output-fmt FORMAT[,OPT[=VAL]]...
+    #                Specify output format (SAM, BAM, CRAM)
+    #       --output-fmt-option OPT[=VAL]
+    #                Specify a single output file format option in the form
+    #                of OPTION or OPTION=VALUE
+    #       --reference FILE
+    #                Reference sequence FASTA FILE [null]
+    #   -@, --threads INT
+    #                Number of additional threads to use [0]
+
+    # Usage:   samtools view [options] <in.bam>|<in.sam> [region1 [...]]
+    #
+    # Options: -b       output BAM
+    #          -h       print header for the SAM output
+    #          -H       print header only (no alignments)
+    #          -S       input is SAM
+    #          -u       uncompressed BAM output (force -b)
+    #          -1       fast compression (force -b)
+    #          -x       output FLAG in HEX (samtools-C specific)
+    #          -X       output FLAG in string (samtools-C specific)
+    #          -c       print only the count of matching records
+    #          -B       collapse the backward CIGAR operation
+    #          -@ INT   number of BAM compression threads [0]
+    #          -L FILE  output alignments overlapping the input BED FILE [null]
+    #          -t FILE  list of reference names and lengths (force -S) [null]
+    #          -T FILE  reference sequence file (force -S) [null]
+    #          -o FILE  output file name [stdout]
+    #          -R FILE  list of read groups to be outputted [null]
+    #          -f INT   required flag, 0 for unset [0]
+    #          -F INT   filtering flag, 0 for unset [0]
+    #          -q INT   minimum mapping quality [0]
+    #          -l STR   only output reads in library STR [null]
+    #          -r STR   only output reads in read group STR [null]
+    #          -s FLOAT fraction of templates to subsample; integer part as seed [-1]
+    #          -?       longer help
+
+
+    # samtools pre-v1.x requires view before sort because sort did not support sam input.
+    # samtools post-v1.x sort before view will makes it easier to toggle the output format (bam vs cram).
+    # http://www.htslib.org/workflow/
+
+	# TODO: removed the bwa verbose output (-v 2). Is it needed?
+	bwa mem -R "@RG\tID:${sample_name}\tSM:vac6wt\tPL:ILLUMINA\tPU:vac6wt" -M -t "$NCPU" "$assembly" "$R1" "${R2:-}" \
+	  | samtools sort -l 0 -@ $NCPU - \
+	  | samtools view -Su -o $bam -
+
+    # TODO: generate CSI instead of BAI index when more programs support the CSI format.
+    # [Support CSI as well as BAI indexes](https://github.com/samtools/htsjdk/issues/447)
+	samtools index "$bam"
+}
+
+
+
+# --This command verifies the fastq files are compressed with gzip with the added bonus of checking the integrity of the archives.--
+# FIXME: The test fails if the files are symbolic links. Get the real path.
+# gzip <filename> is a symbolic link -- skipping
+#gzip --test $R1 $R2
+
+# TODO: document the optional depletion step.
+# Why/When would a user need this?
+# What is the biological significance?
+# What are the potential consequences?
+if [[ -f "$reference" ]]; then
+  bwa index "$reference"
+  bwa mem -R "@RG\tID:${sample_name}\tSM:vac6wt\tPL:ILLUMINA\tPU:vac6wt" -v 2 -M -t "$NCPU" "$reference" "$R1" "${R2:-}" \
+    | java -jar "$picard" SamToFastq I=/dev/stdin F="$f_deplete_fq" F2="$r_deplete_fq"
+
+  R1=$f_deplete_fq
+  R2=$r_deplete_fq
+else
+  echo "optional reference fasta undefined -- skipping read depletion"
+fi
+
+subsample "$R1" "$R2"
+
+# TODO: optional skip if trim files exist
+# TODO: support both single/paired end reads
+# TODO: unaligned reads are sent to /dev/null because they are not used in this pipeline.
+# Consider options for allowing the user to specify they want to keep these files.
+#java -jar "$trimmomatic" \
+#	PE "$r1_subsample_fastq" "$r2_subsample_fastq" \
+#	-threads "$NCPU" \
+#	"${f_paired_fq%.gz}" \
+#	/dev/null \
+#	"${r_paired_fq%.gz}" \
+#	/dev/null \
+#	ILLUMINACLIP:"$trimmomatic_adapters":2:30:10 \
+#	LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+java -jar "$trimmomatic" \
+	PE "$r1_subsample_fastq" "$r2_subsample_fastq" \
+	-threads "$NCPU" \
+	"$f_paired_fq" \
+	/dev/null \
+	"$r_paired_fq" \
+	/dev/null \
+	ILLUMINACLIP:"$trimmomatic_adapters":2:30:10 \
+	LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+
+
+# TODO: hammer is included with spades; --only-assembler is required when using an alternative error corrector.
+# TODO: parameterize --careful
+#
+# FIXME: spades -k auto crashes with test data
+# The $test_monkey_patch paramter 
+# [SPAdes stack trace failure with large K-mer values #5](https://github.com/mossmatters/HybPiper/issues/5)
+#
+# SC2086: Double quote to prevent globbing and word splitting.
+# shellcheck disable=SC2086
+spades.py \
+  -1 "$f_paired_fq" \
+  -2 "$r_paired_fq" \
+  --careful \
+  -o "$spades_workdir" \
+  -t "$NCPU" \
+  $test_monkey_patch
+filter_assembly "$spades_assembly" "$keep_n_bases"
+align_reads "$spades_bam" "$spades_assembly" "$R1" "$R2"
+
+# http://www.drive5.com/usearch/manual/cmd_filter_phix.html
+# Filter reads for hits to the PhiX genome which is used as a spike in Illumina amplicon sequencing.
+#
+# Input is a FASTA or FASTQ file. A reverse (R2) read file can be specified using
+# -reverse, in which case a read pair is discarded if the forward (R1) and/or
+# reverse (R2) read has a hit to PhiX. If -reverse is specified, -output2 must
+# be specified for the reverse read output file. Output is written in the same
+# format (FASTA or FASTQ) as the input.
+#
+# Standard output files are supported for reporting PhiX hits.
+#
+# Multithreading is supported.
+#
+# Examples
+#
+# usearch -filter_phix reads.fq -output filtered_reads.fq -alnout hits.txt
+#
+# usearch -filter_phix reads_fwd.fq -reverse reads_rev.fq -output fil_fwd.fq -output2 fil_rev.fq
+#
+# Cannot pipe trimmomatic to usearch through fifo
+# -----------------------------------------------
+# I tried to pipe the trimmomatic paired reads to usearch through a fifo.
+# Trimmomatic finished, I suspect prematurely, with a success message
+# and usearch was blocked. The last output from usearch was "100% Build Index".
+#usearch \
+#  -filter_phix "${f_paired_fq%.gz}" \
+#  -reverse "${r_paired_fq%.gz}" \
+#  -output >(gzip > "$f_paired_fq") \
+#  -output2 >(gzip > "$r_paired_fq")
+#
+#rm "${f_paired_fq%.gz}" "${r_paired_fq%.gz}"
+
+# If hmmer is not available, fallback to musket if available
+#command -v hmmer >/dev/null 2>&1 || command -v musket >/dev/null 2>&1 && {
+#  musket -k 17 8000000 -p $NCPU -omulti ${sample_name} -inorder ${sample_name}.F.paired.fastq.gz ${sample_name}.R.paired.fastq.gz
+#  mv ${sample_name}.0 ${sample_name}.0.musket.fastq.gz
+#  mv ${sample_name}.1 ${sample_name}.1.musket.fastq.gz
+#}
+
+
+# > https://github.com/broadinstitute/pilon/wiki/Requirements-&-Usage
+# >
+# > Starting with Pilon version 1.17, Pilon can be given any type of BAM file with
+# > the command line argument --bam <any.bam>, and it will automatically classify
+# > the BAM as one of the following:
+# >
+# > --frags <frags.bam> for paired-end sequencing of DNA fragments,
+# >         such as Illumina paired-end reads of fragment size <1000bp.
+# > --jumps <jumps.bam> for paired sequencing data of larger insert size,
+# >         such as Illumina mate pair libraries, typically of insert size >1000bp.
+# > --unpaired <unpaired.bam> for unpaired sequencing reads.
+# >
+# > Input BAM files must be sorted in coordinate order and indexed. 
+java -jar "$pilon" \
+  --threads "$NCPU" \
+  --fix all,amb \
+  --genome "$spades_assembly" \
+  --bam "$spades_bam" \
+  --output "${pilon_assembly%.fasta}"
+filter_assembly "$spades_assembly" "$keep_n_bases"
+align_reads "$pilon_bam" "$pilon_assembly" "$R1" "$R2"
+
+
+# https://github.com/tseemann/prokka
+# Index the sequence databases
+#./prokka-1.11/bin/prokka --setupdb
+
+# prokka exits with the following error: Genbank contig IDs are 44 chars, must be <= 20.
+# sed truncates all contig ID's to 20 characters.
+# TODO: map sequences to a random string and possibly restore after running prokka
+#   LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c20
+#sed 's/\(>.\{1,20\}\).*/\1/' "$assembly" > "${assembly}.prokka"
+#./prokka-1.11/bin/prokka \
+#  --prefix ${sample_name} \
+#  --locustag ${sample_name} \
+#  --centre ${sample_name} \
+#  --compliant \
+#  --mincontiglen ${keep_n_bases} \
+#  --strain ${sample_name} \
+#  "${assembly}.prokka"
+# TODO: missing a step?
+  #${sample_name}.${keep_n_bases}.spades.assembly.fasta
+
+# > http://www.htslib.org/doc/samtools.html
+# > samtools idxstats in.sam|in.bam|in.cram
+# >
+# > Retrieve and print stats in the index file corresponding to the input file.
+# > Before calling idxstats, the input BAM file must be indexed by samtools index.
+# >
+# > The output is TAB-delimited with each line consisting of reference sequence name,
+# > sequence length, # mapped reads and # unmapped reads. It is written to stdout.
+#
+# > https://bedtools.readthedocs.io/en/stable/content/tools/genomecov.html
+# > Some of the BEDTools (e.g., genomeCoverageBed, complementBed, slopBed) need to know the size of
+# > the chromosomes for the organism for which your BED files are based. When using the UCSC Genome
+# > Browser, Ensemble, or Galaxy, you typically indicate which species / genome build you are working.
+# > The way you do this for BEDTools is to create a “genome” file, which simply lists the names of the
+# > chromosomes (or scaffolds, etc.) and their size (in basepairs)
+#
+# https://bedtools.readthedocs.io/en/latest/content/tools/genomecov.html
+genomeCoverageBed \
+	-g <(samtools idxstats "$pilon_bam" | cut -f-2 | sort -k1,1) \
+	-ibam "$pilon_bam" \
+        -max 3 \
+	> "$bedtools_coverage" &
+
+#if [[ -n "$blastdb" ]] && blastdbcmd -db "$blastdb" -info > /dev/null; then
+#if blastdbcmd -info -db nt > /dev/null 2>&1; then
+    # TODO: document generate query fasta
+	# Truncate sequences to the first $max_sequence_length bases
+    #
+    #     samtools faidx reference.fasta /* creates 
+    #     samtools faidx reference.fasta $(/*a script to print the .fai file
+    #                                        as a series of ranges*/)
+    #
+    # Prior to 
+    #
+    # Solutions that introduced additional dependencies were not considered.
+	awk -v query_length="$keep_n_bases" '
+	# header pattern detected
+	/^>/ {
+		if (sequence) {
+            middle_idx = int((length(sequence) - query_length) / 2)
+            if (middle_idx < 0) {
+                # the sequence is shorter than the query; return the entire sequence
+                middle_idx = 0
+            }
+			# print previous sequence if exists 
+            print substr(sequence,middle_idx,query_length)
+		}
+
+		# print the tag 
+		print
+
+		# initialize sequence
+		sequence = ""
+
+		# skip further processing
+		next
+	}
+	# accumulate sequence
+	{
+		#if (length(sequence) < max_sequence_length) {
+		#	sequence = sequence $0
+		#}
+        sequence = sequence $0
+	}
+	# remnant sequence
+	END { print sequence }' "$pilon_assembly" > "$blast_query"
+
+	# TODO: add optional -remote flag if a database is not specified.
+	blastn \
+		-task blastn \
+		-query "$blast_query" \
+		-db nt \
+		-outfmt '7 std stitle' \
+		-dust no \
+		-evalue 0.01 \
+		-num_threads "$NCPU" \
+		-out "$blast_report"
+#else
+#	2>&1 printf "skip blast step blastdb not found: '%s'\n" "$blastdb.nin"
+#fi
+
+wait # genomeCoverageBed should finish long before blast, but it would be foolish to rely on this assumption.
+
+# TODO: Should the sorts use the stable flag (-s)?
+# The blast report is too verbose for species identification.
+# The ugap summary joins the blast and coverage report and filters it down to
+# the longest cbest scoring e-value
+#
+# The 'join' command will join two files on a common column, but they must
+# be sorted first.
+#
+#   sort -t $'\t' -u -k2nr,2 -k1,1 $bedtools_coverage
+#   In addition to sorting by contig (-k1,1), the unique (-u) flag in
+#   combination with sorting numerically by coverage bin (-k2n,2) filters it to
+#   pair the largest available coverage bin for each contig.
+#
+#   sort -u -k1,1 $blast_report
+#   In addition to sorting by contig (-k1,1), the unique (-u) flag filters it to
+#   the best scoring e-value for each contig.
+#
+# sort -t $'\t' -k 4nr,4
+# Finally, it is sorted by longest to shortest contig.
+join -j1 -t $'\t' \
+    <(sort -t $'\t' -k2nr,2 $bedtools_coverage | sort -u -k1,1) \
+    <(sort -t $'\t' -u -k1,1 $blast_report) \
+    | sort -t $'\t' -nr -k4,4 \
+    > $ugap_summary
+
+# Print a summary listing how many times each species was observed
+awk -F $'\t' '{print $17}' $ugap_summary \
+    | cut -d ' ' -f 1,2 \
+    | sort \
+    | uniq -c \
+    | sort -n -k1,1 \
+    > $ugap_species_list
+
+
+# TODO: add platform with a default value of ILLUMINA.
+# Document in the help text that is is used simply to fill in the alignment header (non-critical to the operation of *this* script)
+# Valid values: ILLUMINA, SOLID, LS454, HELICOS and PACBIO.
+
+#help() {
+#}
+#
+#[[ -z "${1-}" ]] && help "$0"
+#case $1 in
+#  --help|-h) help ;;
+#  *) help "$0" ;;
+#esac
+
+
+# TODO: generate a proper Read Group header
+#
+# The following Read Group header field descriptions was copied for future reference from https://software.broadinstitute.org/gatk/guide/article?id=6472
+#
+# Meaning of the read group fields required by GATK
+# 
+# ID = Read group identifier This tag identifies which read group each read belongs to, so each read group's ID must be unique.
+# It is referenced both in the read group definition line in the file header (starting with @RG) and in the RG:Z tag for each read record.
+# Note that some Picard tools have the ability to modify IDs when merging SAM files in order to avoid collisions.
+# In Illumina data, read group IDs are composed using the flowcell + lane name and number, making them a globally unique identifier across all sequencing data in the world.
+# Use for BQSR: ID is the lowest denominator that differentiates factors contributing to technical batch effects:
+# therefore, a read group is effectively treated as a separate run of the instrument in data processing steps such as base quality score recalibration,
+# since they are assumed to share the same error model.
+# 
+# PU = Platform Unit The PU holds three types of information, the {FLOWCELL_BARCODE}.{LANE}.{SAMPLE_BARCODE}.
+# The {FLOWCELL_BARCODE} refers to the unique identifier for a particular flow cell.
+# The {LANE} indicates the lane of the flow cell and the {SAMPLE_BARCODE} is a sample/library-specific identifier.
+# Although the PU is not required by GATK but takes precedence over ID for base recalibration if it is present.
+# In the example shown earlier, two read group fields, ID and PU, appropriately differentiate flow cell lane, marked by .2,
+# a factor that contributes to batch effects.
+# 
+# SM = Sample The name of the sample sequenced in this read group.
+# GATK tools treat all read groups with the same SM value as containing sequencing data for the same sample,
+# and this is also the name that will be used for the sample column in the VCF file.
+# Therefore it's critical that the SM field be specified correctly.
+# When sequencing pools of samples, use a pool name instead of an individual sample name.
+# 
+# PL = Platform/technology used to produce the read.
+# This constitutes the only way to know what sequencing technology was used to generate the sequencing data.
+# Valid values: ILLUMINA, SOLID, LS454, HELICOS and PACBIO.
+#
+# LB = DNA preparation library identifier MarkDuplicates uses the LB field to determine which read groups might contain molecular duplicates,
+# in case the same DNA library was sequenced on multiple lanes.
+#
+# If your sample collection's BAM files lack required fields or do not differentiate pertinent factors within the fields,
+# use Picard's AddOrReplaceReadGroups to add or appropriately rename the read group fields as outlined here.
+

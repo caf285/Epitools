@@ -2,11 +2,12 @@
 
 import sys
 import datetime
+import json
 
 # ==================================================( functions )
 def printHelp():
   print("\nreturns all lines of GAS.tsv that follow arguments given")
-  print("usage: queryGAS.py [-h] [-n | -e | -d | -l | -m ]")
+  print("usage: queryGAS.py [-h] [-j | -n | -e | -d | -l | -m ]")
   print("\t-n\tSample Name")
   print("\t-e\tExclude Name")
   print("\t-t\tType")
@@ -25,9 +26,11 @@ def read(fileName):
 # ==================================================( main )
 def main():
 
+  #TODO: support for TYPE
+
   # check args
   # fill dictionary for all accepted args
-  args = {"-n":[], "-e":[], "-d":[], "-l":[], "-m":[]}
+  args = {"-j":[],"-n":[], "-e":[], "-d":[], "-l":[], "-m":[]}
   flag = ""
   for arg in sys.argv:
     if arg[0] == "-":
@@ -37,6 +40,14 @@ def main():
         printHelp()
     elif flag:
       args[flag].append(arg)
+  print(args)
+
+  # convert json arg to json format
+  # handles single list in json format
+  try:
+    args["-j"] = json.loads("".join(args["-j"]))
+  except:
+    args["-j"] = []
 
   # correct date args
   # if a single date is given, only get that date
@@ -107,6 +118,10 @@ def main():
   query = ["\t".join(header)]
   for sample in gas:
     sample = sample.split("\t")
+
+    # check for JSON list
+    if len(args["-j"]) > 0 and sample[0] not in args["-j"]:
+      continue
 
     # check sampleName
     # trigger used to include all names for -n flag, but exclude all names for -e flag

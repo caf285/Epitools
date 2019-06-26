@@ -118,7 +118,7 @@ func main() {
     fmt.Println(err)
     printHelp()
   }
-  M1 := strings.Join(append(strings.Split(fileName, "/")[:len(strings.Split(fileName, "/"))-1], "M1.nwk"), "/")
+  newick := strings.Join(append(strings.Split(fileName, "/")[:len(strings.Split(fileName, "/"))-1], "tree.nwk"), "/")
   fasta := strings.Split(string(f), ">")[1:]
   names := []string{}
 
@@ -260,7 +260,7 @@ func main() {
   path := []int{-1}
   out := "(" + getNewick(names, tree, path, 0) + "):0;"
 
-  outFile, err := os.Create(M1)
+  outFile, err := os.Create(newick)
   if err != nil {
     fmt.Println(err)
     return

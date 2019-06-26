@@ -43,14 +43,11 @@ done
 # run nasp against M1 reference; exit is no change
 M1=$(/scratch/GAS/bin/mkConfig.py /scratch/GAS/reference/M1-TG92300.fasta -m _)
 
+# get jobID for nasp run (only if "_" QUALITY BREADTH)
+JOBID=0
 if [[ -z ${M1} ]]; then
   echo no new reads found
-  exit 0
-fi
-
-# get jobID for nasp run
-JOBID=0
-if [[ -e /scratch/GAS/.temp/${M1} ]]; then
+elif [[ -e /scratch/GAS/.temp/${M1} ]]; then
   module load nasp
   nasp --config /scratch/GAS/.temp/${M1}
   for id in $(squeue -h -u $(whoami) -n "nasp_matrix" -o "%i"); do
@@ -63,19 +60,21 @@ if [[ -e /scratch/GAS/.temp/${M1} ]]; then
   JOBID=$(sbatch --job-name="GAS-getStats" --output="/dev/null" --time="5:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/getStats.py ${M1%*-config.xml}; rm -r /scratch/GAS/.temp/${M1} /scratch/GAS/.temp/${M1%*-config.xml}")
 fi
 
-#----- create bestsnp.tsv for /scratch/GAS/nasp/ALL
-JOBID=${JOBID##* }
-if (( JOBID != 0 )); then
+#----- create bestsnp.fasta for /scratch/GAS/nasp/ALL (only if new GATK, no FASTA, or FASTA/GATK mismatch)
+if (( ${JOBID##* } != 0 )); then
   JOBID=$(sbatch --job-name="GAS-dto" --output="/dev/null" --time="5:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL")
-  JOBID=$(sbatch --job-name="GAS-matrix" --output="/dev/null" --time="1:00:00" --mem="1g" --dependency=afterok:"${JOBID##* }" --wrap="module load nasp; nasp matrix --dto-file /scratch/GAS/nasp/ALL/matrix_dto.xml;")
+elif [[ ! -f /scratch/GAS/nasp/ALL/matrix_dto.xml || ! -f /scratch/GAS/nasp/ALL/matrices/bestsnp.fasta || ! -f /scratch/GAS/nasp/ALL/matrices/tree.nwk ]] || (( $(( $(cat /scratch/GAS/nasp/ALL/matrices/bestsnp.fasta | grep ">" | wc -l) - 1 )) != $(cat /scratch/GAS/nasp/ALL/matrix_dto.xml | grep "gatk" | wc -l ) )); then
+  JOBID=$(sbatch --job-name="GAS-dto" --output="/dev/null" --time="5:00" --mem="100m" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL/")
 fi
 
-#----- create a neighbor joining tree from bestsnp.tsv
-JOBID=${JOBID##* }
-if (( JOBID != 0 )); then
+#----- create tree.nwk for /scratch/GASnasp/ALL (only if new MATRIX_DTO.XML created)
+if (( ${JOBID##* } != 0 )); then
+  JOBID=$(sbatch --job-name="GAS-matrix" --output="/dev/null" --time="1:00:00" --mem="1g" --dependency=afterok:"${JOBID##* }" --wrap="module load nasp; nasp matrix --dto-file /scratch/GAS/nasp/ALL/matrix_dto.xml;")
   JOBID=$(sbatch --job-name="GAS-fasta" --output="/dev/null" --time="5:00" --mem="100m"  --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkFasta.py /scratch/GAS/nasp/ALL/")
   JOBID=$(sbatch --job-name="GAS-tree" --output="/dev/null" --time="10:00" --mem="32g" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/ALL/matrices/bestsnp.fasta")
 fi
+
+echo done
 
 #----- TODO recursively build nasp run per clade
 
