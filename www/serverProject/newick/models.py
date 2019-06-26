@@ -9,15 +9,60 @@ import datetime
 from django.db import models
 from django.utils import timezone
 
-class PCA(models.Model):
-  id = models.PositiveSmallIntegerField('PcaNumber', primary_key=True)
-
-class County(models.Model):
-  id = models.CharField('CountyName', max_length=50, primary_key=True)
-  polygon = models.TextField('Polygon', max_length=10000, default='[]')
+class Region(models.Model):
+  id = models.CharField('regionName', max_length=50, primary_key=True)
 
 class MPC(models.Model):
-  id = models.CharField('MajorPopulationCenter', max_length=50, primary_key=True)
+  id = models.CharField('majorPopulationCenter', max_length=50, primary_key=True)
+
+class PCA(models.Model):
+  id = models.CharField('pcaName', max_length=50, primary_key=True)
+  polygon = models.TextField('polygon', max_length=100000, default='[]')
+  mpc1 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc1')
+  mpc2 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc2')
+  mpc3 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc3')
+
+class County(models.Model):
+  id = models.CharField('countyName', max_length=50, primary_key=True)
+  polygon = models.TextField('polygon', max_length=10000, default='[]')
+  region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+
+class CountyPCA(models.Model):
+  id = models.AutoField('bridgeId', primary_key=True)
+  county = models.ForeignKey(County, on_delete=models.CASCADE, null=True)
+  pca = models.ForeignKey(PCA, on_delete=models.CASCADE, null=True)
+
+class Facility(models.Model):
+  id = models.PositiveSmallIntegerField('siteId', primary_key=True)
+  name = models.CharField('facilityName', max_length=50, default="_")
+  type = models.CharField('facilityType', max_length=50, default="_")
+  mpc = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True)
+
+class Bacteria(models.Model):
+  id = models.CharField('bacteriaName', max_length=50, primary_key=True)
+  type = models.CharField('bacteriaType', max_length=50, default="_")
+
+class Drug(models.Model):
+  id = models.CharField('drugName', max_length=50, primary_key=True)
+  type = models.CharField('drugType', max_length=50, default="_")
+
+class AMR(models.Model):
+  id = models.AutoField('amrId', primary_key=True)
+  facility = models.ForeignKey(Facility, on_delete=models.CASCADE, null=True)
+  bacteria = models.ForeignKey(Bacteria, on_delete=models.CASCADE, null=True)
+  drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
+  year = models.PositiveSmallIntegerField('amrYear', default=0)
+  tested = models.PositiveSmallIntegerField('numberTested', default=0)
+  suseptable = models.PositiveSmallIntegerField('percentSuseptable', default=0)
+
+class DemoAMR(models.Model):
+  id = models.AutoField('amrId', primary_key=True)
+  facility = models.ForeignKey(Facility, on_delete=models.CASCADE, null=True)
+  bacteria = models.ForeignKey(Bacteria, on_delete=models.CASCADE, null=True)
+  drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
+  year = models.PositiveSmallIntegerField('amrYear', default=0)
+  tested = models.PositiveSmallIntegerField('numberTested', default=0)
+  suseptable = models.PositiveSmallIntegerField('percentSuseptable', default=0)
 
 '''
 class Pathogen(models.Model):
