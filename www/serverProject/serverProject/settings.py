@@ -138,10 +138,10 @@ LOGIN_REDIRECT_URL = '/newick/'
 
 # map setting
 LEAFLET_CONFIG = {
-  'SPATIAL_EXTENT': (-115, 37.02, -108, 31.30),
-  'DEFAULT_CENTER': (-112.063, 33.464),
+  'SPATIAL_EXTENT': (-115.7, 38, -108, 30.2),
+  'DEFAULT_CENTER': (-112, 34.5),
   'DEFAULT_ZOOM': 7,
-  'MIN_ZOOM': 7,
+  'MIN_ZOOM': 6,
   'MAX_ZOOM': 14,
   'ATTRIBUTION_PREFIX': 'Tgen North',
   'ATTRIBUTION': 'stuff',

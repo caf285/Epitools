@@ -11,58 +11,102 @@ from django.utils import timezone
 
 class Region(models.Model):
   id = models.CharField('regionName', max_length=50, primary_key=True)
+  coordinate = models.CharField('regionCoord', max_length=50, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
 
 class MPC(models.Model):
   id = models.CharField('majorPopulationCenter', max_length=50, primary_key=True)
+  coordinate = models.CharField('mpcCoord', max_length=50, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
 
 class PCA(models.Model):
   id = models.CharField('pcaName', max_length=50, primary_key=True)
-  polygon = models.TextField('polygon', max_length=100000, default='[]')
+  coordinate = models.CharField('pcaCoord', max_length=50, default="_")
   mpc1 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc1')
   mpc2 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc2')
   mpc3 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc3')
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
 
 class County(models.Model):
   id = models.CharField('countyName', max_length=50, primary_key=True)
-  polygon = models.TextField('polygon', max_length=10000, default='[]')
+  coordinate = models.CharField('countyCoord', max_length=50, default="_")
   region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
 
 class CountyPCA(models.Model):
   id = models.AutoField('bridgeId', primary_key=True)
   county = models.ForeignKey(County, on_delete=models.CASCADE, null=True)
   pca = models.ForeignKey(PCA, on_delete=models.CASCADE, null=True)
+  class Meta:
+    ordering = ['county', 'pca']
+  def __str__(self):
+    return str(self.county) + "::" + str(self.pca)
 
 class Facility(models.Model):
-  id = models.PositiveSmallIntegerField('siteId', primary_key=True)
+  typeChoices = [('H', 'Hospital'), ('C', 'Clinic')]
   name = models.CharField('facilityName', max_length=50, default="_")
-  type = models.CharField('facilityType', max_length=50, default="_")
+  type = models.CharField('facilityType', max_length=1, choices=typeChoices, default='H')
+  coordinate = models.CharField('facilityCoord', max_length=50, default="_")
   mpc = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True)
+  class Meta:
+    unique_together = ['mpc', 'id']
+    ordering = ['name']
+  def __str__(self):
+    return str(self.name)
 
 class Bacteria(models.Model):
   id = models.CharField('bacteriaName', max_length=50, primary_key=True)
   type = models.CharField('bacteriaType', max_length=50, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
 
 class Drug(models.Model):
   id = models.CharField('drugName', max_length=50, primary_key=True)
   type = models.CharField('drugType', max_length=50, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
 
 class AMR(models.Model):
   id = models.AutoField('amrId', primary_key=True)
   facility = models.ForeignKey(Facility, on_delete=models.CASCADE, null=True)
   bacteria = models.ForeignKey(Bacteria, on_delete=models.CASCADE, null=True)
   drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
-  year = models.PositiveSmallIntegerField('amrYear', default=0)
+  date = models.DateField('amrDate', default="2000-1-1")
   tested = models.PositiveSmallIntegerField('numberTested', default=0)
   suseptable = models.PositiveSmallIntegerField('percentSuseptable', default=0)
+  class Meta:
+    ordering = ['date', 'facility', 'bacteria', 'drug']
+  def __str__(self):
+    return str(self.date) + '::' + str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.drug)
 
 class DemoAMR(models.Model):
   id = models.AutoField('amrId', primary_key=True)
   facility = models.ForeignKey(Facility, on_delete=models.CASCADE, null=True)
   bacteria = models.ForeignKey(Bacteria, on_delete=models.CASCADE, null=True)
   drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
-  year = models.PositiveSmallIntegerField('amrYear', default=0)
+  date = models.DateField('amrDate', default="2000-1-1")
   tested = models.PositiveSmallIntegerField('numberTested', default=0)
   suseptable = models.PositiveSmallIntegerField('percentSuseptable', default=0)
+  class Meta:
+    ordering = ['date', 'facility', 'bacteria', 'drug']
+  def __str__(self):
+    return str(self.date) + '::' + str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.drug)
 
 '''
 class Pathogen(models.Model):
