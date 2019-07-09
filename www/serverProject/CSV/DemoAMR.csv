@@ -1,0 +1,13 @@
+﻿facility,bacteria,drug,date,tested,suseptable
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0

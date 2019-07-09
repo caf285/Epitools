@@ -62,6 +62,29 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
     query["region"] = self.getList(Region.objects.all())
     query["county"] = self.getList(County.objects.all())
     query["pca"] = self.getList(PCA.objects.all())
+    query["coordinates"] = self.getCoordinates()
+    query["amr"] = self.getAMR()
+    return query
+
+  # return AMR by BACTERIA, DRUG, PCA, YEAR
+  def getAMR(self):
+    query = {}
+    for i in PCA.objects.all():
+      query[i.id] = []
+      for j in json.loads(serializers.serialize('json', self.filterMPC(i.id))):
+        query[i.id].append(j['fields'])
+    return query
+
+  # return coordinates for each REDION, COUNTY, and PCA
+  def getCoordinates(self):
+    query = {}
+    for i in Region.objects.all():
+      query['region::' + i.id] = i.coordinate
+    for i in County.objects.all():
+      query['county::' + i.id] = i.coordinate
+    for i in PCA.objects.all():
+      query['pca::' + i.id] = i.coordinate
+    query['state::all'] = '[35.452, -111.795]'
     return query
 
   # return simple list of IDs from REGION, COUNTY, and PCA
@@ -70,7 +93,6 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
     for i in query:
       out.append(i.id)
     return out
-
 
   # chain from REGION to AMR level to fill tree
   def filterRegions(self):
@@ -103,12 +125,12 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
   def filterFacility(self, queryMPC):
     query = DemoAMR.objects.none()
     for index in Facility.objects.filter(mpc__id=queryMPC):
-      query = query | self.filterAMR(index.name)
+      query = query | self.filterAMR(index.id)
     return query
 
   def filterAMR(self, queryFacility):
     #return DemoAMR.objects.all()
-    return DemoAMR.objects.filter(facility__name=queryFacility)
+    return DemoAMR.objects.filter(facility__id=queryFacility)
 
 class TestView(LoginRequiredMixin, generic.ListView):
 #class IndexView(generic.ListView):

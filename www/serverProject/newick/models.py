@@ -56,15 +56,14 @@ class CountyPCA(models.Model):
 
 class Facility(models.Model):
   typeChoices = [('H', 'Hospital'), ('C', 'Clinic')]
-  name = models.CharField('facilityName', max_length=50, default="_")
+  id = models.CharField('facilityName', max_length=50, primary_key=True)
   type = models.CharField('facilityType', max_length=1, choices=typeChoices, default='H')
   coordinate = models.CharField('facilityCoord', max_length=50, default="_")
   mpc = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True)
   class Meta:
-    unique_together = ['mpc', 'id']
-    ordering = ['name']
+    ordering = ['id']
   def __str__(self):
-    return str(self.name)
+    return str(self.id)
 
 class Bacteria(models.Model):
   id = models.CharField('bacteriaName', max_length=50, primary_key=True)
