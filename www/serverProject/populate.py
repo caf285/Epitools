@@ -61,8 +61,8 @@ def main():
 
     # PCA
     elif model == "PCA":
-      for x in PCA.objects.all():
-        x.delete()
+      #for x in PCA.objects.all():
+      #  x.delete()
       for line in csv:
         line = line.split(",")
         print(line)

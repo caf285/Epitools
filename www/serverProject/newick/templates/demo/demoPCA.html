@@ -88,12 +88,13 @@
       // for each region
       for (var i = 0; i < Object.keys(DB.tree).length; i++) {
         let regionName = Object.keys(DB.tree)[i]
-        regionLayers[regionName] = L.layerGroup()
+        regionLayers[regionName] = {}
 
         // for each county
         for (var j = 0; j < Object.keys(DB.tree[regionName]).length; j++) {
           let countyName = Object.keys(DB.tree[regionName])[j]
-          var regionPolygon = L.polygon(countyPolygons[countyName], {
+          
+          regionLayers[regionName][countyName] = L.polygon(countyPolygons[countyName], {
             title: countyName,
             clickable: true,
             color: fillColors("region")[i],
@@ -101,17 +102,16 @@
             weight: 1,
             fillOpacity: 0.7
           });
-          regionPolygon.on("click", function(e) {
+          regionLayers[regionName][countyName].on("click", function(e) {
             if (detail.map.hasLayer(mapLevel["state"])) {
               fillMap("region", regionName)
             } else {
               fillMap("county", regionName + "::" + e.target.options.title)
             }
           });
-          regionLayers[regionName].addLayer(regionPolygon)
 
-          countyLayers[countyName] = L.layerGroup()
-          var countyPolygon = L.polygon(countyPolygons[countyName], {
+          countyLayers[countyName] = {}
+          countyLayers[countyName]['background'] = L.polygon(countyPolygons[countyName], {
             title: countyName,
             clickable: false,
             color: 'hsl(50, 100%, 0%)',
@@ -119,13 +119,11 @@
             weight: 0,
             fillOpacity: 0.1
           });
-          countyLayers[countyName].addLayer(countyPolygon)
 
           // for each pca
           for (var k = 0; k < Object.keys(DB.tree[regionName][countyName]).length; k++) {
             let pcaName = Object.keys(DB.tree[regionName][countyName]).sort().reverse()[k]
             let pcaColors = fillColors("county")
-            pcaLayers[pcaName] = L.layerGroup()
 
             // build Navajo Nation polygon group
             if (pcaName == "Navajo Nation") {
@@ -165,20 +163,19 @@
                 fillOpacity: 0.0,
                 smoothFactor: 0.8
               });
-              group = new L.FeatureGroup();
-              group.addLayer(polygonFill1);
-              group.addLayer(polygonLine1);
-              group.addLayer(polygonLine2);
-              group.addLayer(polygonLine3);
-              group.on("click", function(e) {
+              pcaLayers[pcaName] = new L.FeatureGroup();
+              pcaLayers[pcaName].addLayer(polygonFill1);
+              pcaLayers[pcaName].addLayer(polygonLine1);
+              pcaLayers[pcaName].addLayer(polygonLine2);
+              pcaLayers[pcaName].addLayer(polygonLine3);
+              pcaLayers[pcaName].on("click", function(e) {
                 if (detail.map.hasLayer(mapLevel["county"])) {
                   fillMap("pca", pcaName)
                 } else {
                   fillMap("state", "all")
                 }
               });
-              pcaLayers[pcaName].addLayer(group)
-              countyLayers[countyName].addLayer(group)
+              countyLayers[countyName][pcaName] = pcaLayers[pcaName]
 
             // build Hopi Tribe polygon group
             } else if (pcaName == "Hopi Tribe") {
@@ -218,25 +215,23 @@
                 fillOpacity: 0.0,
                 smoothFactor: 0.8
               });
-              group = new L.FeatureGroup();
-              group.addLayer(polygonFill1);
-              group.addLayer(polygonFill2);
-              group.addLayer(polygonLine1);
-              group.addLayer(polygonLine2);
-              group.on("click", function(e) {
+              pcaLayers[pcaName] = new L.FeatureGroup();
+              pcaLayers[pcaName].addLayer(polygonFill1);
+              pcaLayers[pcaName].addLayer(polygonFill2);
+              pcaLayers[pcaName].addLayer(polygonLine1);
+              pcaLayers[pcaName].addLayer(polygonLine2);
+              pcaLayers[pcaName].on("click", function(e) {
                 if (detail.map.hasLayer(mapLevel["county"])) {
                   fillMap("pca", pcaName)
                 } else {
                   fillMap("state", "all")
                 }
               });
-              countyLayers[countyName].addLayer(group)
-              countyLayers[countyName]
-              pcaLayers[pcaName].addLayer(group)
+              countyLayers[countyName][pcaName] = pcaLayers[pcaName]
 
             // build all other single polygon layers
             } else {
-              var pcaPolygon = L.polygon(pcaPolygons[pcaName], {
+              pcaLayers[pcaName] = L.polygon(pcaPolygons[pcaName], {
                 title: pcaName,
                 clickable: true,
                 color: pcaColors[k % pcaColors.length],
@@ -244,15 +239,14 @@
                 weight: 1,
                 fillOpacity: 0.7
               });
-              pcaPolygon.on("click", function(e) {
+              pcaLayers[pcaName].on("click", function(e) {
                 if (detail.map.hasLayer(mapLevel["county"])) {
                   fillMap("pca", pcaName)
                 } else {
                   fillMap("state", "all")
                 }
               });
-              countyLayers[countyName].addLayer(pcaPolygon)
-              pcaLayers[pcaName].addLayer(pcaPolygon)
+              countyLayers[countyName][pcaName] = pcaLayers[pcaName]
             }
           }
         }
@@ -334,18 +328,18 @@
         for (var i = 0; i < Object.keys(mapLevel).length; i++) {
           detail.map.removeLayer(mapLevel[Object.keys(mapLevel)[i]]);
         }
-        for (var i = 0; i < Object.keys(DB.region).length; i++) {
-          detail.map.removeLayer(regionLayers[DB.region[i]]);
-          detail.map.removeLayer(mapIcons["region::" + DB.region[i]])
-        }
-        for (var i = 0; i < Object.keys(DB.county).length; i++) {
-          detail.map.removeLayer(countyLayers[DB.county[i]]);
-          detail.map.removeLayer(mapIcons["county::" + DB.county[i]])
-        }
-        for (var i = 0; i < Object.keys(DB.pca).length; i++) {
-          console.log(DB.pca[i])
-          detail.map.removeLayer(pcaLayers[DB.pca[i]]);
-          detail.map.removeLayer(mapIcons["pca::" + DB.pca[i]])
+        for (var regionName in DB.tree) {
+          for (var countyName in DB.tree[regionName]) {
+            detail.map.removeLayer(regionLayers[regionName][countyName]);
+            detail.map.removeLayer(countyLayers[countyName]["background"]);
+            for (var pcaName in DB.tree[regionName][countyName]) {
+              detail.map.removeLayer(countyLayers[countyName][pcaName]);
+              detail.map.removeLayer(pcaLayers[pcaName]);
+              detail.map.removeLayer(mapIcons["pca::" + pcaName])
+            }
+            detail.map.removeLayer(mapIcons["county::" + countyName])
+          }
+          detail.map.removeLayer(mapIcons["region::" + regionName])
         }
       }
 
@@ -355,28 +349,30 @@
         clearMap();
         if (level == "state") {
           detail.map.addLayer(mapLevel["state"]);
-          for (var i = 0; i < Object.keys(DB.tree).length; i++) {
-            detail.map.addLayer(regionLayers[Object.keys(DB.tree)[i]]);
-            detail.map.addLayer(mapIcons["region::" + Object.keys(DB.tree)[i]])
+          for (var regionName in DB.tree) {
+            for (var countyName in DB.tree[regionName]) {
+              detail.map.addLayer(regionLayers[regionName][countyName]);
+            }
+            detail.map.addLayer(mapIcons["region::" + regionName])
           }
           detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]),7)
         } else if (level == "region") {
           detail.map.addLayer(mapLevel[level])
-          detail.map.addLayer(regionLayers[label])
-          for (var i = 0; i < Object.keys(DB.tree[label]).length; i++) {
-            detail.map.addLayer(mapIcons["county::" + Object.keys(DB.tree[label])[i]])
+          for (var countyName in DB.tree[label]) {
+            detail.map.addLayer(regionLayers[label][countyName]);
+            detail.map.addLayer(mapIcons["county::" + countyName])
           }
           detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 7)
         } else if (level == "county") {
           let regionName = label.split("::")[0]
           let countyName = label.split("::")[1]
           detail.map.addLayer(mapLevel[level])
-          detail.map.addLayer(countyLayers[countyName])
-          detail.map.setView(JSON.parse(DB.coordinates["county::" + countyName]), 8)
-          for (var i = 0; i < Object.keys(DB.tree[regionName][countyName]).length; i++) {
-            let pcaName = Object.keys(DB.tree[regionName][countyName])[i]
+          detail.map.addLayer(countyLayers[countyName]["background"])
+          for (var pcaName in DB.tree[regionName][countyName]) {
+            detail.map.addLayer(pcaLayers[pcaName])
             detail.map.addLayer(mapIcons["pca::" + pcaName])
           }
+          detail.map.setView(JSON.parse(DB.coordinates["county::" + countyName]), 8)
         } else if (level == "pca") {
           detail.map.addLayer(mapLevel[level])
           detail.map.addLayer(pcaLayers[label])
@@ -387,13 +383,14 @@
             detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 9)
           }
         }
+
+        //TODO, pass level and label
         updateMap();
       }
 
       // change map icon and graph information
       function updateMap() {
-        for (var i = 0; i < Object.keys(DB.tree).length; i++) {
-          let regionName = Object.keys(DB.tree)[i]
+        for (var regionName in DB.tree) {
           if (detail.map.hasLayer(mapIcons["region::" + regionName])) {
             let regionKey = getBugDrug(Object.keys(pcaAMR['region'][regionName]))
             if (regionKey) {
@@ -402,7 +399,14 @@
               //----- Update is triggered after interacting with map, date slider, or drop down menu.
 
               // update map
-              mapIcons["region::" + regionName].options.icon.options.html = regionName + "<br>" + pcaAMR['region'][regionName][regionKey][String(document.getElementById("yearScale").value)] + " " + getPlus(parseInt(pcaAMR['region'][regionName][regionKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))]), parseInt(pcaAMR['region'][regionName][regionKey][String(document.getElementById("yearScale").value)]))
+              let regionPlus = getPlus(pcaAMR['region'][regionName][regionKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))], pcaAMR['region'][regionName][regionKey][String(document.getElementById("yearScale").value)])
+              let regionValue = avgPCA(pcaAMR['region'][regionName][regionKey][String(document.getElementById("yearScale").value)])
+              mapIcons["region::" + regionName].options.icon.options.html = regionName + "<br>" + regionPlus + regionValue
+              let regionStroke = getColor(100-Math.min(regionValue/4, 90), 25+Math.min(regionValue/4/4, 25), 30)
+              let regionFill = getColor(100-Math.min(regionValue/4, 90), 25+Math.min(regionValue/4/4, 25), 50)
+              for (var countyName in DB.tree[regionName]) {
+                regionLayers[regionName][countyName].setStyle({color:regionStroke,fillColor:regionFill})
+              }
 
               // update graph
 
@@ -421,13 +425,15 @@
               */  
 
             } else {
+              for (var countyName in DB.tree[regionName]) {
+                regionLayers[regionName][countyName].setStyle({color:getColor(0, 0, 30), fillColor:getColor(0, 0, 50)})
+              }
               mapIcons["region::" + regionName].options.icon.options.html = regionName + "<br>-"
             }
             detail.map.removeLayer(mapIcons["region::" + regionName])
             detail.map.addLayer(mapIcons["region::" + regionName])
           } else {
-            for (var j = 0; j < Object.keys(DB.tree[regionName]).length; j++) {
-              let countyName = Object.keys(DB.tree[regionName])[j]
+            for (var countyName in DB.tree[regionName]) {
               if (detail.map.hasLayer(mapIcons["county::" + countyName])) {
                 let countyKey = getBugDrug(Object.keys(pcaAMR['county'][countyName]))
                 if (countyKey) {
@@ -436,7 +442,15 @@
                   //----- Update is triggered after interacting with map, date slider, or drop down menu.
 
                   // update map
-                  mapIcons["county::" + countyName].options.icon.options.html = countyName + "<br>" + pcaAMR['county'][countyName][countyKey][String(document.getElementById("yearScale").value)] + " " + getPlus(parseInt(pcaAMR['county'][countyName][countyKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))]), parseInt(pcaAMR['county'][countyName][countyKey][String(document.getElementById("yearScale").value)]))
+                  let countyPlus = getPlus(pcaAMR['county'][countyName][countyKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))], pcaAMR['county'][countyName][countyKey][String(document.getElementById("yearScale").value)])
+                  let countyValue = avgPCA(pcaAMR['county'][countyName][countyKey][String(document.getElementById("yearScale").value)])
+                  mapIcons["county::" + countyName].options.icon.options.html = countyName + "<br>" + countyPlus + countyValue
+                  let countyStroke = getColor(100-Math.min(countyValue/2, 90), 25+Math.min(countyValue/4, 25), 30)
+                  let countyFill = getColor(100-Math.min(countyValue/2, 90), 25+Math.min(countyValue/4, 25), 50)
+
+                  for (var pcaName in DB.tree[regionName][countyName]) {
+                    regionLayers[regionName][countyName].setStyle({color:countyStroke,fillColor:countyFill})
+                  }
 
                   // update graph
 
@@ -446,13 +460,15 @@
                   */
 
                 } else {
+                  for (var pcaName in DB.tree[regionName][countyName]) {
+                    regionLayers[regionName][countyName].setStyle({color:getColor(0, 0, 30), fillColor:getColor(0, 0, 50)})
+                  }
                   mapIcons["county::" + countyName].options.icon.options.html = countyName + "<br>-"
                 }
                 detail.map.removeLayer(mapIcons["county::" + countyName])
                 detail.map.addLayer(mapIcons["county::" + countyName])
               } else {
-                for (var k = 0; k < Object.keys(DB.tree[regionName][countyName]).length; k++) {
-                  let pcaName = Object.keys(DB.tree[regionName][countyName])[k]
+                for (var pcaName in DB.tree[regionName][countyName]) {
                   if (detail.map.hasLayer(mapIcons["pca::" + pcaName])) {
                     let pcaKey = getBugDrug(Object.keys(pcaAMR['pca'][pcaName]))
                     if (pcaKey) {
@@ -461,7 +477,14 @@
                       //----- Update is triggered after interacting with map, date slider, or drop down menu.
 
                       // update map
-                      mapIcons["pca::" + pcaName].options.icon.options.html = pcaName + "<br>" + pcaAMR['pca'][pcaName][pcaKey][String(document.getElementById("yearScale").value)] + " " + getPlus(parseInt(pcaAMR['pca'][pcaName][pcaKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))]), parseInt(pcaAMR['pca'][pcaName][pcaKey][String(document.getElementById("yearScale").value)]))
+                      let pcaPlus = getPlus(pcaAMR['pca'][pcaName][pcaKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))], pcaAMR['pca'][pcaName][pcaKey][String(document.getElementById("yearScale").value)])
+                      let pcaValue = avgPCA(pcaAMR['pca'][pcaName][pcaKey][String(document.getElementById("yearScale").value)])
+                      mapIcons["pca::" + pcaName].options.icon.options.html = pcaName + "<br>" + pcaPlus + pcaValue
+                      let pcaStroke = getColor(100-Math.min(pcaValue, 90), 25+Math.min(pcaValue, 25), 30)
+                      let pcaFill = getColor(100-Math.min(pcaValue, 90), 25+Math.min(pcaValue, 25), 50)
+
+                      countyLayers[countyName][pcaName].setStyle({color:pcaStroke,fillColor:pcaFill})
+                      pcaLayers[pcaName].setStyle({color:pcaStroke,fillColor:pcaFill})
 
                       // update graph
 
@@ -470,7 +493,9 @@
                                 looking at a single PCA. You can change the graph to do something different here is you want.
                       */
 
-                     } else {
+                    } else {
+                      countyLayers[countyName][pcaName].setStyle({color:getColor(0, 0, 30), fillColor:getColor(0, 0, 50)})
+                      pcaLayers[pcaName].setStyle({color:getColor(0, 0, 30), fillColor:getColor(0, 0, 50)})
                       mapIcons["pca::" + pcaName].options.icon.options.html = pcaName + "<br>-"
                     }
                     detail.map.removeLayer(mapIcons["pca::" + pcaName])
@@ -512,15 +537,47 @@
         return false;
       }
 
+      function getColor(hue, saturation, light) {
+        return "hsl(" + String(hue) + ", " + String(saturation) + "%, " + String(light) + "%)"
+      }
+
       // return comparison symbol between values
       // used for comparison of previous AMR year
       function getPlus(x, y) {
-        if (x > y) {
-          return "-"
-        } else if (x < y) {
-          return "+"
+        var xN = 0
+        var yN = 0
+        if (detail.map.hasLayer(np["n"])) {
+          for (var i = 0; i < x.length; i++) {
+            xN += x[i][0]
+            yN += y[i][0]
+          }
         } else {
-          return "="
+          for (var i = 0; i < x.length; i++) {
+            xN += x[i][1]
+            yN += y[i][1]
+          }
+        }
+        if (xN > yN) {
+          return "<img style='width:20px;' src='{% static '/newick/images/down.png' %}' alt='down'>"
+        } else if (xN < yN) {
+          return "<img style='width:20px;' src='{% static '/newick/images/up.png' %}' alt='up'>"
+        } else {
+          return ""
+        }
+      }
+
+      function avgPCA(pcaList) {
+        var out = 0
+        if (detail.map.hasLayer(np["n"])) {
+          for (var i = 0; i < pcaList.length; i++) {
+            out += pcaList[i][0]
+          }
+          return String(out)
+        } else {
+          for (var i = 0; i < pcaList.length; i++) {
+            out += pcaList[i][1]
+          }
+          return String(parseInt(out/pcaList.length))
         }
       }
 
@@ -536,7 +593,7 @@
 
   </script>
 
-  <!-- prints database structure, unneeded in final version -->
+  <!-- prints database structure, unneeded in final version 
   <div id="query"></div>
     {{ demoPCA }}
 
@@ -561,6 +618,6 @@
     {% endfor %}
     </ul>
   {% endfor %}
-  </ul>
+  </ul> -->
 
 {% endblock %}
