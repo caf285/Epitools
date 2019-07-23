@@ -9,37 +9,66 @@ import datetime
 from django.db import models
 from django.utils import timezone
 
+class Bacteria(models.Model):
+  id = models.CharField('bacteriaName', max_length=64, primary_key=True)
+  type = models.CharField('bacteriaType', max_length=64, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
+
+class Drug(models.Model):
+  id = models.CharField('drugName', max_length=64, primary_key=True)
+  type = models.CharField('drugType', max_length=64, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
+
 class Region(models.Model):
-  id = models.CharField('regionName', max_length=50, primary_key=True)
-  coordinate = models.CharField('regionCoord', max_length=50, default="_")
-  class Meta:
-    ordering = ['id']
-  def __str__(self):
-    return str(self.id)
-
-class MPC(models.Model):
-  id = models.CharField('majorPopulationCenter', max_length=50, primary_key=True)
-  coordinate = models.CharField('mpcCoord', max_length=50, default="_")
-  class Meta:
-    ordering = ['id']
-  def __str__(self):
-    return str(self.id)
-
-class PCA(models.Model):
-  id = models.CharField('pcaName', max_length=50, primary_key=True)
-  coordinate = models.CharField('pcaCoord', max_length=50, default="_")
-  mpc1 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc1')
-  mpc2 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc2')
-  mpc3 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc3')
+  id = models.CharField('regionName', max_length=64, primary_key=True)
+  lat = models.CharField('latitude', max_length=16, default="_")
+  lon = models.CharField('longitude', max_length=16, default="_")
   class Meta:
     ordering = ['id']
   def __str__(self):
     return str(self.id)
 
 class County(models.Model):
-  id = models.CharField('countyName', max_length=50, primary_key=True)
-  coordinate = models.CharField('countyCoord', max_length=50, default="_")
+  id = models.CharField('countyName', max_length=64, primary_key=True)
+  lat = models.CharField('latitude', max_length=16, default="_")
+  lon = models.CharField('longitude', max_length=16, default="_")
   region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
+
+class MPC(models.Model):
+  id = models.CharField('majorPopulationCenter', max_length=64, primary_key=True)
+  lat = models.CharField('latitude', max_length=16, default="_")
+  lon = models.CharField('longitude', max_length=16, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
+
+class PCA(models.Model):
+  id = models.CharField('pcaName', max_length=64, primary_key=True)
+  lat = models.CharField('latitude', max_length=16, default="_")
+  lon = models.CharField('longitude', max_length=16, default="_")
+  number = models.PositiveSmallIntegerField('pcaNumber', default=0)
+  score = models.PositiveSmallIntegerField('pcaScore', default=0)
+  rural = models.CharField('ruralCode', max_length=16, default="_")
+  tax = models.CharField('taxDistrict', max_length=2, default="_")
+  azmua = models.CharField('AzMUA', max_length=64, default="_")
+  pchpsa = models.CharField('PCHPSA', max_length=256, default="_")
+  fedmuap = models.CharField('FedMUAP', max_length=256, default="_")
+  mpc1 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc1')
+  mpc2 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc2')
+  mpc3 = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc3')
+  travel2 = models.CharField('travel2', max_length=64, default="_")
+  travel3 = models.CharField('travel3', max_length=64, default="_")
   class Meta:
     ordering = ['id']
   def __str__(self):
@@ -54,28 +83,26 @@ class CountyPCA(models.Model):
   def __str__(self):
     return str(self.county) + "::" + str(self.pca)
 
+class FacilityType(models.Model):
+  type1 = models.CharField('facilityType', max_length=64, db_index=True)
+  type2 = models.CharField('facilitySubtype', max_length=64)
+  class Meta:
+    unique_together = ['type1', 'type2']
+  def __str__(self):
+    return str(self.type1) + "::" + str(self.type2)
+
 class Facility(models.Model):
-  typeChoices = [('H', 'Hospital'), ('C', 'Clinic')]
-  id = models.CharField('facilityName', max_length=50, primary_key=True)
-  type = models.CharField('facilityType', max_length=1, choices=typeChoices, default='H')
-  coordinate = models.CharField('facilityCoord', max_length=50, default="_")
-  mpc = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True)
-  class Meta:
-    ordering = ['id']
-  def __str__(self):
-    return str(self.id)
-
-class Bacteria(models.Model):
-  id = models.CharField('bacteriaName', max_length=50, primary_key=True)
-  type = models.CharField('bacteriaType', max_length=50, default="_")
-  class Meta:
-    ordering = ['id']
-  def __str__(self):
-    return str(self.id)
-
-class Drug(models.Model):
-  id = models.CharField('drugName', max_length=50, primary_key=True)
-  type = models.CharField('drugType', max_length=50, default="_")
+  id = models.CharField('facilityName', max_length=64, primary_key=True)
+  type = models.ForeignKey(FacilityType, on_delete=models.CASCADE, null=True, related_name='type')
+  capacity = models.PositiveSmallIntegerField('capacity', default=0)
+  certification = models.CharField('certification', max_length=1, default="_")
+  mpc = models.ForeignKey(MPC, on_delete=models.CASCADE, null=True, related_name='mpc')
+  address = models.CharField('address', max_length=64, default='_')
+  zip = models.CharField('zipCode', max_length=16, default='_')
+  phone = models.CharField('phoneNumber', max_length=16, default='_')
+  fax = models.CharField('faxNumber', max_length=16, default='_')
+  lat = models.CharField('latitude', max_length=16, default="_")
+  lon = models.CharField('longitude', max_length=16, default="_")
   class Meta:
     ordering = ['id']
   def __str__(self):
@@ -106,49 +133,3 @@ class DemoAMR(models.Model):
     ordering = ['date', 'facility', 'bacteria', 'drug']
   def __str__(self):
     return str(self.date) + '::' + str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.drug)
-
-'''
-class Pathogen(models.Model):
-  id = models.AutoField(primary_key=True) 
-  name = models.CharField('pathogen name', max_length=100)
-
-  def __str__(self):
-    return str(self.name)
-
-class Sample(models.Model):
-  id = models.AutoField(primary_key=True)
-  name = models.CharField('sample name', max_length=50)
-  date = models.DateField('date published')
-  location = models.CharField('address', max_length=100)
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
-  group = models.ForeignKey(Group, on_delete=models.CASCADE)
-  pathogen = models.ForeignKey(Pathogen, on_delete=models.CASCADE)
-  dataFile = models.CharField('sequence file', max_length=250)
-
-  def __str__(self):
-    return str(self.id) + "." + str(self.name)
-
-class Tree(models.Model):
-  id = models.AutoField(primary_key=True)
-  svg = models.CharField('image file', max_length=250)
-  dataFile = models.CharField('newick file', max_length=250)
-  samples = models.ManyToManyField(Sample)
-'''
-
-'''
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
-    def __str__(self):
-      return self.question_text
-    def was_published_recently(self):
-      now = timezone.now()
-      return now - datetime.timedelta(days=1) <= self.pub_date <= now
-
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
-    def __str__(self):
-      return self.choice_text
-'''

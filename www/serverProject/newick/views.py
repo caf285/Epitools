@@ -75,15 +75,15 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
         query[i.id].append(j['fields'])
     return query
 
-  # return coordinates for each REDION, COUNTY, and PCA
+  # return coordinates for each REGION, COUNTY, and PCA
   def getCoordinates(self):
     query = {}
     for i in Region.objects.all():
-      query['region::' + i.id] = i.coordinate
+      query['region::' + i.id] = "[" + i.lat + "," + i.lon + "]"
     for i in County.objects.all():
-      query['county::' + i.id] = i.coordinate
+      query['county::' + i.id] = "[" + i.lat + "," + i.lon + "]"
     for i in PCA.objects.all():
-      query['pca::' + i.id] = i.coordinate
+      query['pca::' + i.id] = "[" + i.lat + "," + i.lon + "]"
     query['state::all'] = '[35.452, -111.795]'
     return query
 

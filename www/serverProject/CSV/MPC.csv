@@ -1,146 +1,190 @@
-id,coordinate
-Ajo,_
-Anthem,_
-Apache Junction,_
-Arizona City,_
-Avondale,_
-Benson,_
-Bisbee,_
-Black Canyon City,_
-Bluewater,_
-Bowie,_
-Buckeye,_
-Bullhead City,_
-Casa Grande,_
-Casas Adobes,_
-Catalina Foothills,_
-Central,_
-Chandler,_
-Chino Valley,_
-Chloride,_
-Clarkdale,_
-Claypool,_
-Clifton,_
-Colorado City,_
-Coolidge,_
-Cornville,_
-Corona De Tucson,_
-Cortaro,_
-Cottonwood,_
-Desert Hills,_
-Dewey,_
-Douglas,_
-Dragoon,_
-Drexel Heights,_
-Eagar,_
-El Mirage,_
-Eloy,_
-Flagstaff,_
-Florence,_
-Flowing Wells,_
-Fort Huachuca,_
-Fort McDowell,_
-Fort Mohave,_
-Fortuna Foothills,_
-Fountain Hills,_
-Gilbert,_
-Glendale,_
-Globe,_
-Gold Canyon,_
-Golden Valley,_
-Goodyear,_
-Green Valley,_
-Guadalupe,_
-Heber,_
-Hereford,_
-Higley,_
-Holbrook,_
-Humboldt,_
-Kayenta,_
-Kingman,_
-Lake Havasu City,_
-Lakeside,_
-Litchfield Park,_
-Littlefield,_
-Marana,_
-Maricopa,_
-McNeal,_
-Mesa,_
-Mohave Valley,_
-Morristown,_
-Munds Park,_
-New River,_
-Nogales,_
-Oracle,_
-Oro Valley,_
-Page,_
-Paradise Valley,_
-Parker,_
-Parks,_
-Pascua Yaqui Tribe,_
-Patagonia,_
-Paulden,_
-Payson,_
-Peach Springs,_
-Peoria,_
-Phoenix,_
-Picture Rocks,_
-Pima,_
-Pine,_
-Pinon,_
-Polacca,_
-Prescott,_
-Prescott Valley,_
-Quartzsite,_
-Queen Creek,_
-Queen Valley,_
-Red Rock,_
-Rio Rico,_
-Rio Verde,_
-Sacaton,_
-Saddlebrooke,_
-Safford,_
-Sahuarita,_
-Saint Johns,_
-Salome,_
-Salt River,_
-San Carlos,_
-San Luis,_
-San Tan Valley,_
-San Xavier,_
-Scottsdale,_
-Sells,_
-Show Low,_
-Sierra Vista,_
-Sierra Vista Southeast,_
-Snowflake,_
-Somerton,_
-Springerville,_
-Sun City,_
-Sun City West,_
-Sun Lakes,_
-Superior,_
-Surprise,_
-Tanque Verde,_
-Taylor,_
-Teec Nos Pos,_
-Tempe,_
-Thatcher,_
-Tombstone,_
-Topock,_
-Tuba City,_
-Tubac,_
-Tucson,_
-Tucson Estates,_
-Vail,_
-Valencia West,_
-Wellton,_
-Whiteriver,_
-Wickenburg,_
-Willcox,_
-Williams,_
-Williamson,_
-Winslow,_
-Wittmann,_
-Youngtown,_
-Yuma,_
+﻿id,lat,lon
+Aguila,_,_
+Ajo,_,_
+Anthem,_,_
+Apache Junction,_,_
+Arivaca,_,_
+Arizona City,_,_
+Ash Fork,_,_
+Avondale,_,_
+Bagdad,_,_
+Beaver Dam,_,_
+Benson,_,_
+Bisbee,_,_
+Black Canyon City,_,_
+Bluewater,_,_
+Bouse,_,_
+Bowie,_,_
+Buckeye,_,_
+Bullhead City,_,_
+Camp Verde,_,_
+Carefree,_,_
+Casa Grande,_,_
+Casas Adobes,_,_
+Catalina Foothills,_,_
+Cave Creek,_,_
+Central,_,_
+Chandler,_,_
+Chinle,_,_
+Chino Valley,_,_
+Chloride,_,_
+Clarkdale,_,_
+Claypool,_,_
+Clifton,_,_
+Colorado City,_,_
+Concho,_,_
+Coolidge,_,_
+Cornville,_,_
+Corona De Tucson,_,_
+Cortaro,_,_
+Cottonwood,_,_
+Desert Hills,_,_
+Dewey,_,_
+Dolan Springs,_,_
+Douglas,_,_
+Dragoon,_,_
+Drexel Heights,_,_
+Duncan,_,_
+Eagar,_,_
+Ehrenberg,_,_
+El Mirage,_,_
+Eloy,_,_
+Flagstaff,_,_
+Florence,_,_
+Flowing Wells,_,_
+Fort Defiance,_,_
+Fort Huachuca,_,_
+Fort McDowell,_,_
+Fort Mohave,_,_
+Fortuna Foothills,_,_
+Fountain Hills,_,_
+Fredonia,_,_
+Ganado,_,_
+Gila Bend,_,_
+Gilbert,_,_
+Glendale,_,_
+Globe,_,_
+Gold Canyon,_,_
+Golden Valley,_,_
+Goodyear,_,_
+Grand Canyon,_,_
+Green Valley,_,_
+Guadalupe,_,_
+Heber,_,_
+Hereford,_,_
+Higley,_,_
+Holbrook,_,_
+Huachuca City,_,_
+Humboldt,_,_
+Kayenta,_,_
+Kearny,_,_
+Kingman,_,_
+Lake Havasu City,_,_
+Lakeside,_,_
+Laveen,_,_
+Leupp,_,_
+Litchfield Park,_,_
+Littlefield,_,_
+Mammoth,_,_
+Marana,_,_
+Maricopa,_,_
+Mayer,_,_
+McNeal,_,_
+Mesa,_,_
+Miami,_,_
+Mohave Valley,_,_
+Morenci,_,_
+Morristown,_,_
+Munds Park,_,_
+New River,_,_
+Nogales,_,_
+Oracle,_,_
+Oro Valley,_,_
+Page,_,_
+Palo Verde,_,_
+Paradise Valley,_,_
+Parker,_,_
+Parks,_,_
+Pascua Yaqui Tribe,_,_
+Patagonia,_,_
+Paulden,_,_
+Payson,_,_
+Peach Springs,_,_
+Pearce,_,_
+Peoria,_,_
+Phoenix,_,_
+Picture Rocks,_,_
+Pima,_,_
+Pine,_,_
+Pinetop,_,_
+Pinon,_,_
+Pirtleville,_,_
+Polacca,_,_
+Prescott,_,_
+Prescott Valley,_,_
+Quartzsite,_,_
+Queen Creek,_,_
+Queen Valley,_,_
+Red Rock,_,_
+Rimrock,_,_
+Rio Rico,_,_
+Rio Verde,_,_
+Sacaton,_,_
+Saddlebrooke,_,_
+Safford,_,_
+Sahuarita,_,_
+Saint Johns,_,_
+Salome,_,_
+Salt River,_,_
+San Carlos,_,_
+San Luis,_,_
+San Manuel,_,_
+San Tan Valley,_,_
+San Xavier,_,_
+Sanders,_,_
+Scottsdale,_,_
+Sedona,_,_
+Sells,_,_
+Show Low,_,_
+Sierra Vista,_,_
+Sierra Vista Southeast,_,_
+Snowflake,_,_
+Somerton,_,_
+Springerville,_,_
+St Johns,_,_
+Stanfield,_,_
+Star Valley,_,_
+Sun City,_,_
+Sun City West,_,_
+Sun Lakes,_,_
+Superior,_,_
+Surprise,_,_
+Tanque Verde,_,_
+Taylor,_,_
+Teec Nos Pos,_,_
+Tempe,_,_
+Thatcher,_,_
+Tolleson,_,_
+Tombstone,_,_
+Tonopah,_,_
+Topock,_,_
+Tuba City,_,_
+Tubac,_,_
+Tucson,_,_
+Tucson Estates,_,_
+Vail,_,_
+Valencia West,_,_
+Vernon,_,_
+Waddell,_,_
+Wellton,_,_
+Wenden,_,_
+Whiteriver,_,_
+Wickenburg,_,_
+Willcox,_,_
+Williams,_,_
+Williamson,_,_
+Winkelman,_,_
+Winslow,_,_
+Wittmann,_,_
+Youngtown,_,_
+Yuma,_,_
