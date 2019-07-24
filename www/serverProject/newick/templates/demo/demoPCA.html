@@ -129,6 +129,8 @@
           let pcaName = Object.keys(DB.tree[regionName][countyName]).sort().reverse()[k]
           let pcaColors = fillColors("county")
 
+          console.log(pcaName)
+
           // build Navajo Nation polygon group
           if (pcaName == "Navajo Nation") {
             var polygonFill1 = L.polygon(pcaPolygons[pcaName]["Fill1"], {
@@ -266,7 +268,7 @@
         mapIcons[iconName] = icon
       }
     }
-
+/*
     //----- fill AMR data in tree
     var pcaAMR = { 'region': {}, 'county': {}, 'pca': {} }
     var bugDrug = {}
@@ -324,6 +326,7 @@
     detail.map.addLayer(bugDrug[Object.keys(bugDrug)[0]]);
     L.control.layers(np, null).addTo(detail.map);
     detail.map.addLayer(np[Object.keys(np)[0]]);
+*/
     updateMap();
     fillMap("state", "all");
 
@@ -387,8 +390,6 @@
           detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 9)
         }
       }
-
-      //TODO, pass level and label
       updateMap();
     }
 

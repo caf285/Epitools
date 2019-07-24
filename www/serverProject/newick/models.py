@@ -115,7 +115,7 @@ class AMR(models.Model):
   drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
   date = models.DateField('amrDate', default="2000-1-1")
   tested = models.PositiveSmallIntegerField('numberTested', default=0)
-  suseptable = models.PositiveSmallIntegerField('percentSuseptable', default=0)
+  susceptible = models.PositiveSmallIntegerField('percentSusceptible', default=0)
   class Meta:
     ordering = ['date', 'facility', 'bacteria', 'drug']
   def __str__(self):
@@ -128,7 +128,7 @@ class DemoAMR(models.Model):
   drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
   date = models.DateField('amrDate', default="2000-1-1")
   tested = models.PositiveSmallIntegerField('numberTested', default=0)
-  suseptable = models.PositiveSmallIntegerField('percentSuseptable', default=0)
+  susceptible = models.PositiveSmallIntegerField('percentSusceptible', default=0)
   class Meta:
     ordering = ['date', 'facility', 'bacteria', 'drug']
   def __str__(self):

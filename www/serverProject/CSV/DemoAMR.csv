@@ -1,100 +1,4 @@
-facility,bacteria,drug,date,tested,suseptable
-Canyon View Kayenta Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-Canyon View Kayenta Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-Canyon View Kayenta Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-Canyon View Kayenta Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-Canyon View Kayenta Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-Canyon View Kayenta Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-Canyon View Kayenta Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-Canyon View Kayenta Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-Canyon View Kayenta Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-Canyon View Kayenta Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-Canyon View Kayenta Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-Canyon View Kayenta Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
-Canyon View Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-Canyon View Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-Canyon View Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-Canyon View Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-Canyon View Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-Canyon View Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-Canyon View Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-Canyon View Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-Canyon View Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-Canyon View Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-Canyon View Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-Canyon View Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
-Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
-Four Corners Regional Health Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-Four Corners Regional Health Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-Four Corners Regional Health Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-Four Corners Regional Health Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-Four Corners Regional Health Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-Four Corners Regional Health Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-Four Corners Regional Health Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-Four Corners Regional Health Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-Four Corners Regional Health Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-Four Corners Regional Health Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-Four Corners Regional Health Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-Four Corners Regional Health Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
-Hopi Health Care Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-Hopi Health Care Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-Hopi Health Care Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-Hopi Health Care Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-Hopi Health Care Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-Hopi Health Care Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-Hopi Health Care Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-Hopi Health Care Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-Hopi Health Care Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-Hopi Health Care Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-Hopi Health Care Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-Hopi Health Care Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
-North Country HealthCare,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-North Country HealthCare,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-North Country HealthCare,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-North Country HealthCare,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-North Country HealthCare,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-North Country HealthCare,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-North Country HealthCare,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-North Country HealthCare,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-North Country HealthCare,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-North Country HealthCare,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-North Country HealthCare,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-North Country HealthCare,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
-Pinon Health Station,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-Pinon Health Station,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-Pinon Health Station,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-Pinon Health Station,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-Pinon Health Station,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-Pinon Health Station,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-Pinon Health Station,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-Pinon Health Station,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-Pinon Health Station,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-Pinon Health Station,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-Pinon Health Station,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-Pinon Health Station,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
-Tuba City Indian Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
-Tuba City Indian Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
-Tuba City Indian Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
-Tuba City Indian Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
-Tuba City Indian Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
-Tuba City Indian Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
-Tuba City Indian Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
-Tuba City Indian Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
-Tuba City Indian Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
-Tuba City Indian Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
-Tuba City Indian Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
-Tuba City Indian Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+facility,bacteria,drug,date,tested,susceptible
 Verde Valley Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
 Verde Valley Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
 Verde Valley Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
@@ -107,3 +11,99 @@ Verde Valley Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
 Verde Valley Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
 Verde Valley Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
 Verde Valley Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+Page Hospital,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Page Hospital,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Page Hospital,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Page Hospital,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Page Hospital,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Page Hospital,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Page Hospital,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Page Hospital,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Page Hospital,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Page Hospital,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Page Hospital,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Page Hospital,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Flagstaff Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Flagstaff Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+Kingman Regional Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Kingman Regional Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Kingman Regional Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Kingman Regional Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Kingman Regional Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Kingman Regional Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Kingman Regional Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Kingman Regional Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Kingman Regional Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Kingman Regional Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Kingman Regional Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Kingman Regional Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+Western Arizona Regional Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Western Arizona Regional Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Western Arizona Regional Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Western Arizona Regional Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Western Arizona Regional Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Western Arizona Regional Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Western Arizona Regional Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Western Arizona Regional Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Western Arizona Regional Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Western Arizona Regional Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Western Arizona Regional Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Western Arizona Regional Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+Banner - University Medical Center Phoenix,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Banner - University Medical Center Phoenix,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Banner - University Medical Center Phoenix,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Banner - University Medical Center Phoenix,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Banner - University Medical Center Phoenix,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Banner - University Medical Center Phoenix,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Banner - University Medical Center Phoenix,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Banner - University Medical Center Phoenix,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Banner - University Medical Center Phoenix,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Banner - University Medical Center Phoenix,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Banner - University Medical Center Phoenix,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Banner - University Medical Center Phoenix,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+St. Joseph's Hospital And Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+St. Joseph's Hospital And Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+St. Joseph's Hospital And Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+St. Joseph's Hospital And Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+St. Joseph's Hospital And Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+St. Joseph's Hospital And Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+St. Joseph's Hospital And Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+St. Joseph's Hospital And Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+St. Joseph's Hospital And Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+St. Joseph's Hospital And Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+St. Joseph's Hospital And Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+St. Joseph's Hospital And Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+Tucson Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Tucson Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Tucson Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Tucson Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Tucson Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Tucson Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Tucson Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Tucson Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Tucson Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Tucson Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Tucson Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Tucson Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0
+Scottsdale Shea Medical Center,Staphylococcus aureus,Oxicillin,2013-01-01,50,3
+Scottsdale Shea Medical Center,Staphylococcus aureus,Oxicillin,2014-01-01,67,4
+Scottsdale Shea Medical Center,Staphylococcus aureus,Oxicillin,2015-01-01,83,4
+Scottsdale Shea Medical Center,Staphylococcus aureus,Oxicillin,2016-01-01,100,5
+Scottsdale Shea Medical Center,Staphylococcus aureus,Oxicillin,2017-01-01,86,5
+Scottsdale Shea Medical Center,Staphylococcus aureus,Oxicillin,2018-01-01,87,5
+Scottsdale Shea Medical Center,Enterococcus faecalis,Vancomycin,2013-01-01,9,0
+Scottsdale Shea Medical Center,Enterococcus faecalis,Vancomycin,2014-01-01,12,0
+Scottsdale Shea Medical Center,Enterococcus faecalis,Vancomycin,2015-01-01,15,0
+Scottsdale Shea Medical Center,Enterococcus faecalis,Vancomycin,2016-01-01,18,0
+Scottsdale Shea Medical Center,Enterococcus faecalis,Vancomycin,2017-01-01,15,0
+Scottsdale Shea Medical Center,Enterococcus faecalis,Vancomycin,2018-01-01,15,0

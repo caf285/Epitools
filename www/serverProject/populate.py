@@ -104,15 +104,14 @@ def main():
 
     # Facility
     elif model == "Facility":
-      for x in Facility.objects.all():
-        print("\tremoving ", x)
-        x.delete()
+      #for x in Facility.objects.all():
+      #  print("\tremoving ", x)
+      #  x.delete()
       for line in csv:
         line = line.split(",")
         print(line)
         facility = Facility.objects.get_or_create(id=line[0], type=FacilityType.objects.filter(type1=line[1].split("::")[0], type2=line[1].split("::")[-1])[0], capacity=line[2], certification=line[3], mpc=MPC.objects.filter(id=line[4])[0], address=line[5], zip=line[6], phone=line[7], fax=line[8], lat=line[9], lon=line[10])
 
-'''
     # DemoAMR
     elif model == "DemoAMR":
       #for x in DemoAMR.objects.all():
@@ -121,7 +120,6 @@ def main():
         line = line.split(",")
         print(line)
         amr = DemoAMR.objects.get_or_create(facility=Facility.objects.filter(id=line[0])[0], bacteria=Bacteria.objects.filter(id=line[1])[0], drug=Drug.objects.filter(id=line[2])[0], date=line[3], tested=line[4], suseptable=line[5])
-'''
 
 if __name__ == "__main__":
   main()
