@@ -60,12 +60,49 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
     query = {}
     query["amr"] = self.getAMR()
     query["tree"] = self.getTree()
-    query["region"] = self.getList(Region.objects.all())
-    query["county"] = self.getList(County.objects.all())
-    query["pca"] = self.getList(PCA.objects.all())
+    query["pca"] = self.getPCA()
     query["coordinates"] = self.getCoordinates()
-
     return query
+
+  def getAMR(self):
+    amr = {'region':{},'county':{},'pca':{}}
+    query = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', DemoAMR.objects.all()))))
+    for line in query:
+      line['date'] = "::".join(line['date'].split("-")[:-1])
+      mpc = json.loads(serializers.serialize('json', Facility.objects.filter(id=line['facility'])))[0]['fields']['mpc']
+      pcas = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', PCA.objects.filter(mpc1=mpc)))))
+      pcas = list(dict.fromkeys(pcas))
+      counties = []
+      for pca in pcas:
+        if pca not in amr['pca']:
+          amr['pca'][pca] = {}
+        if line['bacteria'] + "::" + line['drug'] not in amr['pca'][pca]:
+          amr['pca'][pca][line['bacteria'] + "::" + line['drug']] = {}
+        if line['date'] not in amr['pca'][pca][line['bacteria'] + "::" + line['drug']]:
+          amr['pca'][pca][line['bacteria'] + "::" + line['drug']][line['date']] = []
+        amr['pca'][pca][line['bacteria'] + "::" + line['drug']][line['date']].append([line['tested'], line['susceptible']])
+        counties += list(map(lambda x: x['fields']['county'], json.loads(serializers.serialize('json', CountyPCA.objects.filter(pca=pca)))))
+      counties = list(dict.fromkeys(counties))
+      regions = []
+      for county in counties:
+        if county not in amr['county']:
+          amr['county'][county] = {}
+        if line['bacteria'] + "::" + line['drug'] not in amr['county'][county]:
+          amr['county'][county][line['bacteria'] + "::" + line['drug']] = {}
+        if line['date'] not in amr['county'][county][line['bacteria'] + "::" + line['drug']]:
+          amr['county'][county][line['bacteria'] + "::" + line['drug']][line['date']] = []
+        amr['county'][county][line['bacteria'] + "::" + line['drug']][line['date']].append([line['tested'], line['susceptible']])
+        regions += list(map(lambda x: x['fields']['region'], json.loads(serializers.serialize('json', County.objects.filter(id=county)))))
+      regions = list(dict.fromkeys(regions))
+      for region in regions:
+        if region not in amr['region']:
+          amr['region'][region] = {}
+        if line['bacteria'] + "::" + line['drug'] not in amr['region'][region]:
+          amr['region'][region][line['bacteria'] + "::" + line['drug']] = {}
+        if line['date'] not in amr['region'][region][line['bacteria'] + "::" + line['drug']]:
+          amr['region'][region][line['bacteria'] + "::" + line['drug']][line['date']] = []
+        amr['region'][region][line['bacteria'] + "::" + line['drug']][line['date']].append([line['tested'], line['susceptible']])
+    return amr
 
   def getTree(self):
     tree = {}
@@ -77,14 +114,15 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
         tree[region][county] = {}
         pcas = list(map(lambda x: x['fields']['pca'], json.loads(serializers.serialize('json', CountyPCA.objects.filter(county=county)))))
         for pca in pcas:
-          tree[region][county][pca] = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', PCA.objects.filter(id=pca)))))
+          tree[region][county][pca] = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', PCA.objects.filter(id=pca)))))
     return tree
 
-  def getList(self, query):
-    out = []
-    for i in query:
-      out.append(i.id)
-    return out
+  def getPCA(self):
+    pca = {}
+    query = json.loads(serializers.serialize('json', PCA.objects.all()))
+    for line in query:
+      pca[line['pk']] = line['fields']
+    return pca
 
   def getCoordinates(self):
     query = {}
@@ -96,20 +134,6 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
       query['pca::' + i.id] = "[" + i.lat + "," + i.lon + "]"
     query['state::all'] = '[35.452, -111.795]'
     return query
-
-  def getAMR(self):
-    amr = {}
-    query = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', DemoAMR.objects.all()))))
-    for line in query:
-      mpc = json.loads(serializers.serialize('json', Facility.objects.filter(id=line['facility'])))[0]['fields']['mpc']
-      if mpc not in amr:
-        amr[mpc] = {}
-      if line['bacteria'] not in amr[mpc]:
-        amr[mpc][line['bacteria']] = {}
-      if line['drug'] not in amr[mpc][line['bacteria']]:
-        amr[mpc][line['bacteria']][line['drug']] = []
-      amr[mpc][line['bacteria']][line['drug']].append([line['date'], line['tested'], line['susceptible']])
-    return amr
 
 '''
 class DemoPCAView(LoginRequiredMixin, generic.ListView):

@@ -1,825 +1,106 @@
 {% extends "demo/demo.html" %}
 
 {% block static %}
-{{ block.super }}
-{% load leaflet_tags %}
-{% leaflet_css %}
-{% leaflet_js %}
-
-{% load static %}
-<script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
-<script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
-<script src="{% static '/newick/js/colorPalette.js' %}"></script>
-<script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
-<script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
-<style>
-  .leaflet-container {
-    /* all maps */
-    width: 60%;
-    height: 800px;
-    z-index: 1;
-    margin-left: 40%;
-  }
-
-  .region {
-    font-size: 18px;
-    position: absolute;
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  .county {
-    font-size: 15px;
-    position: absolute;
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  .pca {
-    font-size: 10px;
-    position: absolute;
-    text-align: center;
-    vertical-align: middle;
-  }
-</style>
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+  {% load static %}
+  <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
+  <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
+  <script src="{% static '/newick/js/colorPalette.js' %}"></script>
+  <script src="{% static '/newick/js/PCA.js' %}"></script>
+  <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
+  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+  <style>
+    .leaflet-container {
+      /* all maps */
+      height: 600px;
+      width: 100%;
+      z-index: 0;
+    }
+    #popupHover {
+      position: fixed;
+      z-index: 100;
+      left: 100px;
+      top: 100px;
+    }
+    .region {
+      font-size: 20px;
+      position: absolute;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .county {
+      font-size: 16px;
+      position: absolute;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .pca {
+      font-size: 12px;
+      position: absolute;
+      text-align: center;
+      vertical-align: middle;
+    }
+  </style>
+  <script>
+    // load database
+    DB = {{ demoPCA | safe }}
+    upImage = '{% static '/newick/images/up.png' %}'
+    downImage = '{% static '/newick/images/down.png' %}'
+  </script>
 {% endblock %}
 
-{% block content %}
-
-{% leaflet_map "main" %}
-<div style="position:relative;">
-  <div style="text-align:center;width:100%;position:absolute;top:-50px;z-index:100;">
-    <div style="position: relative;top:-36px">
-      <div id="yearScaleLabel" style="width:60%;margin-left:40%;font-size:36px;"></div>
-      <div class="controls" style="width:60%;margin-left:40%;">
-        <input style="width:300px;" type="range" id="yearScale" min="0" max="0">
-      </div>
+{% block sideContent %}
+  Bacteria
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Enterococcus faecalis</button>
+    <div class="dropdown-menu" aria-labelledby="about-us">
+    <a class="dropdown-item">Enterococcus faecalis</a>
+    <a class="dropdown-item">Staphylococcus aureus</a>
     </div>
   </div>
-  <div style="width:40%;position:absolute;top:-800px;left:0;z-index:100;">
-    <div id="testPlot" style="width:100%;height:800px;">
+  </br>
+
+  Drug
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Vancomycin</button>
+    <div class="dropdown-menu" aria-labelledby="about-us">
+    <a class="dropdown-item">Vancomycin</a>
+    <a class="dropdown-item">Oxicillin</a>
     </div>
   </div>
-</div>
-
-<script>
-  // load database
-  DB = {{ demoPCA | safe }}
-
-  // Get DOM element for plot
-  let plotRegion = document.getElementById("testPlot")
-
-  //----- MAP
-  window.addEventListener("map:init", function (e) {
-    var detail = e.detail;
-
-    //----- base layers
-    var baseLayers = {
-      "Grey": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', { 'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16 }),
-      "Dark Grey": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { 'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16 }),
-    };
-    L.control.layers(baseLayers, null).addTo(detail.map);
-    detail.map.addLayer(baseLayers["Grey"])
-
-    //----- map layer groups
-    var mapLevel = { "state": L.layerGroup(), "region": L.layerGroup(), "county": L.layerGroup(), "pca": L.layerGroup() }
-    //L.control.layers(mapLevel).addTo(detail.map)
-
-    var regionLayers = {};
-    var countyLayers = {};
-    var pcaLayers = {};
-
-    // for each region
-    for (var i = 0; i < Object.keys(DB.tree).length; i++) {
-      let regionName = Object.keys(DB.tree)[i]
-      regionLayers[regionName] = {}
-
-      // for each county
-      for (var j = 0; j < Object.keys(DB.tree[regionName]).length; j++) {
-        let countyName = Object.keys(DB.tree[regionName])[j]
-
-        regionLayers[regionName][countyName] = L.polygon(countyPolygons[countyName], {
-          title: countyName,
-          clickable: true,
-          color: fillColors("region")[i],
-          opacity: 0.7,
-          weight: 1,
-          fillOpacity: 0.7
-        });
-        regionLayers[regionName][countyName].on("click", function (e) {
-          if (detail.map.hasLayer(mapLevel["state"])) {
-            fillMap("region", regionName)
-          } else {
-            fillMap("county", regionName + "::" + e.target.options.title)
-          }
-        });
-
-        countyLayers[countyName] = {}
-        countyLayers[countyName]['background'] = L.polygon(countyPolygons[countyName], {
-          title: countyName,
-          clickable: false,
-          color: 'hsl(50, 100%, 0%)',
-          opacity: 0,
-          weight: 0,
-          fillOpacity: 0.1
-        });
-
-        // for each pca
-        for (var k = 0; k < Object.keys(DB.tree[regionName][countyName]).length; k++) {
-          let pcaName = Object.keys(DB.tree[regionName][countyName]).sort().reverse()[k]
-          let pcaColors = fillColors("county")
-
-          console.log(pcaName)
-
-          // build Navajo Nation polygon group
-          if (pcaName == "Navajo Nation") {
-            var polygonFill1 = L.polygon(pcaPolygons[pcaName]["Fill1"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 0,
-              fillOpacity: 0.7,
-              smoothFactor: 0.8
-            });
-            var polygonLine1 = L.polygon(pcaPolygons[pcaName]["Line1"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 1,
-              fillOpacity: 0.0,
-              smoothFactor: 0.8
-            });
-            var polygonLine2 = L.polygon(pcaPolygons[pcaName]["Line2"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 1,
-              fillOpacity: 0.0,
-              smoothFactor: 0.8
-            });
-            var polygonLine3 = L.polygon(pcaPolygons[pcaName]["Line3"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 1,
-              fillOpacity: 0.0,
-              smoothFactor: 0.8
-            });
-            pcaLayers[pcaName] = new L.FeatureGroup();
-            pcaLayers[pcaName].addLayer(polygonFill1);
-            pcaLayers[pcaName].addLayer(polygonLine1);
-            pcaLayers[pcaName].addLayer(polygonLine2);
-            pcaLayers[pcaName].addLayer(polygonLine3);
-            pcaLayers[pcaName].on("click", function (e) {
-              if (detail.map.hasLayer(mapLevel["county"])) {
-                fillMap("pca", pcaName)
-              } else {
-                fillMap("state", "all")
-              }
-            });
-            countyLayers[countyName][pcaName] = pcaLayers[pcaName]
-
-            // build Hopi Tribe polygon group
-          } else if (pcaName == "Hopi Tribe") {
-            var polygonFill1 = L.polygon(pcaPolygons[pcaName]["Fill1"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 0,
-              fillOpacity: 0.7,
-              smoothFactor: 0.8
-            });
-            var polygonFill2 = L.polygon(pcaPolygons[pcaName]["Fill2"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 1,
-              fillOpacity: 0.7,
-              smoothFactor: 0.8
-            });
-            var polygonLine1 = L.polygon(pcaPolygons[pcaName]["Line1"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 1,
-              fillOpacity: 0.0,
-              smoothFactor: 0.8
-            });
-            var polygonLine2 = L.polygon(pcaPolygons[pcaName]["Line2"], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 1,
-              fillOpacity: 0.0,
-              smoothFactor: 0.8
-            });
-            pcaLayers[pcaName] = new L.FeatureGroup();
-            pcaLayers[pcaName].addLayer(polygonFill1);
-            pcaLayers[pcaName].addLayer(polygonFill2);
-            pcaLayers[pcaName].addLayer(polygonLine1);
-            pcaLayers[pcaName].addLayer(polygonLine2);
-            pcaLayers[pcaName].on("click", function (e) {
-              if (detail.map.hasLayer(mapLevel["county"])) {
-                fillMap("pca", pcaName)
-              } else {
-                fillMap("state", "all")
-              }
-            });
-            countyLayers[countyName][pcaName] = pcaLayers[pcaName]
-
-            // build all other single polygon layers
-          } else {
-            pcaLayers[pcaName] = L.polygon(pcaPolygons[pcaName], {
-              title: pcaName,
-              clickable: true,
-              color: pcaColors[k % pcaColors.length],
-              opacity: 0.7,
-              weight: 1,
-              fillOpacity: 0.7
-            });
-            pcaLayers[pcaName].on("click", function (e) {
-              if (detail.map.hasLayer(mapLevel["county"])) {
-                fillMap("pca", pcaName)
-              } else {
-                fillMap("state", "all")
-              }
-            });
-            countyLayers[countyName][pcaName] = pcaLayers[pcaName]
-          }
-        }
-      }
-    }
-
-    //----- map icon groups
-    var mapIcons = {};
-    for (var i = 0; i < Object.keys(DB.coordinates).length; i++) {
-      let iconName = Object.keys(DB.coordinates)[i]
-      if (DB.coordinates[iconName] != "_") {
-        var icon = L.divIcon({ className: iconName.split("::")[0], iconAnchor: 100, iconSize: 200 });
-        icon = L.marker(JSON.parse(DB.coordinates[iconName]), { icon: icon, interactive: false });
-        mapIcons[iconName] = icon
-      }
-    }
-/*
-    //----- fill AMR data in tree
-    var pcaAMR = { 'region': {}, 'county': {}, 'pca': {} }
-    var bugDrug = {}
-    var dates = []
-    var np = { 'n': L.layerGroup(), '%': L.layerGroup() }
-    for (var i = 0; i < Object.keys(DB.tree).length; i++) {
-      let regionName = Object.keys(DB.tree)[i]
-      pcaAMR['region'][regionName] = {}
-      for (var j = 0; j < Object.keys(DB.tree[regionName]).length; j++) {
-        let countyName = Object.keys(DB.tree[regionName])[j]
-        pcaAMR['county'][countyName] = {}
-        for (var k = 0; k < Object.keys(DB.tree[regionName][countyName]).length; k++) {
-          // fill PCA
-          let pcaName = Object.keys(DB.tree[regionName][countyName])[k]
-          pcaAMR['pca'][pcaName] = {}
-          for (l in DB.amr[pcaName]) {
-            // PCA
-            let pcaDate = DB.amr[pcaName][l]['date'].split("-")[0]
-            if (!(DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug'] in pcaAMR['pca'][pcaName])) {
-              bugDrug[DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']] = L.layerGroup()
-              pcaAMR['pca'][pcaName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']] = {}
-            }
-            if (!(pcaDate in pcaAMR['pca'][pcaName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']])) {
-              dates.push(pcaDate)
-              pcaAMR['pca'][pcaName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']][pcaDate] = []
-            }
-            pcaAMR['pca'][pcaName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']][pcaDate].push([DB.amr[pcaName][l].tested, DB.amr[pcaName][l].suseptable])
-            // fill COUNTY
-            if (!(DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug'] in pcaAMR['county'][countyName])) {
-              pcaAMR['county'][countyName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']] = {}
-            }
-            if (!(pcaDate in pcaAMR['county'][countyName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']])) {
-              pcaAMR['county'][countyName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']][pcaDate] = []
-            }
-            pcaAMR['county'][countyName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']][pcaDate].push([DB.amr[pcaName][l].tested, DB.amr[pcaName][l].suseptable])
-            // fill REGION
-            if (!(DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug'] in pcaAMR['region'][regionName])) {
-              pcaAMR['region'][regionName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']] = {}
-            }
-            if (!(pcaDate in pcaAMR['region'][regionName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']])) {
-              pcaAMR['region'][regionName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']][pcaDate] = []
-            }
-            pcaAMR['region'][regionName][DB.amr[pcaName][l]['bacteria'] + '::' + DB.amr[pcaName][l]['drug']][pcaDate].push([DB.amr[pcaName][l].tested, DB.amr[pcaName][l].suseptable])
-          }
-        }
-      }
-    }
-    // setup year slider
-    document.getElementById("yearScale").min = dates.sort()[0];
-    document.getElementById("yearScale").max = dates.sort().reverse()[0];
-    document.getElementById("yearScale").value = dates.sort()[0];
-
-    // fill map and set controls
-    L.control.layers(bugDrug, null).addTo(detail.map);
-    detail.map.addLayer(bugDrug[Object.keys(bugDrug)[0]]);
-    L.control.layers(np, null).addTo(detail.map);
-    detail.map.addLayer(np[Object.keys(np)[0]]);
-*/
-    updateMap();
-    fillMap("state", "all");
-
-    // remove all unused map polygons and icons
-    function clearMap() {
-      for (var i = 0; i < Object.keys(mapLevel).length; i++) {
-        detail.map.removeLayer(mapLevel[Object.keys(mapLevel)[i]]);
-      }
-      for (var regionName in DB.tree) {
-        for (var countyName in DB.tree[regionName]) {
-          detail.map.removeLayer(regionLayers[regionName][countyName]);
-          detail.map.removeLayer(countyLayers[countyName]["background"]);
-          for (var pcaName in DB.tree[regionName][countyName]) {
-            detail.map.removeLayer(countyLayers[countyName][pcaName]);
-            detail.map.removeLayer(pcaLayers[pcaName]);
-            detail.map.removeLayer(mapIcons["pca::" + pcaName])
-          }
-          detail.map.removeLayer(mapIcons["county::" + countyName])
-        }
-        detail.map.removeLayer(mapIcons["region::" + regionName])
-      }
-    }
-
-    // show all map polygons and icons at current level and label
-    // levels are from PCA to STATE level, and label is the current selection ie. "County, Coconino", "PCA, Page"
-    function fillMap(level, label) {
-      clearMap();
-      if (level == "state") {
-        detail.map.addLayer(mapLevel["state"]);
-        for (var regionName in DB.tree) {
-          for (var countyName in DB.tree[regionName]) {
-            detail.map.addLayer(regionLayers[regionName][countyName]);
-          }
-          detail.map.addLayer(mapIcons["region::" + regionName])
-        }
-        detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 7)
-      } else if (level == "region") {
-        detail.map.addLayer(mapLevel[level])
-        for (var countyName in DB.tree[label]) {
-          detail.map.addLayer(regionLayers[label][countyName]);
-          detail.map.addLayer(mapIcons["county::" + countyName])
-        }
-        detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 7)
-      } else if (level == "county") {
-        let regionName = label.split("::")[0]
-        let countyName = label.split("::")[1]
-        detail.map.addLayer(mapLevel[level])
-        detail.map.addLayer(countyLayers[countyName]["background"])
-        for (var pcaName in DB.tree[regionName][countyName]) {
-          detail.map.addLayer(pcaLayers[pcaName])
-          detail.map.addLayer(mapIcons["pca::" + pcaName])
-        }
-        detail.map.setView(JSON.parse(DB.coordinates["county::" + countyName]), 8)
-      } else if (level == "pca") {
-        detail.map.addLayer(mapLevel[level])
-        detail.map.addLayer(pcaLayers[label])
-        detail.map.addLayer(mapIcons["pca::" + label])
-        if (label == "Navajo Nation") {
-          detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 8)
-        } else {
-          detail.map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 9)
-        }
-      }
-      updateMap();
-    }
-
-    // change map icon and graph information
-    function updateMap() {
-      dataArr = []
-      for (var regionName in DB.tree) {
-        if (detail.map.hasLayer(mapIcons["region::" + regionName])) {
-          let regionKey = getBugDrug(Object.keys(pcaAMR['region'][regionName]))
-          if (regionKey) {
-            //====================( UPDATE ALL REGION DATA )
-            //----- This section updates all region data when region icons are active, and AMR data exists at the region level.
-            //----- Update is triggered after interacting with map, date slider, or drop down menu.
-
-            // update map
-            let regionPlus = getPlus(pcaAMR['region'][regionName][regionKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))], pcaAMR['region'][regionName][regionKey][String(document.getElementById("yearScale").value)])
-            let regionValue = avgPCA(pcaAMR['region'][regionName][regionKey][String(document.getElementById("yearScale").value)])
-            mapIcons["region::" + regionName].options.icon.options.html = regionName + "<br>" + regionPlus + regionValue
-            let regionStroke = getColor(100 - Math.min(regionValue / 4, 90), 25 + Math.min(regionValue / 4 / 4, 25), 30)
-            let regionFill = getColor(100 - Math.min(regionValue / 4, 90), 25 + Math.min(regionValue / 4 / 4, 25), 50)
-            for (var countyName in DB.tree[regionName]) {
-              regionLayers[regionName][countyName].setStyle({ color: regionStroke, fillColor: regionFill })
-            }
-
-            // update graph
-
-            /* TODO:  This level will update when looking at the entire state, and the map will be labelled by region. Currently the AMR output will be a massive list of
-                      all AMR enteries for all PCAs in the database, split by region. "regionName" and "regionKey" are available for use here. AMR information is stored
-                      in the object "pcaAMR". The current year can be found with "document.getElementById("yearScale").value", and max and min with
-                      "document.getElementById("yearScale").max" and "document.getElementById("yearScale").min".
-
-                      To structure for "pcaAMR" is pcaAMR[level][level name][bug/drug name][year], so an example here would be pcaAMR['region'][regionName][regionKey][2016]
-                      and example output would be something like "[11, 4][55, 2][134, 5][3, 0]+" which in this example would be 4 pairs of ["n tested", "% suseptable"],
-                      followed by "+", meaning the average "n tested" for 2016 is greater than 2015.
-
-                      In this level, your graph X plane would be all years, Y can be average of all "n tested"*"% suseptable", and each line would be a region
-
-                      For all years, you can probably do a for loop ranging between the yearScale min and max. Also it may nee to account for a year not existing
-            */
-
-            //==================================================================================================== (The Meat & Potatoes)
-            // yearSlider element
-            let year_slider = document.getElementById("yearScale")
-            let yr_min = parseInt(year_slider.min)
-            let yr_max = parseInt(year_slider.max)
-
-            // Prepare graph data for render
-            var pathogenGraph = {}
-
-            pathogenGraph[regionName] = {
-              'x': [],
-              'y': [],
-              'name': regionName,
-              'type': 'scatter'
-            }
-
-            var layout = {
-              // barmode: 'stack',
-              legend: {
-                x: -0.2,
-                y: 1.4
-              },
-              title: {
-                text: "Susceptability By Region",
-                x: 0.9
-              },
-              xaxis: {
-                title: {
-                  text: "Time (yrs)"
-                }
-              },
-              yaxis: {
-                title: {
-                  text: "Average Num of Susceptable Samples"
-                }
-              }
-            }
-
-            // for each year that exists on the slider
-            var year = yr_min
-            for (year; year <= yr_max; year++) {
-              // If year exists on the slider, continue. Else, fallout
-              if (dates.indexOf(year.toString()) > -1) {
-
-                var avg_n_val = 0
-                var avg_perc_susc = 0
-                // Calculation of average value for this iteration of year, region, and bacteria
-                // Structure: pcaAMR['level'][levelName][levelKey][year]
-                for (var arrCluster = 0; arrCluster < pcaAMR['region'][regionName][regionKey][year].length; arrCluster++) {
-                  avg_n_val += pcaAMR['region'][regionName][regionKey][year][arrCluster][0]
-                  avg_perc_susc += pcaAMR['region'][regionName][regionKey][year][arrCluster][1]
-                }
-                avg_n_val = avg_n_val / arrCluster;
-                avg_perc_susc = avg_perc_susc / arrCluster;
-
-                // Loop is only for collecting values within coconino county
-                // Loop through all years in coconino county, mapping "n" values to y axis per year
-                pathogenGraph[regionName]['x'].push(year);
-                pathogenGraph[regionName]['y'].push(Math.floor(avg_n_val * (avg_perc_susc / 100) * 100) / 100) // do average calculation for n and % for given year
-              }
-            }
-            dataArr.push(pathogenGraph[regionName])
-            Plotly.react(plotRegion, dataArr, layout)
-
-          } else {
-            for (var countyName in DB.tree[regionName]) {
-              regionLayers[regionName][countyName].setStyle({ color: getColor(0, 0, 30), fillColor: getColor(0, 0, 50) })
-            }
-            mapIcons["region::" + regionName].options.icon.options.html = regionName + "<br>-"
-          }
-          detail.map.removeLayer(mapIcons["region::" + regionName])
-          detail.map.addLayer(mapIcons["region::" + regionName])
-        } else {
-          for (var countyName in DB.tree[regionName]) {
-            if (detail.map.hasLayer(mapIcons["county::" + countyName])) {
-              let countyKey = getBugDrug(Object.keys(pcaAMR['county'][countyName]))
-              if (countyKey) {
-                //====================( UPDATE ALL COUNTY DATA )
-                //----- This section updates all county data when county icons are active, and AMR data exists at the county level.
-                //----- Update is triggered after interacting with map, date slider, or drop down menu.
-
-                // update map
-                let countyPlus = getPlus(pcaAMR['county'][countyName][countyKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))], pcaAMR['county'][countyName][countyKey][String(document.getElementById("yearScale").value)])
-                let countyValue = avgPCA(pcaAMR['county'][countyName][countyKey][String(document.getElementById("yearScale").value)])
-                mapIcons["county::" + countyName].options.icon.options.html = countyName + "<br>" + countyPlus + countyValue
-                let countyStroke = getColor(100 - Math.min(countyValue / 2, 90), 25 + Math.min(countyValue / 4, 25), 30)
-                let countyFill = getColor(100 - Math.min(countyValue / 2, 90), 25 + Math.min(countyValue / 4, 25), 50)
-
-                for (var pcaName in DB.tree[regionName][countyName]) {
-                  regionLayers[regionName][countyName].setStyle({ color: countyStroke, fillColor: countyFill })
-                }
-
-                // update graph
-
-                /* TODO:  This is the county level. Like last time, you have access to variables "countyName", and "countyKey", and can pull returned AMR data with the
-                          format pcaAMR['county'][countyName][countyKey][2018]. X should be years, Y again can be average of all "n tested"*"% suseptable", and each line
-                          should be a county.
-                */
-
-                // yearSlider element
-                let year_slider = document.getElementById("yearScale")
-                let yr_min = parseInt(year_slider.min)
-                let yr_max = parseInt(year_slider.max)
-
-                // Prepare graph data for render
-                var pathogenGraph = {}
-
-                pathogenGraph[countyName] = {
-                  'x': [],
-                  'y': [],
-                  'name': countyName,
-                  'type': 'scatter'
-                }
-
-                var layout = {
-                  // barmode: 'stack',
-                  legend: {
-                    x: -0.2,
-                    y: 1.4
-                  },
-                  title: {
-                    text: "Susceptability By County",
-                    x: 0.9
-                  },
-                  xaxis: {
-                    title: {
-                      text: "Time (yrs)"
-                    }
-                  },
-                  yaxis: {
-                    title: {
-                      text: "Average Num of Susceptable Samples"
-                    }
-                  }
-                }
-
-                // for each year that exists on the slider
-                var year = yr_min
-                for (year; year <= yr_max; year++) {
-                  // If year exists on the slider, and data exists for selected context, continue. Else, fallout
-                  if (dates.indexOf(year.toString()) > -1 && pcaAMR['county'][countyName][countyKey][year]) {
-
-                    var avg_n_val = 0
-                    var avg_perc_susc = 0
-                    // Calculation of average value for this iteration of year, region, and bacteria
-                    // Structure: pcaAMR['level'][levelName][levelKey][year]
-                    for (var arrCluster = 0; arrCluster < pcaAMR['county'][countyName][countyKey][year].length; arrCluster++) {
-                      avg_n_val += pcaAMR['county'][countyName][countyKey][year][arrCluster][0]
-                      avg_perc_susc += pcaAMR['county'][countyName][countyKey][year][arrCluster][1]
-                    }
-                    avg_n_val = avg_n_val / arrCluster;
-                    avg_perc_susc = avg_perc_susc / arrCluster;
-
-                    pathogenGraph[countyName]['x'].push(year);
-                    pathogenGraph[countyName]['y'].push(Math.floor(avg_n_val * (avg_perc_susc / 100) * 100) / 100) // do average calculation for n and % for given year (divided by 100 to make it a decimal)
-                  }
-                }
-                dataArr.push(pathogenGraph[countyName])
-                Plotly.react(plotRegion, dataArr, layout)
-
-              } else {
-                for (var pcaName in DB.tree[regionName][countyName]) {
-                  regionLayers[regionName][countyName].setStyle({ color: getColor(0, 0, 30), fillColor: getColor(0, 0, 50) })
-                }
-                dataArr = []
-                mapIcons["county::" + countyName].options.icon.options.html = countyName + "<br>-"
-              }
-              detail.map.removeLayer(mapIcons["county::" + countyName])
-              detail.map.addLayer(mapIcons["county::" + countyName])
-            } else {
-              for (var pcaName in DB.tree[regionName][countyName]) {
-                if (detail.map.hasLayer(mapIcons["pca::" + pcaName])) {
-                  let pcaKey = getBugDrug(Object.keys(pcaAMR['pca'][pcaName]))
-                  if (pcaKey) {
-                    //====================( UPDATE ALL PCA DATA )
-                    //----- This section updates all pca data when pca icons are active, and AMR data exists at the pca level.
-                    //----- Update is triggered after interacting with map, date slider, or drop down menu.
-
-                    // update map
-                    let pcaPlus = getPlus(pcaAMR['pca'][pcaName][pcaKey][String(Math.max(document.getElementById("yearScale").value - 1, document.getElementById("yearScale").min))], pcaAMR['pca'][pcaName][pcaKey][String(document.getElementById("yearScale").value)])
-                    let pcaValue = avgPCA(pcaAMR['pca'][pcaName][pcaKey][String(document.getElementById("yearScale").value)])
-                    mapIcons["pca::" + pcaName].options.icon.options.html = pcaName + "<br>" + pcaPlus + pcaValue
-                    let pcaStroke = getColor(100 - Math.min(pcaValue, 90), 25 + Math.min(pcaValue, 25), 30)
-                    let pcaFill = getColor(100 - Math.min(pcaValue, 90), 25 + Math.min(pcaValue, 25), 50)
-
-                    countyLayers[countyName][pcaName].setStyle({ color: pcaStroke, fillColor: pcaFill })
-                    pcaLayers[pcaName].setStyle({ color: pcaStroke, fillColor: pcaFill })
-
-                    // update graph
-
-                    /* TODO:  Just like above, this will be updated per PCA. Dictionary format would be pcaAMR['pca'][pcaName][pcaKey][2018], X for years,
-                              and Y for average of all "n tested"*"% suseptable". You can also check here if there is only one pair returned, then you are only
-                              looking at a single PCA. You can change the graph to do something different here is you want.
-                    */
-                    let year_slider = document.getElementById("yearScale")
-                    let yr_min = parseInt(year_slider.min)
-                    let yr_max = parseInt(year_slider.max)
-
-                    // Prepare graph data for render
-                    var pathogenGraph = {}
-
-                    pathogenGraph[pcaName] = {
-                      'x': [],
-                      'y': [],
-                      'name': pcaName,
-                      'type': 'scatter'
-                    }
-
-                    var layout = {
-                      // barmode: 'stack',
-                      legend: {
-                        x: -0.2,
-                        y: 1.4
-                      },
-                      title: {
-                        text: "Susceptability By PCA",
-                        x: 0.9
-                      },
-                      xaxis: {
-                        title: {
-                          text: "Time (yrs)"
-                        }
-                      },
-                      yaxis: {
-                        title: {
-                          text: "Average Num of Susceptable Samples"
-                        }
-                      }
-                    }
-
-                    // for each year that exists on the slider
-                    var year = yr_min
-                    for (year; year <= yr_max; year++) {
-                      // If year exists on the slider, continue. Else, fallout
-                      if (dates.indexOf(year.toString()) > -1) {
-
-                        var avg_n_val = 0
-                        var avg_perc_susc = 0
-                        // Calculation of average value for this iteration of year, region, and bacteria
-                        // Structure: pcaAMR['level'][levelName][levelKey][year]
-                        for (var arrCluster = 0; arrCluster < pcaAMR['pca'][pcaName][pcaKey][year].length; arrCluster++) {
-                          if (pcaAMR['pca'][pcaName][pcaKey][year][arrCluster].length > 1) {
-
-                          }
-                          avg_n_val += pcaAMR['pca'][pcaName][pcaKey][year][arrCluster][0]
-                          avg_perc_susc += pcaAMR['pca'][pcaName][pcaKey][year][arrCluster][1]
-                        }
-                        avg_n_val = avg_n_val / arrCluster;
-                        avg_perc_susc = avg_perc_susc / arrCluster;
-
-                        // Push years and average values onto the trace
-                        pathogenGraph[pcaName]['x'].push(year);
-                        pathogenGraph[pcaName]['y'].push(Math.floor(avg_n_val * (avg_perc_susc / 100) * 100) / 100) // do average calculation for n and % for given year
-                      }
-                    }
-                    dataArr.push(pathogenGraph[pcaName])
-                    Plotly.react(plotRegion, removeDuplicates(dataArr, 'name'), layout)
-
-
-                  } else {
-                    countyLayers[countyName][pcaName].setStyle({ color: getColor(0, 0, 30), fillColor: getColor(0, 0, 50) })
-                    pcaLayers[pcaName].setStyle({ color: getColor(0, 0, 30), fillColor: getColor(0, 0, 50) })
-                    mapIcons["pca::" + pcaName].options.icon.options.html = pcaName + "<br>-"
-                  }
-                  detail.map.removeLayer(mapIcons["pca::" + pcaName])
-                  detail.map.addLayer(mapIcons["pca::" + pcaName])
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // fill color list for coloring polygons
-    function fillColors(color) {
-      let colorList = [];
-      if (color == "region") {
-        for (var i = 0; i < Object.keys(colorPalette).length; i++) {
-          colorList.push(colorPalette[Object.keys(colorPalette).sort()[i]][2]);
-        }
-        return colorList;
-      } else if (color == "county") {
-        for (var i = 0; i < Object.keys(colorPalette).length; i++) {
-          for (var j = 1; j < 4; j++) {
-            colorList.push(colorPalette[Object.keys(colorPalette).sort()[i]][j]);
-          }
-        }
-        return colorList;
-      }
-    }
-
-    // return active AMR data
-    // used to return AMR data attributed to visible map icons
-    function getBugDrug(keys) {
-      for (i in keys) {
-        if (detail.map.hasLayer(bugDrug[keys[i]])) {
-          return keys[i];
-        }
-      }
-      return false;
-    }
-
-    function getColor(hue, saturation, light) {
-      return "hsl(" + String(hue) + ", " + String(saturation) + "%, " + String(light) + "%)"
-    }
-
-    // return comparison symbol between values
-    // used for comparison of previous AMR year
-    function getPlus(x, y) {
-      var xN = 0
-      var yN = 0
-      if (detail.map.hasLayer(np["n"])) {
-        for (var i = 0; i < x.length; i++) {
-          xN += x[i][0]
-          yN += y[i][0]
-        }
-      } else {
-        for (var i = 0; i < x.length; i++) {
-          xN += x[i][1]
-          yN += y[i][1]
-        }
-      }
-      if (xN > yN) {
-        return "<img style='width:20px;' src='{% static '/newick/images/down.png' %}' alt='down'>"
-      } else if (xN < yN) {
-        return "<img style='width:20px;' src='{% static '/newick/images/up.png' %}' alt='up'>"
-      } else {
-        return ""
-      }
-    }
-
-    function avgPCA(pcaList) {
-      var out = 0
-      if (detail.map.hasLayer(np["n"])) {
-        for (var i = 0; i < pcaList.length; i++) {
-          out += pcaList[i][0]
-        }
-        return String(out)
-      } else {
-        for (var i = 0; i < pcaList.length; i++) {
-          out += pcaList[i][1]
-        }
-        return String(parseInt(out / pcaList.length))
-      }
-    }
-
-    function removeDuplicates(myArr, prop) {
-      return myArr.filter((obj, pos, arr) => {
-        return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
-      });
-    }
-
-    // listener events for map interaction
-    document.getElementById("yearScale").addEventListener('input', function (event) {
-      updateMap()
-    });
-    detail.map.on('baselayerchange', function () {
-      updateMap()
-    })
-
-  }, false);
-
-</script>
-
-<!-- prints database structure, unneeded in final version 
-  <div id="query"></div>
-    {{ demoPCA }}
-
-  <ul>
-    <li>{{ demoPCA.region }}</li>
-    <li>{{ demoPCA.county }}</li>
-    <li>{{ demoPCA.pca }}</li>
-    <li>{{ demoPCA.amr|safe }}</li>
-  </ul>
-
-  <ul>
-  {% for i in demoPCA.tree.items %}
-    <li>{{ i.0 }}</li>
-    <ul>
-    {% for j in i.1.items %}
-      <li>{{ j.0 }}</li>
-      <ul>
-      {% for k in j.1.items %}
-        <li>{{ k }}</li>
-      {% endfor %}
-      </ul>
-    {% endfor %}
-    </ul>
-  {% endfor %}
-  </ul> -->
-
+  </br>
+
+  n/%
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">n</button>
+    <div class="dropdown-menu" aria-labelledby="about-us">
+    <a class="dropdown-item">n</a>
+    <a class="dropdown-item">%</a>
+    </div>
+  </div>
+  </br>
+
+  Year
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">2013</button>
+    <div class="dropdown-menu" aria-labelledby="about-us">
+    <a class="dropdown-item">2013</a>
+    <a class="dropdown-item">2014</a>
+    <a class="dropdown-item">2015</a>
+    <a class="dropdown-item">2016</a>
+    <a class="dropdown-item">2017</a>
+    <a class="dropdown-item">2018</a>
+    </div>
+  </div>
+  </br>
+
+  <input type="range" id="yearScale" min="0" max="0">
+{% endblock %}
+
+{% block mainContent %}
+  {% leaflet_map "main" %}
+  <div id="popupHover">asd</div>
 {% endblock %}

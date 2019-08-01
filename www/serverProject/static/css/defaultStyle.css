@@ -1,5 +1,4 @@
 html, body {
-  background-color: #e3e3e3;
   color: #333;
   font-size: 12px;
   margin: 0px;
@@ -9,34 +8,99 @@ html, body {
   overflow-y: scroll;
 }
 
-#container {  
+#container {
+  min-height: 100%;
   display: flex;
   flex-flow: column;
-  height: 100%;
+  align-items: stretch;
+  justify-content: space-between;
 }
 
 #header {
   font-size: 16px;
   line-height: 25px;
+  z-index: 1000;
 }
 
 .navbar {
-  background-color: #146379;
 }
 
 #content {
-  flex: 1 1 auto;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-flow: row;
+  align-items: stretch;
+}
+
+#sideWindow {
+  position: fixed;
+  background-color: white;
+  height: 76%;
+  width: 300px;
+  top: 12%;
+  left: -8px;
+  padding-left: 16px;
+  padding-right: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+#sideContent {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow-y: scroll;
+}
+
+#sideWindow.toggle {
+  left: -292px;
+}
+
+#sideButton {
+  height: 100px;
+  width: 20px;
+  position: absolute;
+  right: -12px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+#sideButton span {
+  top: 25px;
+  font-size: 10px;
+  position: absolute;
+  transform-origin: left center;
+  transform: rotate(90deg);
+}
+
+#mainContent {
+  left: 188px;
+  right: 0;
+  margin-left: 12px;
+  margin-right: 12px;
+  flex-grow: 1;
+  display: flex;
+  flex-flow: column;
+  align-items: stretch;
 }
 
 #footer {
-  flex: 0 0 30px;
+  font-size: 10px;
   line-height: 30px;
   padding-left: 10px;
   padding-right: 10px;
   color: white;
-  background-color: #146379
+  z-index: 1000;
 }
 
 #cr {
   float: right;
 }
+
+

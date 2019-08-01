@@ -14,20 +14,21 @@
 
     <!-- Javascript -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/defaultScript.js' %}"></script>
   {% endblock %}
 
 </head>
-<body>
-
+<body class="bg-dark">
   <div id="container">
+
+    <!-- HEADER () -->
     <div id="header">
       <nav class="navbar navbar-expand navbar-dark bg-dark">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item {% block home %}{% endblock %}"><a class="nav-link" href="/newick/">Home&nbsp</a></li>
@@ -47,7 +48,6 @@
             {% endif %}
           </ul>
         </div>
-
         <ul class="navbar-nav ml-auto">
           {% if request.user.is_superuser %}
             <li class="nav-item"><a class="nav-link" href="/admin/" target="_blank">Admin</a></li>
@@ -61,10 +61,20 @@
       </nav>
     </div>
 
-    <div id="content">
-      {% block content %}{% endblock %}
+    <!-- CONTENT -->
+    <div id="content">                                                                                                            
+      <div id="sideWindow" class="toggle">
+        <button id="sideButton" type="button" class="btn btn-danger"><span>Options</span></button>
+        <div id="sideContent">
+          {% block sideContent %}{% endblock %}
+        </div>
+      </div>
+      <div id="mainContent">
+        {% block mainContent %}{% endblock %}
+      </div>
     </div>
 
+    <!-- FOOTER -->
     <div class="bg-dark" id="footer">
       {% if user.is_authenticated %}
         <div style="float: left; text-transform: lowercase;">{{ user.get_username }}</div>, last login: {{ user.last_login }}
@@ -75,6 +85,5 @@
 
   </div>
   <script>main();</script>
-
 </body>
 </html>

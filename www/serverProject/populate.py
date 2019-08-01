@@ -119,7 +119,7 @@ def main():
       for line in csv:
         line = line.split(",")
         print(line)
-        amr = DemoAMR.objects.get_or_create(facility=Facility.objects.filter(id=line[0])[0], bacteria=Bacteria.objects.filter(id=line[1])[0], drug=Drug.objects.filter(id=line[2])[0], date=line[3], tested=line[4], suseptable=line[5])
+        amr = DemoAMR.objects.get_or_create(facility=Facility.objects.filter(id=line[0])[0], bacteria=Bacteria.objects.filter(id=line[1])[0], drug=Drug.objects.filter(id=line[2])[0], date=line[3], tested=line[4], susceptible=line[5])
 
 if __name__ == "__main__":
   main()
