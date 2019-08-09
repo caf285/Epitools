@@ -1,0 +1,27 @@
+.leaflet-container {
+  /* all maps */
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+.region {
+  font-size: 20px;
+  position: absolute;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.county {
+  font-size: 16px;
+  position: absolute;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.pca {
+  font-size: 12px;
+  position: absolute;
+  text-align: center;
+  vertical-align: middle;
+}   

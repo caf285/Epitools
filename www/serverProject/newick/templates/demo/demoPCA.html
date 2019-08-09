@@ -6,101 +6,74 @@
   {% leaflet_css %}
   {% leaflet_js %}
   {% load static %}
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static '/newick/css/PCA.css' %}"></link>
+
+  <!-- Javascript -->
   <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
   <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
   <script src="{% static '/newick/js/colorPalette.js' %}"></script>
-  <script src="{% static '/newick/js/PCA.js' %}"></script>
+  <script src="{% static '/newick/js/antibiogram.js' %}"></script>
+  <script src="{% static '/newick/js/mapAZ.js' %}"></script>
   <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
   <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
-  <style>
-    .leaflet-container {
-      /* all maps */
-      height: 600px;
-      width: 100%;
-      z-index: 0;
-    }
-    #popupHover {
-      position: fixed;
-      z-index: 100;
-      left: 100px;
-      top: 100px;
-    }
-    .region {
-      font-size: 20px;
-      position: absolute;
-      text-align: center;
-      vertical-align: middle;
-    }
-    .county {
-      font-size: 16px;
-      position: absolute;
-      text-align: center;
-      vertical-align: middle;
-    }
-    .pca {
-      font-size: 12px;
-      position: absolute;
-      text-align: center;
-      vertical-align: middle;
-    }
-  </style>
   <script>
     // load database
-    DB = {{ demoPCA | safe }}
-    upImage = '{% static '/newick/images/up.png' %}'
-    downImage = '{% static '/newick/images/down.png' %}'
+    var DB = {{ demoPCA | safe }}
+    var levels = ["region", "county", "pca"]
+    var mapFunctions = []
+    var upImage = '{% static '/newick/images/up.png' %}'
+    var downImage = '{% static '/newick/images/down.png' %}'
   </script>
 {% endblock %}
 
 {% block sideContent %}
-  Bacteria
+  Bacteria::Drug
   <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Enterococcus faecalis</button>
+    <button id="bacteriaDrug" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ demoPCA.amr.bugDrugs.0 }}</button>
     <div class="dropdown-menu" aria-labelledby="about-us">
-    <a class="dropdown-item">Enterococcus faecalis</a>
-    <a class="dropdown-item">Staphylococcus aureus</a>
-    </div>
-  </div>
-  </br>
-
-  Drug
-  <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Vancomycin</button>
-    <div class="dropdown-menu" aria-labelledby="about-us">
-    <a class="dropdown-item">Vancomycin</a>
-    <a class="dropdown-item">Oxicillin</a>
+    {% for i in demoPCA.amr.bugDrugs %}
+      <a class="dropdown-item" onclick="document.getElementById('bacteriaDrug').innerHTML = '{{ i }}'; updateMap()">{{ i }}</a>
+    {% endfor %}
     </div>
   </div>
   </br>
 
   n/%
   <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">n</button>
+    <button id="n%" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">n</button>
     <div class="dropdown-menu" aria-labelledby="about-us">
-    <a class="dropdown-item">n</a>
-    <a class="dropdown-item">%</a>
+    <a class="dropdown-item" onclick="document.getElementById('n%').innerHTML = 'n'; updateMap()">n</a>
+    <a class="dropdown-item" onclick="document.getElementById('n%').innerHTML = '%'; updateMap()">%</a>
     </div>
   </div>
   </br>
 
   Year
   <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">2013</button>
+    <button id="yearScale" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ demoPCA.amr.dates.0 }}</button>
     <div class="dropdown-menu" aria-labelledby="about-us">
-    <a class="dropdown-item">2013</a>
-    <a class="dropdown-item">2014</a>
-    <a class="dropdown-item">2015</a>
-    <a class="dropdown-item">2016</a>
-    <a class="dropdown-item">2017</a>
-    <a class="dropdown-item">2018</a>
+    {% for i in demoPCA.amr.dates %}
+      <a class="dropdown-item" onclick="document.getElementById('yearScale').innerHTML = '{{ i }}'; updateMap()">{{ i }}</a>
+    {% endfor %}
     </div>
   </div>
   </br>
 
-  <input type="range" id="yearScale" min="0" max="0">
 {% endblock %}
 
 {% block mainContent %}
-  {% leaflet_map "main" %}
-  <div id="popupHover">asd</div>
+  <div class="mainContent">
+    {% leaflet_map "main" %}
+  </div>
+  <span style="color:white;">
+  <div class="mainContent">
+    Antibiogram
+  </div>
+  <div class="mainContent">
+    Plotly
+  </div>
+  </span>
 {% endblock %}
+

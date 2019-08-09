@@ -59,16 +59,20 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
   def get_queryset(self):
     query = {}
     query["amr"] = self.getAMR()
-    query["tree"] = self.getTree()
+    query["map"] = self.getMap()
     query["pca"] = self.getPCA()
     query["coordinates"] = self.getCoordinates()
     return query
 
   def getAMR(self):
-    amr = {'region':{},'county':{},'pca':{}}
+    amr = {'region':{}, 'county':{}, 'pca':{}, 'dates':[], 'bugDrugs':[]}
     query = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', DemoAMR.objects.all()))))
     for line in query:
       line['date'] = "::".join(line['date'].split("-")[:-1])
+      if line['date'] not in amr['dates']:
+        amr['dates'].append(line['date'])
+      if line['bacteria'] + "::" + line['drug'] not in amr['bugDrugs']:
+        amr['bugDrugs'].append(line['bacteria'] + "::" + line['drug'])
       mpc = json.loads(serializers.serialize('json', Facility.objects.filter(id=line['facility'])))[0]['fields']['mpc']
       pcas = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', PCA.objects.filter(mpc1=mpc)))))
       pcas = list(dict.fromkeys(pcas))
@@ -104,18 +108,14 @@ class DemoPCAView(LoginRequiredMixin, generic.ListView):
         amr['region'][region][line['bacteria'] + "::" + line['drug']][line['date']].append([line['tested'], line['susceptible']])
     return amr
 
-  def getTree(self):
-    tree = {}
-    regions = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', Region.objects.all()))))
-    for region in regions:
-      tree[region] = {}
-      counties = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', County.objects.filter(region=region)))))
-      for county in counties:
-        tree[region][county] = {}
-        pcas = list(map(lambda x: x['fields']['pca'], json.loads(serializers.serialize('json', CountyPCA.objects.filter(county=county)))))
-        for pca in pcas:
-          tree[region][county][pca] = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', PCA.objects.filter(id=pca)))))
-    return tree
+  def getMap(self):
+    mapAZ = {}
+    mapAZ["state::all"] = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', Region.objects.all()))))
+    for region in mapAZ["state::all"]:
+      mapAZ["region::" + region] = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', County.objects.filter(region=region)))))
+      for county in mapAZ["region::" + region]:
+        mapAZ["county::" + county] = list(map(lambda x: x['fields']['pca'], json.loads(serializers.serialize('json', CountyPCA.objects.filter(county=county)))))
+    return mapAZ
 
   def getPCA(self):
     pca = {}

@@ -79,7 +79,7 @@ html, body {
   transform: rotate(90deg);
 }
 
-#mainContent {
+#mainWindow {
   left: 188px;
   right: 0;
   margin-left: 12px;
@@ -88,6 +88,11 @@ html, body {
   display: flex;
   flex-flow: column;
   align-items: stretch;
+}
+
+.mainContent {
+  height: 600px;
+  width: 100%;
 }
 
 #footer {
