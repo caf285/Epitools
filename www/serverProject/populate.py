@@ -39,6 +39,14 @@ def main():
     print(model)
 
     # Bacteria
+    if model == "Bacteria":
+      for x in Bacteria.objects.all():
+        print("\tremoving ", x)
+        x.delete()
+      for line in csv:
+        line = line.split(",")
+        print(line)
+        Bacteria.objects.get_or_create(id=line[0], type=line[1])
 
     # Drug
 
@@ -114,8 +122,8 @@ def main():
 
     # DemoAMR
     elif model == "DemoAMR":
-      #for x in DemoAMR.objects.all():
-      #  x.delete()
+      for x in DemoAMR.objects.all():
+        x.delete()
       for line in csv:
         line = line.split(",")
         print(line)

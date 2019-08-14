@@ -21,7 +21,7 @@
   <script>
     // load database
     var DB = {{ demoPCA | safe }}
-    var levels = ["region", "county", "pca"]
+    var levels = ["state", "region", "county", "pca"]
     var mapFunctions = []
     var upImage = '{% static '/newick/images/up.png' %}'
     var downImage = '{% static '/newick/images/down.png' %}'
@@ -29,51 +29,72 @@
 {% endblock %}
 
 {% block sideContent %}
-  Bacteria::Drug
+  Bacteria:
   <div class="dropdown">
-    <button id="bacteriaDrug" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ demoPCA.amr.bugDrugs.0 }}</button>
-    <div class="dropdown-menu" aria-labelledby="about-us">
-    {% for i in demoPCA.amr.bugDrugs %}
-      <a class="dropdown-item" onclick="document.getElementById('bacteriaDrug').innerHTML = '{{ i }}'; updateMap()">{{ i }}</a>
-    {% endfor %}
+    <button id="bacteriaButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+    <div id="bacteriaDropdown" class="dropdown-menu" aria-labelledby="about-us">
     </div>
   </div>
   </br>
 
-  n/%
+  Drug:
   <div class="dropdown">
-    <button id="n%" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">n</button>
+    <button id="drugButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+    <div id="drugDropdown" class="dropdown-menu" aria-labelledby="about-us">
+    </div>
+  </div>
+  </br>
+
+  Susceptible/Resistant:
+  <div class="dropdown">
+    <button id="sr" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Susceptible</button>
     <div class="dropdown-menu" aria-labelledby="about-us">
-    <a class="dropdown-item" onclick="document.getElementById('n%').innerHTML = 'n'; updateMap()">n</a>
-    <a class="dropdown-item" onclick="document.getElementById('n%').innerHTML = '%'; updateMap()">%</a>
+      <a class="dropdown-item" onclick="document.getElementById('sr').innerHTML = 'Susceptible'; updatePlotly(); updateAll()">Susceptible</a>
+      <a class="dropdown-item" onclick="document.getElementById('sr').innerHTML = 'Resistant'; updatePlotly(); updateAll()">Resistant</a>
+    </div>
+  </div>
+  </br>
+
+  Map Color:
+  <div class="dropdown">
+    <button id="mapColorButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
+    <div id="mapColorDropdown" class="dropdown-menu" aria-labelledby="about-us">
     </div>
   </div>
   </br>
 
   Year
-  <div class="dropdown">
-    <button id="yearScale" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ demoPCA.amr.dates.0 }}</button>
-    <div class="dropdown-menu" aria-labelledby="about-us">
-    {% for i in demoPCA.amr.dates %}
-      <a class="dropdown-item" onclick="document.getElementById('yearScale').innerHTML = '{{ i }}'; updateMap()">{{ i }}</a>
-    {% endfor %}
-    </div>
-  </div>
+  <input type="range" id="yearScale">
   </br>
 
 {% endblock %}
 
 {% block mainContent %}
   <div class="mainContent">
-    {% leaflet_map "main" %}
+    <div style="width: 60%; margin-right: 10px;">
+      {% leaflet_map "main" %}
+    </div>
+    <div id="plot" style="width: 40%;">
+    </div>
   </div>
-  <span style="color:white;">
   <div class="mainContent">
-    Antibiogram
+    <table class="table table-bordered table-light">
+      <thead>
+        <tr>
+          <td colspan="100%" style="font-size: 18px;"><center><b><div id="antibiogramHeader"></div></b></center></td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="100%" style="font-size: 16px;"><center><b><div id="antibiogramSubheader"></div></b></center></td>
+        </tr>
+        <tr id="drug">
+          <td style="vertical-align: bottom;width: 200px;"><div><center><b>Organism</b></center></div></td>
+          <td style="vertical-align: bottom;width: 50px;"><div><center><b># Strains</b></center></div></td>
+        </tr>
+      </thead>
+      <tbody id="bug">
+      </tbody>
+    </table>
   </div>
-  <div class="mainContent">
-    Plotly
-  </div>
-  </span>
 {% endblock %}
 

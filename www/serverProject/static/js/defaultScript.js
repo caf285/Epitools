@@ -28,3 +28,11 @@ function main() {
 
   getYear();
 }
+
+function proper(text) {
+  if (typeof text == 'string') {
+    return text.split(" ").map(x => x[0].toUpperCase() + x.slice(1).toLowerCase()).join(" ")
+  } else {
+    return ""
+  }
+}

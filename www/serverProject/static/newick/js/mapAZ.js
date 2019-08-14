@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('mousemove', function(e) {
   popup.style.left = String(parseInt(e.clientX + 10)) + "px"
   popup.style.top = String(parseInt(e.clientY - popup.offsetHeight/2)) + "px"
-});
+}, false);
 
 // map initialization
 window.addEventListener("map:init", function (e) {
@@ -205,7 +205,7 @@ window.addEventListener("map:init", function (e) {
   for (var i = 0; i < Object.keys(DB.coordinates).length; i++) {
     let iconName = Object.keys(DB.coordinates)[i]
     if (DB.coordinates[iconName] != "_") {
-      var icon = L.divIcon({ className: iconName.split("::")[0], iconAnchor: 100, iconSize: 200, html: iconName.split("::")[1]});
+      var icon = L.divIcon({ className: iconName.split("::")[0], iconAnchor: [100, 100], iconSize: 200, html: iconName.split("::")[1]});
       icon = L.marker(JSON.parse(DB.coordinates[iconName]), { icon: icon, interactive: false });
       icons[iconName] = icon
     }
@@ -230,14 +230,13 @@ window.addEventListener("map:init", function (e) {
       map.addLayer(layers[level + "::" + label][i])
     }
     if (level == "state") {
-      map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 6)
+      map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 7)
     } else if (level == "region" || level == "county") {
       map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 7)
     } else {
       map.setView(JSON.parse(DB.coordinates[level + "::" + label]), 8)
     }
   }
-
 
   function getPCA(pca) {
     out = []
@@ -255,22 +254,23 @@ window.addEventListener("map:init", function (e) {
     out.push(DB.pca[pca]['travel2'])
     return out.join("</br>")
   }
-
-  // fill color list for coloring polygons
-  function fillColors(color) {
-    let colorList = [];
-    if (color == "region") {
-      for (var i = 0; i < Object.keys(colorPalette).length; i++) {
-        colorList.push(colorPalette[Object.keys(colorPalette).sort()[i]][2]);
-      }
-      return colorList;
-    } else if (color == "county") {
-      for (var i = 0; i < Object.keys(colorPalette).length; i++) {
-        for (var j = 1; j < 4; j++) {
-          colorList.push(colorPalette[Object.keys(colorPalette).sort()[i]][j]);
-        }
-      }
-      return colorList;
-    }
-  }
 }, false);
+
+// fill color list for coloring polygons
+function fillColors(color) {
+  let colorList = [];
+  if (color == "region") {
+    for (var i = 0; i < Object.keys(colorPalette).length; i++) {
+      colorList.push(colorPalette[Object.keys(colorPalette).sort()[i]][2]);
+    }
+    return colorList;
+  } else if (color == "county") {
+    for (var i = 0; i < Object.keys(colorPalette).length; i++) {
+      for (var j = 1; j < 4; j++) {
+        colorList.push(colorPalette[Object.keys(colorPalette).sort()[i]][j]);
+      }
+    }
+    return colorList;
+  }
+}
+
