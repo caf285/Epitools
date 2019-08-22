@@ -41,7 +41,7 @@ done
 
 #----- resolve all M1% in "GAS.tsv"
 # run nasp against M1 reference; exit is no change
-M1=$(/scratch/GAS/bin/mkConfig.py /scratch/GAS/reference/M1-TG92300.fasta -m _)
+M1=$(/scratch/GAS/bin/mkConfig.py /scratch/GAS/reference/M1\:\:TG92300.fasta -m _)
 
 # get jobID for nasp run (only if "_" QUALITY BREADTH)
 JOBID=0
@@ -74,9 +74,10 @@ if (( ${JOBID##* } != 0 )); then
   JOBID=$(sbatch --job-name="GAS-tree" --output="/dev/null" --time="10:00" --mem="32g" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/ALL/matrices/bestsnp.fasta")
 fi
 
-echo done
-
 #----- TODO recursively build nasp run per clade
+if (( ${JOBID##* } != 0 )); then
+  JOBID=$(sbatch --job-name="GAS-clades" --output="/dev/null" --time="10:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/getClades.py | while read line; do /scratch/GAS/bin/cladeGAS.sh \${line}; done")
+fi
 
 #----- TODO find best reference per clade
 

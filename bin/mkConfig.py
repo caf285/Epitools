@@ -49,6 +49,7 @@ def main():
   gas = gas.stdout.read().split("\n")[:-1]
 
   header = gas.pop(0).split("\t")
+
   cols = {}
   for i in range(len(header)):
     cols[header[i]] = i

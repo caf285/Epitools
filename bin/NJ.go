@@ -63,27 +63,30 @@ func branch(matrix [][]int, tempTree []int, count int) (b1 int, b2 int){
   return
 }
 
-func getBest(tree map[int]map[int]float64, tempScore float64, tempPath []int, bestScore float64, bestPath []int) (float64, []int){
-  if tempScore > bestScore {
-    bestScore = tempScore
-    bestPath = tempPath
+func getBest(tree map[int]map[int]float64, tempScore float64, tempPath []int, bestScore []float64, bestPath []int) ([]int){
+  if tempScore > bestScore[0] {
+    bestScore[0] = tempScore
+    bestPath = bestPath[:0]
+    for i := 0; i < len(tempPath); i ++ {
+      bestPath = append(bestPath, tempPath[i])
+    }
   }
   for key, _ := range tree[tempPath[len(tempPath) - 1]] {
     if !indexList(key, tempPath) {
-      bestScore, bestPath = getBest(tree, tempScore + tree[tempPath[len(tempPath) - 1]][key], append(tempPath, key), bestScore, bestPath)
+      bestPath = getBest(tree, tempScore + tree[tempPath[len(tempPath) - 1]][key], append(tempPath, key), bestScore, bestPath)
     }
   }
-
-  return bestScore, bestPath
+  return bestPath
 }
 
 func getNewick(names []string, tree map[int]map[int]float64, path []int, score float64) string {
-  if len(tree[path[len(path) - 1]]) == 1 {
+  if path[len(path) - 1] < len(names) && path[len(path) - 1] >= 0 {
     return names[path[len(path) - 1]] + ":" + strconv.FormatFloat(math.Abs(score), 'f', -1, 64)
   } else if score == 0 {
     thing := []string{}
     for index := range tree[path[len(path) - 1]]{
       if ! indexList(index, path) {
+  
         thing = append(thing, getNewick(names, tree, append(path, index), tree[path[len(path) - 1]][index]))
       }
     }
@@ -231,29 +234,25 @@ func main() {
   tree[tempTree[1]][count + 1] = float64(matrix[0][1]) / 2
 
   // get nodes with longest path
-  bestScore := float64(0)
-  bestPath := []int{0}
+  bestScore := []float64{0}
+  bestPath := []int{}
   for i := 0; i < len(names); i++ {
 
-    tempScore, tempPath := getBest(tree, 0, []int{i}, bestScore, bestPath)
-    if tempScore > bestScore {
-      bestScore = tempScore
-      bestPath = tempPath
-    }
+    bestPath = getBest(tree, 0, []int{i}, bestScore, bestPath)
   }
 
   // get midpoint location and root at midpoint
-  bestScore -= bestScore / 2
+  bestScore[0] -= bestScore[0] / 2
   tree[-1] = make(map[int]float64)
   for i := 0; i < len(bestPath) - 1; i++ {
-    if bestScore - tree[bestPath[i]][bestPath[i + 1]] < 0 {
-      tree[-1][bestPath[i]] = bestScore
-      tree[-1][bestPath[i + 1]] = -(bestScore - tree[bestPath[i]][bestPath[i + 1]])
+    if bestScore[0] - tree[bestPath[i]][bestPath[i + 1]] < 0 {
+      tree[-1][bestPath[i]] = bestScore[0]
+      tree[-1][bestPath[i + 1]] = -(bestScore[0] - tree[bestPath[i]][bestPath[i + 1]])
       delete(tree[bestPath[i]], bestPath[i + 1])
       delete(tree[bestPath[i + 1]], bestPath[i])
       break
     }
-    bestScore -= tree[bestPath[i]][bestPath[i + 1]]
+    bestScore[0] -= tree[bestPath[i]][bestPath[i + 1]]
   }
 
   // print nwk

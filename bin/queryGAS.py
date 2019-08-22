@@ -7,7 +7,8 @@ import json
 # ==================================================( functions )
 def printHelp():
   print("\nreturns all lines of GAS.tsv that follow arguments given")
-  print("usage: queryGAS.py [-h] [-j | -n | -e | -d | -l | -m ]")
+  print("usage: queryGAS.py [-h] [-j | -exact | -n | -e | -d | -l | -m ]")
+  print("\t-exact\tExact Sample Name")
   print("\t-n\tSample Name")
   print("\t-e\tExclude Name")
   print("\t-t\tType")
@@ -30,7 +31,7 @@ def main():
 
   # check args
   # fill dictionary for all accepted args
-  args = {"-j":[],"-n":[], "-e":[], "-d":[], "-l":[], "-m":[]}
+  args = {"-j":[], "-exact":[], "-n":[], "-e":[], "-d":[], "-l":[], "-m":[]}
   flag = ""
   for arg in sys.argv:
     if arg[0] == "-":
@@ -40,7 +41,6 @@ def main():
         printHelp()
     elif flag:
       args[flag].append(arg)
-  print(args)
 
   # convert json arg to json format
   # handles single list in json format
@@ -120,7 +120,11 @@ def main():
     sample = sample.split("\t")
 
     # check for JSON list
-    if len(args["-j"]) > 0 and sample[0] not in args["-j"]:
+    #if len(args["-j"]) > 0 and sample[0] not in args["-j"]:
+    #  continue
+
+    # check exact sampleName
+    if len(args["-exact"]) > 0 and sample[0] not in args["-exact"]:
       continue
 
     # check sampleName
