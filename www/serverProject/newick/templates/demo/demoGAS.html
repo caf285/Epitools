@@ -1,0 +1,94 @@
+{% extends "demo/demo.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+  {% load static %}
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static '/newick/css/PCA.css' %}"></link>
+
+  <!-- Javascript -->
+  <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
+  <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
+  <script src="{% static '/newick/js/colorPalette.js' %}"></script>
+  <script src="{% static '/newick/js/mapAZ.js' %}"></script>
+  <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
+  <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
+  <script>
+    // load database
+    var DB = {{ demoGAS | safe }}
+    var levels = ["state", "region", "county", "pca"]
+    var mapFunctions = []
+    
+  </script>
+{% endblock %}
+
+{% block sideContent %}
+  M-Type:
+  <div class="dropdown">
+    <button id="gasMType" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ALL</button>
+    <div class="dropdown-menu dropdown-center">
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'ALL';">ALL</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M1';">M1</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M4';">M4</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M12';">M12</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M28';">M28</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M59';">M59</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M81';">M81</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M82';">M82</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M89';">M89</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M90';">M90</a>
+    </div>
+  </div>
+  </br>
+
+  Display By:
+  <div class="dropdown">
+    <button id="gasDisplay" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" onclick="document.getElementById('gasDisplay').innerHTML = 'Default';">Default</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasDisplay').innerHTML = 'M-Type';">M-Type</a>
+      <a class="dropdown-item" onclick="document.getElementById('gasDisplay').innerHTML = 'Map View';">Map View</a>
+    </div>
+  </div>
+  </br>
+
+{% endblock %}
+
+{% block mainContent %}
+  <div class="mainContent">
+    <div style="width: 60%; margin-right: 10px;">
+      {% leaflet_map "main" %}
+    </div>
+    <div id="phylocanvas" style="width: 40%; background-color: white; overflow-y: scroll;"></div>
+    <style>#phylocanvas {width: 100%; height: 800px;}</style>
+    <script>
+      var tree = new Phylocanvas.Tree('phylocanvas');
+      tree.baseNodeSize = 4
+      tree.setTreeType('rectangular')
+      tree.load('(((((TG78107:2,TG93246:4):3.5,TG93318:33.5):1,((((31896:4,TG93046:5):1,TG92156:8,TG92260:7):6,GAS-TG102855-xx-CL-USA-xxxx-081-JB:17):4.5,((TG93206:1,Streptococcus-Group-A-TG93453:1,(AZ_GAS_TG93641:0,GAS_TG93685:1):3):18,GAS-TG114467-xx-CL-USA-2018-081-JB:10,TG92276:7,(TG128508:17,(((TG77226:7,(TG92380:10,TG92356:14):4,TG93038:16):3.5,(GAS_TG93653:1.5,(TG92236:1.5,TG92256:2.5):1.5):9.5):1.5,(((Streptococcus-Group-A-TG93457:2,(Reference:0,TG92300:0):2):7.5,(GAS-TG114459-xx-CL-USA-2018-081-JB:0,GAS-TG114479-xx-CL-USA-2018-081-JB:0):9.5):1.5,((GAS_TG93697:14.5,TG93222:6.5):1.5,(TG116723:7.5,(TG92348:4):4):0.5):0.5):1.5):1.5):3):2):6.5):3,(((TG78019:7.5,((TG78263:0.5,(TG93374:0,TG93390:1):0.5):7.5,TG93410:6.5):4.5):1,(TG78275:0,TG93362:2):12):0.5,(((((TG77955:0,(TG78199:2,03-2454:1):3,TG77963:8):3.5,TG78027:8.5):1,((GAS-FMCTG95169-xx-CL-USA-2017-040-JB:29,GAS-TG110871-xx-CL-USA-xxxx-081-JB:24):3,GAS-TG133116-095:23):3.5,((TG78283:10,TG77923:8):7,(TG78023:11,TG78223:13):4,(TG78083:8,TG78159:11,(TG78231:1,TG78239:2,TG78307:2,TG93334:2):11):2,TG93322:12):0.5):7.5,(TG93234:18,((TG78259:5,TG78235:14):1,(06-299002:2,(TG93350:2,TG78303:1):1):16):13):0.5):3,TG93274:23):8.5):1.5):151.5,((GAS_TG93957:35,(TG77919:14,TG78039:103):33):64.5,(H:11,(TG78291:2,TG93406:0):1):20.5):7):0;');
+      tree.showBranchLengthLabels = true
+
+
+
+    </script>
+  </div>
+  <div class="mainContent">
+    <table class="table table-bordered table-light">
+      <thead>
+        <tr>
+          <td colspan="100%" style="font-size: 18px;"><center><b><div id="gasHeader">Sample Selection</div></b></center></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="100%"><center><div id="gasBody">decription</div></center></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+

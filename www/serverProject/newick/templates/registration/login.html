@@ -1,7 +1,6 @@
 {% extends "registration/log.html" %}
 
 {% block mainContent %}
-  {{ block.super }}
   <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
 

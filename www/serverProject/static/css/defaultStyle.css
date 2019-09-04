@@ -8,6 +8,10 @@ html, body {
   overflow-y: scroll;
 }
 
+.table {
+  margin: 0;
+}
+
 #container {
   min-height: 100%;
   display: flex;
@@ -36,6 +40,7 @@ html, body {
 #sideWindow {
   position: fixed;
   background-color: white;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.75);
   height: 76%;
   width: 300px;
   top: 12%;
@@ -62,6 +67,7 @@ html, body {
 }
 
 #sideButton {
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.75);
   height: 100px;
   width: 20px;
   position: absolute;

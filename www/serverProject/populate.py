@@ -81,14 +81,14 @@ def main():
         MPC.objects.get_or_create(id=line[0], lat=line[1], lon=line[2])
 
     # PCA
-    elif model == "PCA":
+    #elif model == "PCA":
       #for x in PCA.objects.all():
       #  print("\tremoving ", x)
       #  x.delete()
-      for line in csv:
-        line = line.split(",")
-        print(line)
-        PCA.objects.get_or_create(id=line[0], lat=line[1], lon=line[2], number=line[3], score=line[4], rural=line[5], tax=line[6], azmua=line[7], pchpsa=line[8], fedmuap=line[9], mpc1=MPC.objects.filter(id=line[10])[0], mpc2=MPC.objects.filter(id=line[11])[0], mpc3=MPC.objects.filter(id=line[12])[0], travel2=line[13], travel3=line[14])
+      #for line in csv:
+      #  line = line.split(",")
+      #  print(line)
+      #  PCA.objects.get_or_create(id=line[0], lat=line[1], lon=line[2], number=line[3], score=line[4], rural=line[5], tax=line[6], azmua=line[7], pchpsa=line[8], fedmuap=line[9], mpc1=MPC.objects.filter(id=line[10])[0], mpc2=MPC.objects.filter(id=line[11])[0], mpc3=MPC.objects.filter(id=line[12])[0], travel2=line[13], travel3=line[14])
 
     # CountyPCA
     elif model == "CountyPCA":
