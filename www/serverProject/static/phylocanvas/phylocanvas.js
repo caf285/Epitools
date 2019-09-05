@@ -1,5 +1,6 @@
 /*
 1 - event listeners and functions
+  1DRW - draw on canvas (scale bar)
 
 7 - 
   7SCP - set click parameters (bounds for mouse detection)
@@ -998,6 +999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'draw',
 	    value: function draw(forceRedraw) {
+
 	      this.highlighters.length = 0;
 
 	      if (this.maxBranchLength === 0) {
@@ -1031,6 +1033,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.drawn = true;
 
 	      this.canvas.restore();
+
+        // 1DRW - draw on canvas
+          //this.canvas.fillRect(20, this.canvas.canvas.height - 50, 300, 30)
+          // draw scale frame
+	        this.canvas.beginPath();
+    	    this.canvas.moveTo(20, this.canvas.canvas.height - 20);
+    	    this.canvas.lineTo(20, this.canvas.canvas.height - 40);
+    	    this.canvas.lineTo(320, this.canvas.canvas.height - 40);
+    	    this.canvas.lineTo(320, this.canvas.canvas.height - 20);
+    	    this.canvas.stroke();
+          // draw scale text
+          let tmpTxt = [this.canvas.font, this.canvas.textAlign]
+          this.canvas.font = "20px " + tmpTxt[0].split(" ")[1]
+          this.canvas.textAlign = "center"
+          this.canvas.fillText((300 / this.branchScalar / this.zoom).toFixed(2), 160, this.canvas.canvas.height - 20)
+          this.canvas.font = tmpTxt[0]
+          this.canvas.textAlign = tmpTxt[1]
+    	    this.canvas.closePath();
+        //
+
 	    }
 
 	    /**
@@ -2748,11 +2770,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.dragging || this.hasCollapsedAncestor()) {
 	        return null;
 	      }
+
+        // 7SCP - set branch click range scalar
+        var bw = 3
+	      if (bw * this.tree.zoom < bw) {
+	        bw = bw / this.tree.zoom;
+	      }
+        //
+
 	      if (x < this.maxx && x > this.minx && y < this.maxy && y > this.miny) {
 	        return this;
 	      }
         // 7SCP - set click parameters (bounds for mouse detection)
-        else if (x < this.startx+2 && x > this.startx-2 && y < this.centery+2 && y > this.starty-2 ||x < this.startx+2 && x > this.startx-2 && y < this.starty+2 && y > this.centery-2 || x < this.centerx+2 && x > this.startx-2 && y < this.centery+2 && y > this.centery-2) {
+        // check root branch first
+        else if (this == tree.root && x < this.startx+bw && x > this.startx-100 && y < this.starty+bw && y > this.starty-bw) {
+          return this;
+        // check any other branch
+        } else if (x < this.startx+bw && x > this.startx-bw && y < this.centery+bw && y > this.starty-bw || x < this.startx+bw && x > this.startx-bw && y < this.starty+bw && y > this.centery-bw || x < this.centerx+bw && x > this.startx-bw && y < this.centery+bw && y > this.centery-bw) {
           return this;
         }
         //
@@ -2826,9 +2860,10 @@ return /******/ (function(modules) { // webpackBootstrap
         if (!this.leaf) {
 	        boundedRadius *= 2 / 3;
         }
-	      if (radius * this.tree.zoom < 5) {
+	      if (radius * this.tree.zoom < 3) {
 	        boundedRadius = 5 / this.tree.zoom;
 	      }
+        boundedRadius = Math.max(boundedRadius, parseInt(this.getFontString().match(/\d+/)) / 2)
 	      //if (radius * this.tree.zoom < 5 || !this.leaf) {
 	      //  boundedRadius = 5 / this.tree.zoom;
 	      //}
@@ -2840,12 +2875,12 @@ return /******/ (function(modules) { // webpackBootstrap
         // 7SND - set node bounded dimensions
         // includes label in mouse over dimensions
         if (this.leaf) {
-  	      var label = this.getLabel();
-          var tempFont = this.canvas.font
+  	      let label = this.getLabel();
+          let tempFont = this.canvas.font
   	      this.canvas.font = this.getFontString();
-  	      this.labelWidth = this.canvas.measureText(label).width; //TODO - label text
+  	      this.labelWidth = this.canvas.measureText(label).width;
+          this.maxx = centerX + radius + this.labelWidth;
           this.canvas.font = tempFont
-          this.maxx = this.minx + this.getLabelStartX() + this.labelWidth;
         }
         //
 	    }
@@ -2986,23 +3021,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'drawHighlight',
 	    value: function drawHighlight(centerX, centerY) {
 	      this.canvas.save();
-	      this.canvas.beginPath();
 
 	      this.canvas.strokeStyle = this.tree.highlightColour;
 	      this.canvas.lineWidth = this.getHighlightLineWidth();
 	      var radius = this.getHighlightRadius();
 
         // 7SHD - set internal node highlight highlight dimensions
+        if (this == tree.root) {
+	        this.canvas.beginPath();
+    	    this.canvas.moveTo(this.startx - (tree.baseNodeSize * 2 / 3), this.starty);
+    	    this.canvas.lineTo(this.startx - 100, this.starty);
+	        this.canvas.stroke();
+	        this.canvas.closePath();
+	        this.canvas.beginPath();
+	        this.canvas.arc(this.startx, this.starty, tree.baseNodeSize * 2 / 3, 0, Angles.FULL, false);
+	        this.canvas.stroke();
+	        this.canvas.closePath();
+        } else {
+	      this.canvas.beginPath();
+        if (this.starty > centerY) {
+    	    this.canvas.moveTo(this.startx, this.starty - Math.min(this.starty - centerY, tree.baseNodeSize * 2 / 3));
+        } else {
+    	    this.canvas.moveTo(this.startx, this.starty + Math.min(centerY - this.starty, tree.baseNodeSize * 2 / 3));
+        }
+    	  this.canvas.lineTo(this.startx, centerY);
+	      this.canvas.stroke();
+	      this.canvas.closePath();
+
+
+	      this.canvas.beginPath();
+    	  if (Math.abs(this.starty - centerY) < tree.baseNodeSize * 2 / 3)  {
+    	    this.canvas.moveTo(this.startx + Math.min(centerX - this.startx, tree.baseNodeSize * 2 / 3), this.starty);
+        } else {
+          this.canvas.moveTo(this.startx, centerY);
+        }
+        if (this.leaf) {
+    	    this.canvas.lineTo(centerX - tree.baseNodeSize, centerY);
+        } else {
+    	    this.canvas.lineTo(centerX - (tree.baseNodeSize * 2 / 3), centerY);
+        }
+	      this.canvas.stroke();
+	      this.canvas.closePath();
+
+
+	      this.canvas.beginPath();
         if (this.leaf) {
 	        this.canvas.arc(centerX, centerY, tree.baseNodeSize, 0, Angles.FULL, false);
         } else {
 	        this.canvas.arc(centerX, centerY, tree.baseNodeSize * 2 / 3, 0, Angles.FULL, false);
         }
+	      this.canvas.stroke();
+	      this.canvas.closePath();
+        }
 	      //this.canvas.arc(centerX, centerY, radius, 0, Angles.FULL, false);
 
-	      this.canvas.stroke();
 
-	      this.canvas.closePath();
 	      this.canvas.restore();
 	    }
 
@@ -5319,7 +5392,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  validator: validator
 	};
 
-/***/ }
-/******/ ])
+/***/ }])
 });
 ;
