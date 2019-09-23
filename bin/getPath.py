@@ -36,6 +36,7 @@ def main():
     printHelp()
   
   gas = read("/scratch/GAS/GAS.tsv").split("\n")
+
   tempGas = []
 
   for index in sys.argv:

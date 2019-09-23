@@ -39,7 +39,11 @@ def main():
   header = gas.pop(0).split("\t")
   cols = {}
   for i in range(len(header)):
-    cols[header[i]] = i 
+    cols[header[i]] = i
+
+  print(list(filter(None, map(lambda x: x if x.split("ALL")[0] == "" else "", os.listdir("/scratch/GAS/nasp")))))
+  quit()
+ 
   M1 = {}
   for line in gas:
     M1[line.split("\t")[0]] = line
@@ -58,7 +62,7 @@ def main():
   for index in sorted(M1.keys()):
     output.append(M1[index])
   print("\n".join(output))
-  write("/scratch/GAS/GAS.tsv", "\n".join(output))
+  #write("/scratch/GAS/GAS.tsv", "\n".join(output) + "\n")
 
 if __name__ == "__main__":
   main()

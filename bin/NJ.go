@@ -228,10 +228,12 @@ func main() {
     // getbest
   }
   tree[count + 1] = make(map[int]float64)
-  tree[count + 1][tempTree[0]] = float64(matrix[0][1]) / 2
-  tree[count + 1][tempTree[1]] = float64(matrix[0][1]) / 2
-  tree[tempTree[0]][count + 1] = float64(matrix[0][1]) / 2
-  tree[tempTree[1]][count + 1] = float64(matrix[0][1]) / 2
+  //tree[count + 1][tempTree[0]] = float64(matrix[0][1]) / 2
+  //tree[count + 1][tempTree[1]] = float64(matrix[0][1]) / 2
+  //tree[tempTree[0]][count + 1] = float64(matrix[0][1]) / 2
+  //tree[tempTree[1]][count + 1] = float64(matrix[0][1]) / 2
+  tree[tempTree[0]][tempTree[1]] = float64(matrix[0][1])
+  tree[tempTree[1]][tempTree[0]] = float64(matrix[0][1])
 
   // get nodes with longest path
   bestScore := []float64{0}

@@ -7,7 +7,7 @@ import os
 import json
 
 def usage():
-  print("return list of clades from ALL '*.nwk' tree file")
+  print("return list of clades from M1 '*.nwk' tree file")
   print("usage: getClades.py [-h]")
   print("example:\n    ./getClades.py\n")
   exit(0)
@@ -34,9 +34,45 @@ def main():
   for index in refSamples:
     reference[index[1]] = index[0]
 
-  ##### get clades
-  clades = subprocess.Popen("/scratch/GAS/bin/parseNWK.py -c /scratch/GAS/nasp/ALL/matrices/tree.nwk", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
-  clades = json.loads(clades.stdout.read())
+  ##### parse tree and build all clades
+  nwk = read("/scratch/GAS/nasp/ALL/matrices/tree.nwk")
+  nwk = "_".join(nwk.split(' '))
+  clades = [[]]
+  depth = 0
+  fltTrigger = False
+  snps = []
+  sample = []
+  for char in nwk:
+    if fltTrigger == True:
+      try:
+        float(''.join(snps + [char]))
+        snps.append(char)
+        continue
+      except:
+        if float(''.join(snps)) > 100:
+          clades.append([])
+        fltTrigger = False
+    if char in ['(', ')', ':', ',', ';']:
+      if char == '(':
+        depth += 1
+      elif char == ')':
+        depth -= 1
+      elif char == ":":
+        fltTrigger = True
+        snps = []
+      elif char == ";":
+        break
+      if sample:
+        while "\'" in sample:
+          sample.remove("\'")
+        while "\"" in sample:
+          sample.remove("\"")
+        clades[-1].append("".join(sample))
+        sample = []
+    else:
+      sample.append(char)
+  while [] in clades:
+    clades.remove([])
 
   ##### build mType::clade pairs
   for clade in clades:
