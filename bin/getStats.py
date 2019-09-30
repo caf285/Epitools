@@ -6,9 +6,11 @@ import subprocess
 
 # ==================================================( functions )
 def printHelp():
-  print("\nreturn all samples names from GAS.tsv that have no M1%")
-  print("usage: statsM1.py [-h]")
-  print("example:\n\t./statsM1.py\n")
+  print("\nreports the quality breadth for each readpair against a reference")
+  print("usage: getStats.py [-h] NASP REF")
+  print("\tNASP\tdirectory of nasp run in /scratch/GAS/.temp/")
+  print("\tREF\tname of the reference sample")
+  print("example:\n\t./getStats.py TG92300-f93hhs773e TG92300\n")
   exit(0)
 
 def read(fileName):
@@ -33,36 +35,29 @@ def main():
   # check args
   if "-h" in sys.argv:
     printHelp()
+  else:
+    tempDir = "/scratch/GAS/.temp/" + sys.argv[1] + "/"
+    naspDir = "/scratch/GAS/nasp/ALL\:\:" + sys.argv[2] + "/"
 
-  # update all samples with M1 QUALITY_BREADTH data
-  gas = read("/scratch/GAS/GAS.tsv").split("\n")
-  header = gas.pop(0).split("\t")
-  cols = {}
-  for i in range(len(header)):
-    cols[header[i]] = i
-
-  print(list(filter(None, map(lambda x: x if x.split("ALL")[0] == "" else "", os.listdir("/scratch/GAS/nasp")))))
-  quit()
- 
-  M1 = {}
+  # read GAS.tsv and prep headers and lines for QUALITY BREADTH update
+  gas = list(map(lambda x: x.split("\t"), read("/scratch/GAS/GAS.tsv").strip().split("\n")))
+  header = gas.pop(0)
+  refIndex = header.index(sys.argv[2])
+  gasHash = {}
   for line in gas:
-    M1[line.split("\t")[0]] = line
+    gasHash[line[0]] = line
 
   # get sample list of all samples > M1 80% QUALITY_BREADTH
   cutoff = 80
-  DIR = "/scratch/GAS/.temp/" + sys.argv[1]
-  stats = read(DIR + "/statistics/sample_stats.tsv").split("\n")[5::4]
+  stats = read(tempDir + "statistics/sample_stats.tsv").split("\n")[5::4]
   for line in stats:
     line = line.split("\t")
-    M1[line[0]] = "\t".join(M1[line[0]].split("\t")[:cols["M1"]] + [line[-7]] + M1[line[0]].split("\t")[min(cols["M1"]+1, len(cols)):])
+    gasHash[line[0]] = gasHash[line[0]][:refIndex] + [line[-7]] + gasHash[line[0]][refIndex+1:]
     if float(line[-7][:-1]) >= cutoff:
-      subprocess.call("cp " + DIR + "/gatk/" + line[0] + "-bwamem-gatk.vcf /scratch/GAS/nasp/ALL/gatk/" + line[0] + "-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+      subprocess.call("cp " + tempDir + "gatk/" + line[0] + "-bwamem-gatk.vcf " + naspDir + "/gatk/" + line[0] + "-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+  subprocess.call("cp " + tempDir + "reference/duplicates.txt " + naspDir + "reference/duplicates.txt", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
 
-  output = ["\t".join(header)]
-  for index in sorted(M1.keys()):
-    output.append(M1[index])
-  print("\n".join(output))
-  #write("/scratch/GAS/GAS.tsv", "\n".join(output) + "\n")
+  write("/scratch/GAS/GAS.tsv", "\n".join(["\t".join(header)] + sorted(map(lambda x: "\t".join(x), gasHash.values()))))
 
 if __name__ == "__main__":
   main()

@@ -3,6 +3,7 @@
 import sys
 import os
 import subprocess
+import json
 
 # ==================================================( functions )
 def printHelp():
@@ -36,35 +37,39 @@ def main():
     printHelp()
   else:
     DIR = sys.argv[1]
-    gas = " ".join(sys.argv[2:])
+    allRef = sys.argv[2:]
 
   if not os.path.exists(DIR):
     printHelp()
   else:
     DIR = os.path.abspath(DIR)
 
-  # get all samples with no M1 data
-  gas = subprocess.Popen("/scratch/GAS/bin/queryGAS.py " + gas, universal_newlines=True, shell=True, stdout=subprocess.PIPE)
-  gas = list(map(lambda x: x.split("\t")[0], gas.stdout.read().split("\n")[1:-1]))
-
-  # get template, reference, and vcf file names
+  # get template and vcf file names
   template = read("/scratch/GAS/.templates/TEMPLATE_dto.xml").split("=====")
-  vcf = subprocess.Popen("ls " + DIR + "/gatk/*-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
-  vcf = vcf.stdout.read().split("\n")[:-1]
+  vcf = list(map(lambda x: x.split("-bwamem-gatk.vcf")[0], filter(lambda x: x.split("-bwamem-gatk")[-1] == ".vcf", os.listdir(DIR + "/gatk/"))))
 
-  print(vcf)
-  print(gas)
+  # TODO: pass clades of ALL ref to sys.argv[2:] and reduce by VCF files in gatk
+  if allRef:
+    sample = DIR.split("::")[-1]
+    allRef = allRef[0]
+    clade = subprocess.Popen("/scratch/GAS/bin/parseNWK.py -c /scratch/GAS/nasp/ALL::" + allRef + "/matrices/tree.nwk", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+    clade = json.loads(clade.stdout.read())
+    clade = list(filter(lambda x: sample in x, clade))[0]
+    vcf = list(filter(lambda x: x in clade, vcf))
 
   # get file list for config template
   files = []
   for sample in vcf:
-    if sample.split("/")[-1].split("-bwamem-gatk.vcf")[0] in gas:
-      files.append("          <vcf aligner=\"BWA-mem\" name=\"" + sample.split("/")[-1].split("-bwamem-gatk.vcf")[0] + "\" snpcaller=\"GATK\">" + os.path.abspath(sample) + "</vcf>")
+    files.append("          <vcf aligner=\"BWA-mem\" name=\"" + sample + "\" snpcaller=\"GATK\">" + DIR + "/gatk/" + sample + "-bwamem-gatk.vcf</vcf>")
 
   # write M1 config file
   if files:
-    config = [DIR, DIR, DIR, DIR, "\n".join(files)]
-    write(DIR + "/matrix_dto.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
+    if allRef:
+      config = [DIR + "/" + allRef + "/reference/reference.fasta", DIR + "/" + allRef + "/matrices", DIR + "/" + allRef + "/statistics", DIR + "/" + allRef + "/reference/duplicates.txt", "\n".join(files)]
+      write(DIR + "/" + allRef + "_dto.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
+    else:
+      config = [DIR + "/reference/reference.fasta", DIR + "/matrices", DIR + "/statistics", DIR + "/reference/duplicates.txt", "\n".join(files)]
+      write(DIR + "/matrix_dto.xml", "".join(list(map(lambda x: "".join(list(x)), list(zip(template, config)))) + [template[-1]]))
 
 if __name__ == "__main__":
   main()

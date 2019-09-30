@@ -2,7 +2,6 @@
 
 import sys
 import os
-from time import sleep
 import subprocess
 
 # ==================================================( functions )
@@ -35,7 +34,28 @@ def main():
   if "-h" in sys.argv:
     printHelp()
   
-  gas = read("/scratch/GAS/GAS.tsv").split("\n")
+  gas = list(map(lambda x: x.split("\t"), read("/scratch/GAS/GAS.tsv").strip().split("\n")))
+  header = gas.pop(0)
+
+  # get ALL references, strip out the sample names, filter from GAS headers, get new and old ref lists
+  allRef = list(filter(lambda x: ".fasta" in x and "ALL::" in x and x.index("ALL") == 0, os.listdir("/scratch/GAS/reference")))
+  allRef = list(map(lambda x: x.split("ALL::")[-1].split(".fasta")[0], allRef))
+  newRef = list(filter(lambda x: x not in header, allRef))
+  noRef = list(filter(lambda x: x not in allRef, header[4:]))
+
+  # remove all old reference runs ... these are old news!!
+  for ref in noRef:
+    if os.path.exists("/scratch/GAS/nasp/ALL::" + ref):
+      subprocess.call("rm -r /scratch/GAS/nasp/ALL::" + ref, universal_newlines=True, shell=True)
+    refIndex = header.index(ref)
+    header = header[:refIndex] + header[refIndex+1:]
+    for i in range(len(gas)):
+      gas[i] = gas[i][:refIndex] + gas[i][refIndex+1:]
+
+  # add new references to GAS.tsv
+  for ref in list(filter(lambda x: os.path.exists("/scratch/GAS/reference/ALL::" + x + ".fasta"), newRef)):
+    header.append(ref)
+    gas = list(map(lambda x: x + ["_"], gas))
 
   tempGas = []
 
@@ -69,9 +89,12 @@ def main():
     time = time.stdout.read().split("\n")[0]
 
     # add sample to GAS.tsv
-    if sampleName not in list(map(lambda x: x.split("\t")[0], gas)) and sampleName not in tempGas:
+    if sampleName not in list(map(lambda x: x[0], gas)) and sampleName not in tempGas:
       tempGas.append(sampleName)
-      append("/scratch/GAS/GAS.tsv", "\t".join([sampleName, "GAS", time, "_", "_", "_", "_", path, r1, r2, "_"]))
+      gas.append([sampleName, time, r1, r2] + list("_"*(len(header[4:]))))
+
+  write("/scratch/GAS/GAS.tsv", "\n".join(["\t".join(header)] + list(map(lambda x: "\t".join(x), gas))))
+
 
 if __name__ == "__main__":
   main()

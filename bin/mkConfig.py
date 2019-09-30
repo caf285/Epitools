@@ -11,10 +11,11 @@ def printHelp():
   print("\ncreates a NASP config file in /scratch/GAS/.temp/<ref>-<rand>-config.xml")
   print("<rand>:\t10 digit alpha numeric string")
   print("<ref>:\treference file name")
-  print("usage: mkConfig.py [-h] REFERENCE GAS")
+  print("usage: mkConfig.py [-h] REFERENCE SAMPLE GAS")
   print("\tREFERENCE\tNasp run reference file")
+  print("\tSAMPLE\tname of the reference sample")
   print("\tGAS\tqueryGAS.py arguments")
-  print("example:\n\t./mkConfig.py /scratch/GAS/reference/M1::TG92300.fasta -m 80\n")
+  print("example:\n\t./mkConfig.py /scratch/GAS/reference/M1::TG92300.fasta TG92300 -m 80\n")
   exit(0)
 
 def read(fileName):
@@ -37,7 +38,8 @@ def main():
     printHelp()
   else:
     ref = sys.argv[1]
-    gas = " ".join(sys.argv[2:])
+    refSample = sys.argv[2]
+    query = " ".join(sys.argv[3:])
 
   if not os.path.exists(ref):
     printHelp()
@@ -45,14 +47,10 @@ def main():
     ref = ref.split("/")[-1].split(".fasta")[0]
 
   # get all samples with no M1 data
-  gas = subprocess.Popen("/scratch/GAS/bin/queryGAS.py " + gas, universal_newlines=True, shell=True, stdout=subprocess.PIPE)
-  gas = gas.stdout.read().split("\n")[:-1]
-
-  header = gas.pop(0).split("\t")
-
-  cols = {}
-  for i in range(len(header)):
-    cols[header[i]] = i
+  gas = subprocess.Popen("/scratch/GAS/bin/queryGAS.py " + query, universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+  gas = list(map(lambda x: x.split("\t"), gas.stdout.read().strip().split("\n")))
+  header = gas.pop(0)
+  refIndex = header.index(refSample)
 
   # create temporary M1 directory and run nasp for vcf files
   randStr = "".join(random.choice(string.ascii_lowercase) for i in range(10))
@@ -61,12 +59,12 @@ def main():
 
   # get file list for config template
   files = []
-  for line in gas:
-    line = line.split("\t")
-    files.append("        <ReadFolder path=\"" + line[cols["Path"]] + "\">")
-    files.append("            <ReadPair sample=\"" + line[cols["SampleName"]] + "\">")
-    files.append("                <Read1Filename>" + line[cols["R1"]] + "</Read1Filename>")
-    files.append("                <Read2Filename>" + line[cols["R2"]] + "</Read2Filename>")
+
+  for line in list(filter(lambda x: x[refIndex] == "_" or "-m _" not in query, gas)):
+    files.append("        <ReadFolder path=\"" + "/".join(line[3].split("/")[:-1]) + "/\">")
+    files.append("            <ReadPair sample=\"" + line[0] + "\">")
+    files.append("                <Read1Filename>" + line[2] + "</Read1Filename>")
+    files.append("                <Read2Filename>" + line[3] + "</Read2Filename>")
     files.append("            </ReadPair>")
     files.append("        </ReadFolder>")
 

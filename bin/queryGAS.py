@@ -7,13 +7,12 @@ import json
 # ==================================================( functions )
 def printHelp():
   print("\nreturns all lines of GAS.tsv that follow arguments given")
-  print("usage: queryGAS.py [-h] [-j | -exact | -n | -e | -d | -l | -m ]")
+  print("usage: queryGAS.py [-h] [-j | -exact | -n | -e | -d | -m ]")
   print("\t-exact\tExact Sample Name")
   print("\t-n\tSample Name")
   print("\t-e\tExclude Name")
   print("\t-t\tType")
   print("\t-d\tDate")
-  print("\t-l\tLocation")
   print("\t-m\t>M1 Quality Breadth %")
   print("example:\n\t./queryGAS.py -l FMC -m 80\n")
   exit(0)
@@ -31,7 +30,7 @@ def main():
 
   # check args
   # fill dictionary for all accepted args
-  args = {"-j":[], "-exact":[], "-n":[], "-e":[], "-d":[], "-l":[], "-m":[]}
+  args = {"-j":[], "-exact":[], "-n":[], "-e":[], "-d":[], "-m":[]}
   flag = ""
   for arg in sys.argv:
     if arg[0] == "-":
@@ -131,38 +130,33 @@ def main():
     # trigger used to include all names for -n flag, but exclude all names for -e flag
     nameTrigger = True
     for i in range(len(args["-n"])):
-      if args["-n"][i].lower() in sample[cols["SampleName"]].lower():
+      if args["-n"][i].lower() in sample[cols["id"]].lower():
         nameTrigger = False
     if len(args["-n"]) and nameTrigger == True:
       continue
     else:
       nameTrigger = False
     for i in range(len(args["-e"])):
-      if args["-e"][i].lower() in sample[cols["SampleName"]].lower():
+      if args["-e"][i].lower() in sample[cols["id"]].lower():
         nameTrigger = True
     if len(args["-e"]) and nameTrigger == True:
       continue
 
     # check date
-    date = sample[cols["Date"]].split("-")
+    date = sample[cols["date"]].split("-")
     date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]))
     if date < args["-d"][0] or date > args["-d"][1]:
       continue
 
-    # check location
-    if len(args["-l"]):
-      if args["-l"][0] == "ALL":
-        if "".join([sample[cols["Facility"]], sample[cols["City"]], sample[cols["County"]], sample[cols["State"]]]).lower() == "____":
-          continue
-      elif args["-l"][0].lower() not in "".join([sample[cols["Facility"]], sample[cols["City"]], sample[cols["County"]], sample[cols["State"]]]).lower():
-        continue
-
     # check mType
+    qualityBreadth = []
+    for m in header[4:]:
+      qualityBreadth.append(sample[cols[m]])
     if args["-m"] != []:
       if args["-m"] == "_":
-        if sample[cols["M1"]] != "_":
+        if "_" not in qualityBreadth:
           continue
-      elif sample[cols["M1"]] == "_" or args["-m"] > float(sample[cols["M1"]][:-1]):
+      elif "_" in qualityBreadth or args["-m"] > max(list(map(lambda x: float(x[:-1]), qualityBreadth))):
         continue
 
     # CONGRATULATIONS!!! you have fought bravely and now receive the grand honor of being printed to the screen!
