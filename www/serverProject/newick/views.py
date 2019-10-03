@@ -1,16 +1,16 @@
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
-
 from django.core import serializers
-from django.http import JsonResponse
-
-from .models import Region, County, PCA, CountyPCA, MPC, Facility, Bacteria, Drug, AMR, DemoAMR 
-#from .models import Pathogen
-
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from .models import Region, County, MPC, PCA, CountyPCA
+from .models import FacilityType, Facility
+from .models import GAS 
+from .models import Bacteria, Antibiotic, CollectionMethod, AMR, Resistance
 
 import datetime
 import json
@@ -68,6 +68,10 @@ class DemoGASView(LoginRequiredMixin, generic.ListView):
     query["map"] = getMap()
     query["pca"] = getPCA()
     query["coordinates"] = getCoordinates()
+    query["gas"] = {}
+    samples = json.loads(serializers.serialize('json', GAS.objects.all()))
+    for line in samples:
+      query["gas"][line["pk"]] = line["fields"]
     return query
 
 class DemoPrevHarmView(LoginRequiredMixin, generic.ListView):
@@ -82,12 +86,13 @@ class DemoPrevHarmView(LoginRequiredMixin, generic.ListView):
     return query
 
   def getAMR(self):
+    return {}
+'''
     amr = {'region':{}, 'county':{}, 'pca':{}, 'dates':[], 'bugDrugs':[]}
-    query = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', DemoAMR.objects.all()))))
+    query = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', AMR.objects.all()))))
     for line in query:
-      line['date'] = "::".join(line['date'].split("-")[:-1])
-      if line['date'] not in amr['dates']:
-        amr['dates'].append(line['date'])
+      if str(line['year']) + "::" + str(line['month'] + "::" + str(line['range'])) not in amr['dates']:
+        amr['dates'].append(str(line['year']) + "::" + str(line['month']) + "::" + str(line['range']))
       if line['bacteria'] + "::" + line['drug'] not in amr['bugDrugs']:
         amr['bugDrugs'].append(line['bacteria'] + "::" + line['drug'])
       mpc = json.loads(serializers.serialize('json', Facility.objects.filter(id=line['facility'])))[0]['fields']['mpc']
@@ -124,7 +129,7 @@ class DemoPrevHarmView(LoginRequiredMixin, generic.ListView):
           amr['region'][region][line['bacteria'] + "::" + line['drug']][line['date']] = []
         amr['region'][region][line['bacteria'] + "::" + line['drug']][line['date']].append([line['tested'], line['susceptible']])
     return amr
-
+'''
 class TestView(LoginRequiredMixin, generic.ListView):
 #class IndexView(generic.ListView):
   template_name = 'newick/test.html'

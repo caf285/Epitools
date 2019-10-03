@@ -14,6 +14,7 @@
   <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
   <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
   <script src="{% static '/newick/js/colorPalette.js' %}"></script>
+  <script src="{% static '/newick/js/trees.js' %}"></script>
   <script src="{% static '/newick/js/mapAZ.js' %}"></script>
   <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
   <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
@@ -22,29 +23,42 @@
     var DB = {{ demoGAS | safe }}
     var levels = ["state", "region", "county", "pca"]
     var mapFunctions = []
-    
+    var groups = []
+    {% for group in user.groups.all %}
+      groups.push("{{ group.name }}")
+    {% endfor %}
+
+    function fullDraw() {
+      for (var branch in tree.branches) {
+        //console.log(DB.gas[branch], branch)
+        if (DB.gas[branch] && groups.indexOf(DB.gas[branch].facility) >= 0) { 
+          tree.branches[branch].colour = "red"
+        }
+      }
+      tree.draw()
+    }
+
   </script>
 {% endblock %}
 
 {% block sideContent %}
-  M-Type:
+  Master Reference:
   <div class="dropdown">
-    <button id="gasMType" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ALL</button>
-    <div class="dropdown-menu dropdown-center">
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'ALL';">ALL</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M1';">M1</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M4';">M4</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M12';">M12</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M28';">M28</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M59';">M59</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M81';">M81</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M82';">M82</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M89';">M89</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasMType').innerHTML = 'M90';">M90</a>
+    <button id="masterButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+    <div id="masterDropdown" class="dropdown-menu">
     </div>
   </div>
   </br>
 
+  M-Type:
+  <div class="dropdown">
+    <button id="gasMtypeButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+    <div id="gasMtypeDropdown" class="dropdown-menu">
+    </div>
+  </div>
+  </br>
+
+<!--
   Display By:
   <div class="dropdown">
     <button id="gasDisplay" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
@@ -55,24 +69,72 @@
     </div>
   </div>
   </br>
+-->
+
+  Reports:
+  <div class="dropdown">
+    <button id="reportsButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+    <div id="reportsDropdown" class="dropdown-menu dropdown-menu-right">
+      <a class='dropdown-item'>Unidentified M-Types</a>
+      <a class='dropdown-item'>Missing Dates</a>
+      <a class='dropdown-item'>My Samples</a>
+      <a class='dropdown-item'>Outbreak Monitor</a>
+    </div>
+  </div>
+  </br>
+
+  Zoom:
+  <input style="width:100%" type="range" min=1 max=20 value=1 oninput="tree.zoom = this.value/10; tree.draw()">
+  </br>
+
+  Base Node Size:
+  <input style="width:100%" type="range" min=0 max=50 value=0 oninput="tree.baseNodeSize = this.value/2; tree.draw()">
+  </br>
+
+  Leaf Text Size:
+  <input style="width:100%" type="range" min=1 max=50 value=1 oninput="tree.textSize = this.value; tree.draw()">
+  </br>
+
+  Branch Text Size:
+  <input style="width:100%" type="range" min=1 max=50 value=1 oninput="tree.canvas.font = this.value + 'px ' + tree.canvas.font.split(' ')[1]; tree.draw()">
+  </br>
+
+  Branch Scale:
+  <input style="width:100%" type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
+  </br>
+
+  Line Width:
+  <input style="width:100%" type="range" min=1 max=20 value=1 oninput="tree.lineWidth = this.value/2; tree.draw()">
+  </br>
 
 {% endblock %}
 
 {% block mainContent %}
   <div class="mainContent">
-    <div style="width: 20%; margin-right: 10px;">
+    <div style="width: 0%; margin-right: 10px;">
       {% leaflet_map "main" %}
     </div>
-    <div id="phylocanvas" style="width: 80%; background-color: white; overflow-y: scroll;"></div>
+    <div id="phylocanvas" style="width: 100%; background-color: white; overflow-y: scroll;"></div>
     <style>#phylocanvas {width: 100%; height: 800px;}</style>
     <script>
       var tree = Phylocanvas.default.createTree('phylocanvas')
-      tree.baseNodeSize = 3
+      tree.baseNodeSize = 2
       tree.setTreeType('rectangular')
-      tree.load('(((((TG78107:2,TG93246:4):3.5,TG93318:33.5):1,((((31896:4,TG93046:5):1,TG92156:8,TG92260:7):6,GAS-TG102855-xx-CL-USA-xxxx-081-JB:17):4.5,((TG93206:1,Streptococcus-Group-A-TG93453:1,(AZ_GAS_TG93641:0,GAS_TG93685:1):3):18,GAS-TG114467-xx-CL-USA-2018-081-JB:10,TG92276:7,(TG128508:17,(((TG77226:7,(TG92380:10,TG92356:14):4,TG93038:16):3.5,(GAS_TG93653:1.5,(TG92236:1.5,TG92256:2.5):1.5):9.5):1.5,(((Streptococcus-Group-A-TG93457:2,(Reference:0,TG92300:0):2):7.5,(GAS-TG114459-xx-CL-USA-2018-081-JB:0,GAS-TG114479-xx-CL-USA-2018-081-JB:0):9.5):1.5,((GAS_TG93697:14.5,TG93222:6.5):1.5,(TG116723:7.5,(TG92348:4):4):0.5):0.5):1.5):1.5):3):2):6.5):3,(((TG78019:7.5,((TG78263:0.5,(TG93374:0,TG93390:1):0.5):7.5,TG93410:6.5):4.5):1,(TG78275:0,TG93362:2):12):0.5,(((((TG77955:0,(TG78199:2,03-2454:1):3,TG77963:8):3.5,TG78027:8.5):1,((GAS-FMCTG95169-xx-CL-USA-2017-040-JB:29,GAS-TG110871-xx-CL-USA-xxxx-081-JB:24):3,GAS-TG133116-095:23):3.5,((TG78283:10,TG77923:8):7,(TG78023:11,TG78223:13):4,(TG78083:8,TG78159:11,(TG78231:1,TG78239:2,TG78307:2,TG93334:2):11):2,TG93322:12):0.5):7.5,(TG93234:18,((TG78259:5,TG78235:14):1,(06-299002:2,(TG93350:2,TG78303:1):1):16):13):0.5):3,TG93274:23):8.5):1.5):151.5,((GAS_TG93957:35,(TG77919:14,TG78039:103):33):64.5,(H:11,(TG78291:2,TG93406:0):1):20.5):7):0;');
       tree.showBranchLengthLabels = true
-
-
+      for (var i in trees) {
+        document.getElementById("masterDropdown").innerHTML += "<a class='dropdown-item' onclick='resetM(\"" + i + "\")'>" + i + "</a>"
+      }
+      function resetM(i) {
+        document.getElementById("masterButton").innerHTML = i
+        document.getElementById("gasMtypeButton").innerHTML = "ALL"
+        tree.load(trees[i]["ALL"])
+        fullDraw()
+        document.getElementById("gasMtypeDropdown").innerHTML = ""
+        for (var j in trees[i]) {
+         document.getElementById("gasMtypeDropdown").innerHTML  += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[i][j] + "\"); fullDraw()'>" + j + "</a>"
+        }
+      }
+      resetM(Object.keys(trees)[0])
 
     </script>
   </div>

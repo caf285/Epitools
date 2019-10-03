@@ -2,29 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 
-# Create your models here.
-
-import datetime
-
-from django.db import models
-from django.utils import timezone
-
-class Bacteria(models.Model):
-  id = models.CharField('bacteriaName', max_length=64, primary_key=True)
-  type = models.CharField('bacteriaType', max_length=64, default="_")
-  class Meta:
-    ordering = ['id']
-  def __str__(self):
-    return str(self.id)
-
-class Drug(models.Model):
-  id = models.CharField('drugName', max_length=64, primary_key=True)
-  type = models.CharField('drugType', max_length=64, default="_")
-  class Meta:
-    ordering = ['id']
-  def __str__(self):
-    return str(self.id)
-
+##### Arizona
 class Region(models.Model):
   id = models.CharField('regionName', max_length=64, primary_key=True)
   lat = models.CharField('latitude', max_length=16, default="_")
@@ -83,6 +61,7 @@ class CountyPCA(models.Model):
   def __str__(self):
     return str(self.county) + "::" + str(self.pca)
 
+##### Facilities
 class FacilityType(models.Model):
   type1 = models.CharField('facilityType', max_length=64, db_index=True)
   type2 = models.CharField('facilitySubtype', max_length=64)
@@ -108,28 +87,102 @@ class Facility(models.Model):
   def __str__(self):
     return str(self.id)
 
-class AMR(models.Model):
-  id = models.AutoField('amrId', primary_key=True)
+##### Group A Strep
+class GAS(models.Model):
+  id = models.CharField('sampleName', max_length=64, primary_key=True)
+  tg = models.CharField('tgNumber', max_length=64)
+  az = models.CharField('azNumber', max_length=64)
+  collectionDate = models.DateField('collectionDate', default="2000-1-1")
   facility = models.ForeignKey(Facility, on_delete=models.CASCADE, null=True)
-  bacteria = models.ForeignKey(Bacteria, on_delete=models.CASCADE, null=True)
-  drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
-  date = models.DateField('amrDate', default="2000-1-1")
-  tested = models.PositiveSmallIntegerField('numberTested', default=0)
-  susceptible = models.PositiveSmallIntegerField('percentSusceptible', default=0)
-  class Meta:
-    ordering = ['date', 'facility', 'bacteria', 'drug']
-  def __str__(self):
-    return str(self.date) + '::' + str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.drug)
+  r1 = models.CharField('read1', max_length=128)
+  r2 = models.CharField('read2', max_length=128)
+  sequenceDate = models.DateField('sequenceDate', default="2000-1-1")
+  m1 = models.CharField('m1', max_length=16)
+  mType = models.CharField('mType', max_length=8)
 
-class DemoAMR(models.Model):
-  id = models.AutoField('amrId', primary_key=True)
+##### Prevent Haarm
+class Bacteria(models.Model):
+  id = models.CharField('bacteriaName', max_length=64, primary_key=True)
+  gram = models.CharField('bacteriaGram', max_length=8, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
+
+class Antibiotic(models.Model):
+  id = models.CharField('antibioticName', max_length=64, primary_key=True)
+  type = models.CharField('antibioticType', max_length=64, default="_")
+  class Meta:
+    ordering = ['id']
+  def __str__(self):
+    return str(self.id)
+
+class CollectionMethod(models.Model):
+  id = models.CharField('collectionMethod', max_length=64, primary_key=True)
+  sterile = models.CharField('sterile', max_length=4)
+  class Meta:
+    ordering = ['id']
+  def _str__(self):
+    return str(self.id)
+
+class AMR(models.Model):
   facility = models.ForeignKey(Facility, on_delete=models.CASCADE, null=True)
   bacteria = models.ForeignKey(Bacteria, on_delete=models.CASCADE, null=True)
-  drug = models.ForeignKey(Drug, on_delete=models.CASCADE, null=True)
-  date = models.DateField('amrDate', default="2000-1-1")
-  tested = models.PositiveSmallIntegerField('numberTested', default=0)
-  susceptible = models.PositiveSmallIntegerField('percentSusceptible', default=0)
+  site = models.ForeignKey(CollectionMethod, on_delete=models.CASCADE, null=True)
+  year = models.PositiveSmallIntegerField('year', default=2000)
+  month = models.PositiveSmallIntegerField('month', default=1)
+  range = models.PositiveSmallIntegerField('range', default=1)
+  collected = models.PositiveSmallIntegerField('collected', default=0)
   class Meta:
-    ordering = ['date', 'facility', 'bacteria', 'drug']
+    unique_together = ['facility', 'bacteria', 'site', 'year', 'month']
+    ordering = ['facility', 'bacteria', 'site']
   def __str__(self):
-    return str(self.date) + '::' + str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.drug)
+    return str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.site) + '::' + str(year) + '-' + str(month)
+
+class Resistance(models.Model):
+  id = models.AutoField('resistanceId', primary_key=True)
+  amr = models.ForeignKey(AMR, on_delete=models.CASCADE, null=True)
+  antibiotic = models.ForeignKey(Antibiotic, on_delete=models.CASCADE, null=True)
+  pTested = models.PositiveSmallIntegerField('pTested', default=0)
+  nTested = models.PositiveSmallIntegerField('nTested', default=0)
+  pSusceptible = models.PositiveSmallIntegerField('pSusceptible', default=0)
+  nSusceptible = models.PositiveSmallIntegerField('nSusceptible', default=0)
+  class Meta:
+    ordering = ['amr', 'antibiotic']
+  def __str__(self):
+    return str(self.amr) + '::' + str(self.antibiotic)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

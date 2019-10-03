@@ -1,4 +1,4 @@
-﻿id,type,subtype
+﻿id,type1,type2
 Assisted Living::Adult Day Health Care,Assisted Living,Adult Day Health Care
 Assisted Living::Adult Foster Care,Assisted Living,Adult Foster Care
 Assisted Living::Directed Center,Assisted Living,Directed Center
@@ -23,3 +23,4 @@ Medicare::Hospice,Medicare,Hospice
 Nursing Home::Distinct Partition,Nursing Home,Distinct Partition
 Nursing Home::Dual Certified,Nursing Home,Dual Certified
 Nursing Home::Nursing Only,Nursing Home,Nursing Only
+Research::Lab,Research,Lab

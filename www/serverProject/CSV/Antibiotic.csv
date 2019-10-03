@@ -1,0 +1,140 @@
+﻿id,type
+Amikacin,Aminoglycoside
+Amoxicillin,Penicillin
+Ampicillin,Penicillin
+Arsphenamine,Other
+Azithromycin,Macrolide
+Azlocillin,Penicillin
+Aztreonam,Monobactam
+Bacitracin,Polypeptide
+Benzylpenicillin (Penicillin G),Penicillin
+Capreomycin,Drugs against mycobacteria
+Cefaclor,Cephalosporin
+Cefadroxil,Cephalosporin
+Cefalexin,Cephalosporin
+Cefamandole,Cephalosporin
+Cefazolin,Cephalosporin
+Cefdinir,Cephalosporin
+Cefditoren,Cephalosporin
+Cefepime,Cephalosporin
+Cefixime,Cephalosporin
+Cefmetazole,Cephalosporin
+Cefonicid,Cephalosporin
+Cefoperazone,Cephalosporin
+Cefotaxime,Cephalosporin
+Cefotetan,Cephalosporin
+Cefoxitin,Cephalosporin
+Cefpodoxime,Cephalosporin
+Cefprozil,Cephalosporin
+Ceftaroline Fosamil,Cephalosporin
+Ceftazidime,Cephalosporin
+Ceftibuten,Cephalosporin
+Ceftizoxime,Cephalosporin
+Ceftobiprole,Cephalosporin
+Ceftriaxone,Cephalosporin
+Cefuroxime,Cephalosporin
+Cephalothin,Cephalosporin
+Cephapirin,Cephalosporin
+Cephradine,Cephalosporin
+Chloramphenicol,Other
+Ciprofloxacin,Quinolone/Fluoroquinolone
+Clarithromycin,Macrolide
+Clindamycin,Lincosamide
+Clofazimine,Drugs against mycobacteria
+Colistin,Polypeptide
+Cycloserine,Drugs against mycobacteria
+Dalbavancin,Glycopeptide
+Dapsone,Drugs against mycobacteria
+Daptomycin,Lipopeptide
+Demeclocycline,Tetracycline
+Dicloxacillin,Penicillin
+Doripenem,Carbapenem
+Doxycycline,Tetracycline
+Enoxacin,Quinolone/Fluoroquinolone
+Ertapenem,Carbapenem
+Erythromycin,Macrolide
+Ethambutol,Drugs against mycobacteria
+Ethionamide,Drugs against mycobacteria
+Fidaxomicin,Macrolide
+Flucloxacillin,Penicillin
+Fosfomycin,Other
+Furazolidone,Nitrofuran
+Fusidic Acid,Other
+Gatifloxacin,Quinolone/Fluoroquinolone
+Geldanamycin,Ansamycin
+Gemifloxacin,Quinolone/Fluoroquinolone
+Gentamicin,Aminoglycoside
+Grepafloxacin,Quinolone/Fluoroquinolone
+Herbimycin,Ansamycin
+Imipenem (Cilastatin),Carbapenem
+Isoniazid,Drugs against mycobacteria
+Kanamycin,Aminoglycoside
+Levofloxacin,Quinolone/Fluoroquinolone
+Lincomycin,Lincosamide
+Linezolid,Oxazolidinone
+Lomefloxacin,Quinolone/Fluoroquinolone
+Loracarbef,Carbacephem
+Mafenide,Sulfonamide
+Meropenem,Carbapenem
+Metacycline,Tetracycline
+Methicillin,Penicillin
+Metronidazole,Other
+Mezlocillin,Penicillin
+Minocycline,Tetracycline
+Moxalactam,Cephalosporin
+Moxifloxacin,Quinolone/Fluoroquinolone
+Mupirocin,Other
+Nadifloxacin,Quinolone/Fluoroquinolone
+Nafcillin,Penicillin
+Nalidixic Acid,Quinolone/Fluoroquinolone
+Neomycin,Aminoglycoside
+Netilmicin,Aminoglycoside
+Nitrofurantoin,Nitrofuran
+Norfloxacin,Quinolone/Fluoroquinolone
+Ofloxacin,Quinolone/Fluoroquinolone
+Oritavancin,Glycopeptide
+Oxacillin,Penicillin
+Oxytetracycline,Tetracycline
+Paromomycin,Aminoglycoside
+Phenoxymethylpenicillin (Penicillin V),Penicillin
+Piperacillin,Penicillin
+Platensimycin,Other
+Polymyxin B,Polypeptide
+Posizolid,Oxazolidinone
+Pyrazinamide,Drugs against mycobacteria
+Quinupristin (Dalfopristin),Other
+Radezolid,Oxazolidinone
+Rifabutin,Drugs against mycobacteria
+Rifampin,Drugs against mycobacteria
+Rifapentine,Drugs against mycobacteria
+Rifaximin,Ansamycin
+Roxithromycin,Macrolide
+Sparfloxacin,Quinolone/Fluoroquinolone
+Spectinomycin,Aminoglycoside
+Spiramycin,Macrolide
+Streptomycin,Aminoglycoside
+Sulfacetamide,Sulfonamide
+Sulfadiazine,Sulfonamide
+Sulfadimethoxine,Sulfonamide
+Sulfamethizole,Sulfonamide
+Sulfamethoxazole,Sulfonamide
+Sulfanilimide,Sulfonamide
+Sulfasalazine,Sulfonamide
+Sulfisoxazole,Sulfonamide
+Sulfonamidochrysoidine,Sulfonamide
+Teicoplanin,Glycopeptide
+Telavancin,Glycopeptide
+Telithromycin,Macrolide
+Temafloxacin,Quinolone/Fluoroquinolone
+Temocillin,Penicillin
+Tetracycline,Tetracycline
+Thiamphenicol,Other
+Ticarcillin,Penicillin
+Tigecycline,Other
+Tinidazole,Other
+Tobramycin,Aminoglycoside
+Torezolid,Oxazolidinone
+Trimethoprim-Sulfamethoxazole (Tmp-Smx),Sulfonamide
+Trovafloxacin,Quinolone/Fluoroquinolone
+Vancomycin,Glycopeptide
+Penicillin (Unspecified),Penicillin
