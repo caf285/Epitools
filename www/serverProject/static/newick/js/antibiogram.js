@@ -290,17 +290,16 @@ function updatePlotly() {
         }
       }
     let totalDates = Object.keys(total).filter(x => total[x][0] > 0)
-    console.log(total, totalDates)
     pathogenGraph[drug] = {'x': totalDates.map(x => x.split("::").join("-")), 'y': [], 'name': drug, mode: 'lines+markers'}
     for (let date of totalDates) {
+      console.log(total[date][1]/total[date][0])
       if (sr == 'Susceptible') {
-        pathogenGraph[drug]['y'] = Object.values(total).map(x => x[1]/x[0])
+        pathogenGraph[drug]['y'].push(total[date][1]/total[date][0])
       } else {
-        pathogenGraph[drug]['y'] = Object.values(total).map(x => 1-(x[1]/x[0]))
+        pathogenGraph[drug]['y'].push(1-total[date][1]/total[date][0])
       }
     }
     dataArr.push(pathogenGraph[drug])
-    console.log(dataArr)
   }
   Plotly.react(document.getElementById("plot"), dataArr, layout)
 }
