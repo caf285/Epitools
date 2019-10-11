@@ -8,16 +8,20 @@
   {% load static %}
 
   <!-- CSS -->
-  <link rel="stylesheet" href="{% static '/newick/css/PCA.css' %}"></link>
+  <link rel="stylesheet" href="{% static '/newick/css/PCA.css' %}" type="text/css"></link>
+  <link rel="stylesheet" href="{% static '/jQRangeSlider/css/classic.css' %}" type="text/css"></link>
 
   <!-- Javascript -->
   <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
   <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
   <script src="{% static '/newick/js/colorPalette.js' %}"></script>
-  <script src="{% static '/newick/js/antibiogram.js' %}"></script>
   <script src="{% static '/newick/js/mapAZ.js' %}"></script>
   <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
   <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+  <script src="{% static '/jquery/jquery-1.10.2.min.js' %}"></script>
+  <script src="{% static '/jquery/jquery-ui.min.js' %}"></script>
+  <script src="{% static '/jQRangeSlider/jQAllRangeSliders-min.js' %}"></script>
+  <script src="{% static '/newick/js/antibiogram.js' %}"></script>
   <script>
     // load database
     var DB = {{ demoPrevHarm | safe }}
@@ -29,10 +33,45 @@
 {% endblock %}
 
 {% block sideContent %}
+  Options:
+  <!-- STERILE DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sterile</button>
+    <div id="sterileDropdown" class="dropdown-menu">
+      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="Y" checked> Sterile&nbsp;<br>
+      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="N" checked> Non-Sterile&nbsp;<br>
+    </div>
+  </div>
+  </br>
+
+  <!-- FACILITY DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Facility Types</button>
+    <div id="facilityDropdown" class="dropdown-menu">
+    </div>
+  </div>
+  </br>
+
+  <!-- DRUG DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Drugs</button>
+    <div id="drugCheckDropdown" class="dropdown-menu">
+    </div>
+  </div>
+  </br>
+
+  <!-- DATES DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dates</button>
+    <div id="dateDropdown" class="dropdown-menu">
+    </div>
+  </div>
+  </br>
+
   Bacteria:
   <div class="dropdown">
     <button id="bacteriaButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-    <div id="bacteriaDropdown" class="dropdown-menu" aria-labelledby="about-us">
+    <div id="bacteriaDropdown" class="dropdown-menu">
     </div>
   </div>
   </br>
@@ -40,7 +79,7 @@
   Drug:
   <div class="dropdown">
     <button id="drugButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-    <div id="drugDropdown" class="dropdown-menu" aria-labelledby="about-us">
+    <div id="drugDropdown" class="dropdown-menu">
     </div>
   </div>
   </br>
@@ -48,7 +87,7 @@
   Susceptible/Resistant:
   <div class="dropdown">
     <button id="sr" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Susceptible</button>
-    <div class="dropdown-menu" aria-labelledby="about-us">
+    <div class="dropdown-menu">
       <a class="dropdown-item" onclick="document.getElementById('sr').innerHTML = 'Susceptible'; updatePlotly(); updateAll()">Susceptible</a>
       <a class="dropdown-item" onclick="document.getElementById('sr').innerHTML = 'Resistant'; updatePlotly(); updateAll()">Resistant</a>
     </div>
@@ -58,23 +97,24 @@
   Map Color:
   <div class="dropdown">
     <button id="mapColorButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
-    <div id="mapColorDropdown" class="dropdown-menu" aria-labelledby="about-us">
+    <div id="mapColorDropdown" class="dropdown-menu">
     </div>
   </div>
   </br>
 
+<!-- TODO: fill with double date range slider; replace dates dropdown -->
   Year
-  <input type="range" id="yearScale">
+  <div id="slider"></div>
   </br>
 
 {% endblock %}
 
 {% block mainContent %}
-  <div class="mainContent">
-    <div style="width: 60%; margin-right: 10px;">
+/j'/  <div class="mainContent">
+    <div style="width: 40%; margin-right: 10px;">
       {% leaflet_map "main" %}
     </div>
-    <div id="plot" style="width: 40%;">
+    <div id="plot" style="width: 60%;">
     </div>
   </div>
   <div class="mainContent">
@@ -88,8 +128,6 @@
           <td colspan="100%" style="font-size: 16px;"><center><b><div id="antibiogramSubheader"></div></b></center></td>
         </tr>
         <tr id="drug">
-          <td style="vertical-align: bottom;width: 200px;"><div><center><b>Organism</b></center></div></td>
-          <td style="vertical-align: bottom;width: 50px;"><div><center><b># Strains</b></center></div></td>
         </tr>
       </thead>
       <tbody id="bug">

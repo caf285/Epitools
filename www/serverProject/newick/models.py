@@ -122,7 +122,7 @@ class CollectionMethod(models.Model):
   sterile = models.CharField('sterile', max_length=4)
   class Meta:
     ordering = ['id']
-  def _str__(self):
+  def __str__(self):
     return str(self.id)
 
 class AMR(models.Model):
@@ -137,7 +137,7 @@ class AMR(models.Model):
     unique_together = ['facility', 'bacteria', 'site', 'year', 'month']
     ordering = ['facility', 'bacteria', 'site']
   def __str__(self):
-    return str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.site) + '::' + str(year) + '-' + str(month)
+    return str(self.facility) + '::' + str(self.bacteria) + '::' + str(self.site) + '::' + str(self.year) + '-' + str(self.month)
 
 class Resistance(models.Model):
   id = models.AutoField('resistanceId', primary_key=True)

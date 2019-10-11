@@ -131,7 +131,7 @@
         fullDraw()
         document.getElementById("gasMtypeDropdown").innerHTML = ""
         for (var j in trees[i]) {
-         document.getElementById("gasMtypeDropdown").innerHTML  += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[i][j] + "\"); fullDraw()'>" + j + "</a>"
+         document.getElementById("gasMtypeDropdown").innerHTML  += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[i][j] + "\"); fullDraw()'>" + j.substring(0,30) + "</a>"
         }
       }
       resetM(Object.keys(trees)[0])

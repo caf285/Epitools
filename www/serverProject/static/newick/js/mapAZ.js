@@ -239,6 +239,9 @@ window.addEventListener("map:init", function (e) {
   }
 
   function getPCA(pca) {
+    return pca
+/*
+    // returns list of PCA stats ... probably dont want this clutter following the mouse
     out = []
     out.push([DB.pca[pca]['number'], pca])
     out.push(DB.pca[pca]['score'])
@@ -253,6 +256,7 @@ window.addEventListener("map:init", function (e) {
     out.push(DB.pca[pca]['travel2'])
     out.push(DB.pca[pca]['travel2'])
     return out.join("</br>")
+*/
   }
 }, false);
 

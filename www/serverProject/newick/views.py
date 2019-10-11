@@ -81,12 +81,70 @@ class DemoPrevHarmView(LoginRequiredMixin, generic.ListView):
     query = {}
     query["amr"] = self.getAMR()
     query["map"] = getMap()
-    query["pca"] = getPCA()
+    #query["pca"] = getPCA()
     query["coordinates"] = getCoordinates()
     return query
 
   def getAMR(self):
-    return {}
+    amr = {'amr': {}, 'facilityTypes': [], 'bugDrugs':[], 'dates':[], }
+    query = list(filter(lambda x: x['fields']['collected']/x['fields']['range'] > 1, json.loads(serializers.serialize('json', AMR.objects.filter()))))
+    for i in query:
+      ##### get values for tree
+      # get FacilityType
+      facility = json.loads(serializers.serialize('json', Facility.objects.filter(id=i['fields']['facility'])))[0]['fields']
+      facilityType = json.loads(serializers.serialize('json', FacilityType.objects.filter(pk=facility['type'])))[0]['fields']
+      facilityType = facilityType['type1'] + "::" + facilityType['type2']
+      # get PCAs, Counties, Regions
+      pcas = list(map(lambda x: x['pk'], json.loads(serializers.serialize('json', PCA.objects.filter(mpc1=facility['mpc'])))))
+      counties = list(dict.fromkeys((map(lambda x: x['fields']['county'], list(filter(lambda x: x['fields']['pca'] in pcas, json.loads(serializers.serialize('json', CountyPCA.objects.all()))))))))
+      regions = list(dict.fromkeys(map(lambda x: x['fields']['region'], list(filter(lambda x: x['pk'] in counties, json.loads(serializers.serialize('json', County.objects.all())))))))
+      locations = ["state::all"] + list(map(lambda x: "pca::" + x, pcas)) + list(map(lambda x: "county::" + x, counties)) + list(map(lambda x: "region::" + x, regions))
+      # get Sterile
+      sterile = json.loads(serializers.serialize('json', CollectionMethod.objects.filter(pk=i['fields']['site'])))[0]['fields']['sterile']
+      # get Bug
+      bug = i['fields']['bacteria']
+      # get Resistances
+      resistances = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', Resistance.objects.filter(amr=i['pk'])))))
+      # get Dates
+      total = i['fields']['collected']
+      year = i['fields']['year']
+      month = i['fields']['month']
+      length = i['fields']['range']
+      dates = []
+      while length >= 1:
+        dates.append(str(year) + "::" + str("0" + str(month))[-2:])
+        year, month = (year, month + 1) if month < 12 else (year + 1, 1)
+        length -= 1
+
+      ##### build tree
+      for loc in locations:
+        if loc not in amr['amr']:
+          amr['amr'][loc] = {}
+        if facilityType not in amr['amr'][loc]:
+          amr['amr'][loc][facilityType] = {}
+        if facilityType not in amr['facilityTypes']:
+          amr['facilityTypes'].append(facilityType)
+        if sterile not in amr['amr'][loc][facilityType]:
+          amr['amr'][loc][facilityType][sterile] = {}
+        if bug not in amr['amr'][loc][facilityType][sterile]:
+          amr['amr'][loc][facilityType][sterile][bug] = {}
+        # dates
+        for date in dates:
+          if date not in amr['amr'][loc][facilityType][sterile][bug]:
+            amr['amr'][loc][facilityType][sterile][bug][date] = {}
+          if date not in amr['dates']:
+            amr['dates'].append(date)
+          # drugs
+          for res in resistances:
+            if res['antibiotic'] not in amr['amr'][loc][facilityType][sterile][bug][date]:
+              amr['amr'][loc][facilityType][sterile][bug][date][res['antibiotic']] = {'collected': 0, 'tested': 0, 'susceptible': 0}
+            if bug + "::" + res['antibiotic'] not in amr['bugDrugs']:
+              amr['bugDrugs'].append(bug + "::" + res['antibiotic'])
+            amr['amr'][loc][facilityType][sterile][bug][date][res['antibiotic']]['collected'] += total/i['fields']['range']
+            amr['amr'][loc][facilityType][sterile][bug][date][res['antibiotic']]['tested'] += res['nTested']/i['fields']['range']
+            amr['amr'][loc][facilityType][sterile][bug][date][res['antibiotic']]['susceptible'] += res['nSusceptible']/i['fields']['range']
+
+    return amr
 '''
     amr = {'region':{}, 'county':{}, 'pca':{}, 'dates':[], 'bugDrugs':[]}
     query = list(map(lambda x: x['fields'], json.loads(serializers.serialize('json', AMR.objects.all()))))
