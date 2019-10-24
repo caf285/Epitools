@@ -8,6 +8,7 @@
   {% load static %}
 
   <!-- CSS -->
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static '/newick/css/PCA.css' %}" type="text/css"></link>
   <link rel="stylesheet" href="{% static '/jQRangeSlider/css/classic.css' %}" type="text/css"></link>
 
@@ -22,6 +23,9 @@
   <script src="{% static '/jquery/jquery-ui.min.js' %}"></script>
   <script src="{% static '/jQRangeSlider/jQAllRangeSliders-min.js' %}"></script>
   <script src="{% static '/newick/js/antibiogram.js' %}"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+
   <script>
     // load database
     var DB = {{ demoPrevHarm | safe }}
@@ -38,6 +42,7 @@
   <div class="dropdown">
     <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sterile</button>
     <div id="sterileDropdown" class="dropdown-menu">
+      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="U" checked> Unknown&nbsp;<br>
       &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="Y" checked> Sterile&nbsp;<br>
       &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="N" checked> Non-Sterile&nbsp;<br>
     </div>
@@ -55,7 +60,10 @@
   <!-- DRUG DROPDOWN -->
   <div class="dropdown">
     <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Drugs</button>
-    <div id="drugCheckDropdown" class="dropdown-menu">
+    <div id="drugDropdown" class="dropdown-menu">
+      &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('all')">Select All</button>
+      &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('none')">Select None</button>
+      </br>
     </div>
   </div>
   </br>
@@ -68,6 +76,10 @@
   </div>
   </br>
 
+  <!-- SUSCEPTIBLE TOGGLE -->
+  <input id="sr" type="checkbox" checked data-toggle="toggle" data-on="Susceptible" data-off="Resistant" data-width="100%" data-onstyle="info" data-offstyle="info">
+  </br>
+
   Bacteria:
   <div class="dropdown">
     <button id="bacteriaButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
@@ -76,41 +88,20 @@
   </div>
   </br>
 
-  Drug:
-  <div class="dropdown">
-    <button id="drugButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-    <div id="drugDropdown" class="dropdown-menu">
-    </div>
-  </div>
+  Date Range:
+  <div id="slider"></div>
   </br>
 
-  Susceptible/Resistant:
-  <div class="dropdown">
-    <button id="sr" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Susceptible</button>
-    <div class="dropdown-menu">
-      <a class="dropdown-item" onclick="document.getElementById('sr').innerHTML = 'Susceptible'; updatePlotly(); updateAll()">Susceptible</a>
-      <a class="dropdown-item" onclick="document.getElementById('sr').innerHTML = 'Resistant'; updatePlotly(); updateAll()">Resistant</a>
-    </div>
-  </div>
-  </br>
-
-  Map Color:
-  <div class="dropdown">
+  <div style="visibility: hidden;" class="dropdown">
     <button id="mapColorButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
     <div id="mapColorDropdown" class="dropdown-menu">
     </div>
   </div>
-  </br>
-
-<!-- TODO: fill with double date range slider; replace dates dropdown -->
-  Year
-  <div id="slider"></div>
-  </br>
 
 {% endblock %}
 
 {% block mainContent %}
-/j'/  <div class="mainContent">
+  <div class="mainContent">
     <div style="width: 40%; margin-right: 10px;">
       {% leaflet_map "main" %}
     </div>

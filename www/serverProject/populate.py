@@ -43,7 +43,7 @@ def main():
 
     csv = read("CSV/" + model + ".csv").strip().split("\n")[1:]
     print(model)
-
+    '''
     ##### Arizona Map
     # Region
     if model == "Region":
@@ -143,13 +143,13 @@ def main():
 
     # Antibiotic
     if model == "Antibiotic":
-      #for x in Antibiotic.objects.all():
-      #  print("\tremoving ", x)
-      #  x.delete()
+      for x in Antibiotic.objects.all():
+        print("\tremoving ", x)
+        x.delete()
       for line in csv:
         line = line.split(",")
         print(line)
-        Antibiotic.objects.get_or_create(id=line[0], type=line[1])
+        Antibiotic.objects.get_or_create(id=line[0], alias=line[1], type=line[2])
 
     # Collection Method
     if model == "CollectionMethod":
@@ -160,12 +160,12 @@ def main():
         line = line.split(",")
         print(line)
         CollectionMethod.objects.get_or_create(id=line[0], sterile=line[1])
-
+    '''
     # AMR
     if model == "AMR":
-      #for x in AMR.objects.all():
-      #  print("\tremoving ", x)
-      #  x.delete()
+      for x in AMR.objects.all():
+        print("\tremoving ", x)
+        x.delete()
       for line in csv:
         line = line.split(",")
         print(line)
@@ -173,9 +173,9 @@ def main():
 
     # Resistance
     if model == "Resistance":
-      #for x in Resistance.objects.all():
-      #  print("\tremoving ", x)
-      #  x.delete()
+      for x in Resistance.objects.all():
+        print("\tremoving ", x)
+        x.delete()
       for line in csv:
         line = line.split(",")
         print(line)

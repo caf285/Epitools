@@ -5,6 +5,7 @@ var drugs = []
 
 // build double date range slider
 $(document).ready(function() {
+  // build date range slider
   let minDate = DB.amr.dates.sort()[0].split("::")
   let maxDate = DB.amr.dates.sort()[DB.amr.dates.length - 1].split("::")
   $("#slider").dateRangeSlider({
@@ -12,12 +13,20 @@ $(document).ready(function() {
     bounds: {min: new Date(parseInt(minDate[0]), parseInt(minDate[1]-1)), max:new Date(parseInt(maxDate[0]), parseInt(maxDate[1]-1))},
     step: {months: 1}
   })
+
+  // daterange toggle function
   $("#slider").bind("valuesChanging", function(e, data){
     updateAll()
   });
+
+  // susceptible toggle function
+  $("#sr").change(function() {
+    updateAll()
+  })
 })
 
 window.addEventListener('DOMContentLoaded', function() {
+  sr = document.getElementById("sr")
   fillButtons()
   mapFunctions.push(function() {
     updateAll()
@@ -29,6 +38,20 @@ function updateAll() {
   updateMap()
   updateAntibiogram()
   updatePlotly() 
+}
+
+function selectDrugs(x) {
+  drugs = Array.from(document.getElementsByClassName("drugCheck"))
+  if (x == 'all') {
+    for (let drug of drugs) {
+      drug.checked = true
+    }
+  } else {
+    for (let drug of drugs) {
+      drug.checked = false
+    }
+  }
+  updateAll()
 }
 
 //========================================( FILL BUTTONS )
@@ -59,7 +82,7 @@ function fillButtons() {
 
   // fill drugDropdown
   for (let drug of drugs) {
-    document.getElementById("drugCheckDropdown").innerHTML += "&nbsp;<input oninput=\"updateAll()\" type=\"checkbox\" class=\"drugCheck\" name=\"" + drug + "\" checked> " + drug.substring(0, 35) + "&nbsp;<br>"
+    document.getElementById("drugDropdown").innerHTML += "&nbsp;<input oninput=\"updateAll()\" type=\"checkbox\" class=\"drugCheck\" name=\"" + drug + "\" checked> " + drug.substring(0, 35) + "&nbsp;<br>"
   }
 
   // fill dateDropdown
@@ -71,29 +94,15 @@ function fillButtons() {
 
 //========================================( UPDATE BUTTONS )
 function updateButtons() {
-  // reset drug dropdown based on bug chosen, select first drug
-  document.getElementById('drugDropdown').innerHTML = ""
-  for (var i in drugs) {
-    if (!(DB.amr.bugDrugs.indexOf(document.getElementById('bacteriaButton').innerHTML + "::" + drugs[i]) == -1)) {
-      document.getElementById('drugDropdown').innerHTML += "<a class='dropdown-item' onclick='document.getElementById(\"drugButton\").innerHTML = \"" + drugs[i] + "\"; updateMap(); updatePlotly()'>" + drugs[i].substring(0, 35) + "</a>"
-    }
-  }
-  if (DB.amr.bugDrugs.indexOf(document.getElementById('bacteriaButton').innerHTML + "::" + document.getElementById('drugButton').innerHTML) == -1) {
-    document.getElementById('drugButton').innerHTML = document.getElementById('drugDropdown').getElementsByTagName('a')[0].innerHTML
-  }
-
   // update button context toggle (SUSCEPTIBLE/RESISTANT)
-  sr = document.getElementById('sr').innerHTML
   if (!(document.getElementById("mapColorButton").innerHTML == "Default")) {
-    document.getElementById("mapColorButton").innerHTML = "By " + sr + " %</a>"
+    document.getElementById("mapColorButton").innerHTML = "By " + `${sr.checked ? 'Susceptible' : 'Resistant'}` + " %</a>"
   }
-  document.getElementById("mapColorDropdown").innerHTML = "<a class='dropdown-item' onclick='document.getElementById(\"mapColorButton\").innerHTML = \"Default\"; updateMap()'>Default</a><a class='dropdown-item' onclick='document.getElementById(\"mapColorButton\").innerHTML = \"By " + sr + " %\"; updateMap()'>By " + sr + " %</a>"
+  document.getElementById("mapColorDropdown").innerHTML = "<a class='dropdown-item' onclick='document.getElementById(\"mapColorButton\").innerHTML = \"Default\"; updateMap()'>Default</a><a class='dropdown-item' onclick='document.getElementById(\"mapColorButton\").innerHTML = \"By " + `${sr.checked ? "Susceptible" : "Resistant"}` + " %\"; updateMap()'>By " + `${sr.checked ? "Susceptible" : "Resistant"}` + " %</a>"
 }
 
 //========================================( UPDATE MAP )
 function updateMap() {
-  sr = document.getElementById('sr').innerHTML
-  bacteriaDrug = document.getElementById('bacteriaButton').innerHTML + "::" + document.getElementById('drugButton').innerHTML
   // TODO: update level -> label to level::label
   // update icon text
   for (var i in DB['amr']['amr']) {
@@ -137,15 +146,18 @@ function updateMap() {
 //========================================( UPDATE ANTIBIOGRAM )
 function updateAntibiogram() {
   // update antibiogram headers
-  var sr = document.getElementById("sr").innerHTML
   // TODO: replace yearScale
   let dateRange = Object.values($("#slider").dateRangeSlider("values")).map(x => String(x.getFullYear()) + '::' + String('0' + String(x.getMonth()+1)).substring(String('0' + String(x.getMonth()+1)).length - 2, String('0' + String(x.getMonth()+1)).length))
   if (level == "state") {
     document.getElementById("antibiogramHeader").innerHTML = "Arizona State Antibiogram between " + fixDate(dateRange[0]) + " and " + fixDate(dateRange[1])
   } else {
-    document.getElementById("antibiogramHeader").innerHTML = proper(label + " " + level) + " Antibiogram for " + fixDate(DB.amr.dates.sort()[0])
+    if (level == 'pca') {
+      document.getElementById("antibiogramHeader").innerHTML = proper(label) + " " + level.toUpperCase() + " Antibiogram for " + fixDate(DB.amr.dates.sort()[0])
+    } else {
+      document.getElementById("antibiogramHeader").innerHTML = proper(label + " " + level) + " Antibiogram for " + fixDate(DB.amr.dates.sort()[0])
+    }
   }
-  document.getElementById("antibiogramSubheader").innerHTML = "% " + sr + " for Isolates"
+  document.getElementById("antibiogramSubheader").innerHTML = "% " + `${ sr.checked ? 'Susceptible' : 'Resistant'}` + " for Isolates"
 
   // fill antibiogram % hash by level::label
   let bugHash = {}
@@ -202,7 +214,7 @@ function updateAntibiogram() {
     for (let drug of allDrug.sort()) {
       if (Object.keys(bugHash[bacteria]).indexOf(drug) < 0) {
         newRow += "<td>-</td>"
-      } else if (sr == 'Susceptible') {
+      } else if (sr.checked) {
         newRow += "<td>" + String(parseInt((bugHash[bacteria][drug][1]/bugHash[bacteria][drug][0])*100)) + "%</td>"
       } else {
         newRow += "<td>" + String(100 - parseInt((bugHash[bacteria][drug][1]/bugHash[bacteria][drug][0])*100)) + "%</td>"
@@ -217,7 +229,6 @@ function updatePlotly() {
   // initialize plotly
   var dataArr = []
   var pathogenGraph = {};
-  var sr = document.getElementById("sr").innerHTML
   let bacteria = document.getElementById('bacteriaButton').innerHTML
   let iterator = []
   if (level == "pca") {
@@ -233,7 +244,7 @@ function updatePlotly() {
   var layout = {
     legend: {orientation: 'v'},
     title: {
-      text: `% <b>${sr}</b> for <b>${bacteria}</b> ${level == 'state' ? 'in Arizona' : 'in ' + proper(label)} ${level == 'pca' ? level.toUpperCase() : proper(level)}`,
+      text: `% <b>${ sr.checked ? 'Susceptible' : 'Resistant'}</b> for <b>${bacteria}</b> ${level == 'state' ? 'in Arizona' : 'in ' + proper(label)} ${level == 'pca' ? level.toUpperCase() : proper(level)}`,
       font: {size: 20},
       x: 0.5
     },
@@ -242,7 +253,7 @@ function updatePlotly() {
       range: [DB.amr.dates.sort()[0].split("::").join("-"), DB.amr.dates.sort()[DB.amr.dates.length-1].split("::").join("-")]
     },
     yaxis: {
-      title: {text: `% <b>${sr}</b> for <b>${bacteria}</b>`},
+      title: {text: `% <b>${ sr.checked ? 'Susceptible' : 'Resistant'}</b> for <b>${bacteria}</b>`},
       range: [0, 1],
       tickformat: ',.0%',
     },
@@ -259,7 +270,10 @@ function updatePlotly() {
       line: {width: 0}
     }]
   }
-  
+
+  let dateStart = DB.amr.dates.sort()[DB.amr.dates.length-1]
+  let dateEnd = DB.amr.dates.sort()[0]
+
   // fill graph
   let dateRange = Array.from(document.getElementsByClassName("dateCheck")).filter(x => x.checked).map(x => x.name)
   let totalDrugs = DB.amr.bugDrugs.filter(x => x.indexOf(bacteria) >= 0).map(x => x.split("::")[1])
@@ -278,7 +292,13 @@ function updatePlotly() {
               let dateList = dateRange.filter(x => Object.keys(DB.amr.amr[index][facility][sterile][bacteria]).indexOf(x) >= 0)
               for (let date of dateList) {
                 // TODO: date axis to plotly
-                if (Object.keys(DB.amr.amr[level + "::" + label][facility][sterile][bacteria][date]).indexOf(drug) >= 0) {
+                if (Object.keys(DB.amr.amr[index][facility][sterile][bacteria][date]).indexOf(drug) >= 0) {
+                  if (date > dateEnd) {
+                    dateEnd = String(date)
+                  }
+                  if (date < dateStart) {
+                    dateStart = String(date)
+                  }
                   // add drug if not in total
                   let stats = DB.amr.amr[index][facility][sterile][bacteria][date][drug]
                   total[date][0] += stats['tested']
@@ -292,16 +312,26 @@ function updatePlotly() {
     let totalDates = Object.keys(total).filter(x => total[x][0] > 0)
     pathogenGraph[drug] = {'x': totalDates.map(x => x.split("::").join("-")), 'y': [], 'name': drug, mode: 'lines+markers'}
     for (let date of totalDates) {
-      console.log(total[date][1]/total[date][0])
-      if (sr == 'Susceptible') {
+      if (sr.checked) {
         pathogenGraph[drug]['y'].push(total[date][1]/total[date][0])
       } else {
         pathogenGraph[drug]['y'].push(1-total[date][1]/total[date][0])
       }
     }
+    layout['xaxis']['range'] = [dateStart.split("::").join("-"), dateEnd.split("::").join("-")]
     dataArr.push(pathogenGraph[drug])
   }
   Plotly.react(document.getElementById("plot"), dataArr, layout)
+
+  //document.getElementById("slider").innerHTML = ""
+//  $("#slider").dateRangeSlider({
+//    defaultValues: {min: new Date(parseInt(dateStart.split("::")[0]), parseInt(dateStart.split("::")[1])-1), max:new Date(parseInt(dateEnd.split("::")[0]), parseInt(dateEnd.split("::")[1])-1)},
+//    bounds: {min: new Date(parseInt(dateStart.split("::")[0]), parseInt(dateStart.split("::")[1])-1), max:new Date(parseInt(dateEnd.split("::")[0]), parseInt(dateEnd.split("::")[1])-1)},
+//    step: {months: 1}
+//  })
+
+
+
 }
 
 //========================================( HELPER FUNCTIONS )
@@ -332,7 +362,7 @@ function getColor(level, label) {
 function getPlus(x, y) {
   var xN = 0
   var yN = 0
-  if (sr == "Susceptible") {
+  if (sr.checked) {
     for (var i = 0; i < x.length; i++) {
       xN += x[i][0]
       yN += y[i][0]

@@ -398,3 +398,27 @@ Server Capacity    : 20 (event/worker), 20 (prefork)
 Server Backlog     : 500 (connections)
 Locale Setting     : en_US.UTF-8
 httpd (pid 8059) already running
+Server URL         : http://localhost:1440/
+Server Root        : /tmp/mod_wsgi-localhost:1440:1013
+Server Conf        : /tmp/mod_wsgi-localhost:1440:1013/httpd.conf
+Error Log File     : /tmp/mod_wsgi-localhost:1440:1013/error_log (warn)
+Request Capacity   : 5 (1 process * 5 threads)
+Request Timeout    : 60 (seconds)
+Startup Timeout    : 15 (seconds)
+Queue Backlog      : 100 (connections)
+Queue Timeout      : 45 (seconds)
+Server Capacity    : 20 (event/worker), 20 (prefork)
+Server Backlog     : 500 (connections)
+Locale Setting     : en_US.UTF-8
+Server URL         : http://localhost:1440/
+Server Root        : /tmp/mod_wsgi-localhost:1440:1013
+Server Conf        : /tmp/mod_wsgi-localhost:1440:1013/httpd.conf
+Error Log File     : /tmp/mod_wsgi-localhost:1440:1013/error_log (warn)
+Request Capacity   : 5 (1 process * 5 threads)
+Request Timeout    : 60 (seconds)
+Startup Timeout    : 15 (seconds)
+Queue Backlog      : 100 (connections)
+Queue Timeout      : 45 (seconds)
+Server Capacity    : 20 (event/worker), 20 (prefork)
+Server Backlog     : 500 (connections)
+Locale Setting     : en_US.UTF-8

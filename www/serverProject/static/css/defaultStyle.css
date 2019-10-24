@@ -62,7 +62,7 @@ html, body {
   overflow-y: scroll;
 }
 
-#sideWindow.toggle {
+#sideWindow.tog {
   left: -292px;
 }
 

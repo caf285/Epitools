@@ -1,111 +1,50 @@
 ﻿id,facility,bacteria,site,year,month,range,collected
-Banner - University Medical Center Phoenix::Enterobacter cloacae::_::2017::11,Banner - University Medical Center Phoenix,Enterobacter cloacae,_,2017,11,6,123
-Banner - University Medical Center Phoenix::Enterobacter cloacae::_::2018::5,Banner - University Medical Center Phoenix,Enterobacter cloacae,_,2018,5,6,111
-Banner - University Medical Center Phoenix::Escherichia coli::_::2017::11,Banner - University Medical Center Phoenix,Escherichia coli,_,2017,11,6,187
-Banner - University Medical Center Phoenix::Escherichia coli::_::2018::5,Banner - University Medical Center Phoenix,Escherichia coli,_,2018,5,6,205
-Banner - University Medical Center Phoenix::Escherichia coli::Urine::2017::11,Banner - University Medical Center Phoenix,Escherichia coli,Urine,2017,11,6,929
-Banner - University Medical Center Phoenix::Escherichia coli::Urine::2018::5,Banner - University Medical Center Phoenix,Escherichia coli,Urine,2018,5,6,962
-Banner - University Medical Center Phoenix::Klebsiella pneumoniae::_::2017::11,Banner - University Medical Center Phoenix,Klebsiella pneumoniae,_,2017,11,6,104
-Banner - University Medical Center Phoenix::Klebsiella pneumoniae::_::2018::5,Banner - University Medical Center Phoenix,Klebsiella pneumoniae,_,2018,5,6,252
-Banner - University Medical Center Phoenix::Proteus mirabilis::_::2017::11,Banner - University Medical Center Phoenix,Proteus mirabilis,_,2017,11,6,103
-Banner - University Medical Center Phoenix::Proteus mirabilis::_::2018::5,Banner - University Medical Center Phoenix,Proteus mirabilis,_,2018,5,6,122
-Banner - University Medical Center Phoenix::Pseudomonas aeruginosa::_::2017::11,Banner - University Medical Center Phoenix,Pseudomonas aeruginosa,_,2017,11,6,224
-Banner - University Medical Center Phoenix::Pseudomonas aeruginosa::_::2018::5,Banner - University Medical Center Phoenix,Pseudomonas aeruginosa,_,2018,5,6,298
-Banner - University Medical Center Phoenix::Staphylococcus aureus::_::2017::11,Banner - University Medical Center Phoenix,Staphylococcus aureus,_,2017,11,6,470
-Banner - University Medical Center Phoenix::Staphylococcus aureus::_::2018::5,Banner - University Medical Center Phoenix,Staphylococcus aureus,_,2018,5,6,482
-Banner - University Medical Center Phoenix::Staphylococcus aureus (MRSA)::_::2017::11,Banner - University Medical Center Phoenix,Staphylococcus aureus (MRSA),_,2017,11,6,366
-Banner - University Medical Center Phoenix::Staphylococcus aureus (MRSA)::_::2018::5,Banner - University Medical Center Phoenix,Staphylococcus aureus (MRSA),_,2018,5,6,360
-Banner - University Medical Center Phoenix::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11,Banner - University Medical Center Phoenix,Streptococcus pneumoniae,Aspirate (Unspecified),2017,11,6,144
-Banner - University Medical Center Phoenix::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11,Banner - University Medical Center Phoenix,Streptococcus pneumoniae,Fluid (Cerebral/Spinal),2017,11,6,265
-Phoenix Indian Medical Center::Cronobacter sakazakii::Urine::2019::1,Phoenix Indian Medical Center,Cronobacter sakazakii,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Enterobacter aerogenes::Ear::2019::1,Phoenix Indian Medical Center,Enterobacter aerogenes,Ear,2019,1,6,1
-Phoenix Indian Medical Center::Enterobacter aerogenes::Skin::2019::1,Phoenix Indian Medical Center,Enterobacter aerogenes,Skin,2019,1,6,1
-Phoenix Indian Medical Center::Enterobacter aerogenes::Urine::2019::1,Phoenix Indian Medical Center,Enterobacter aerogenes,Urine,2019,1,6,4
-Phoenix Indian Medical Center::Enterobacter aerogenes::Wound::2019::1,Phoenix Indian Medical Center,Enterobacter aerogenes,Wound,2019,1,6,2
-Phoenix Indian Medical Center::Enterobacter cloacae::Skin::2019::1,Phoenix Indian Medical Center,Enterobacter cloacae,Skin,2019,1,6,2
-Phoenix Indian Medical Center::Enterobacter cloacae::Sputum::2019::1,Phoenix Indian Medical Center,Enterobacter cloacae,Sputum,2019,1,6,1
-Phoenix Indian Medical Center::Enterobacter cloacae::Urine::2019::1,Phoenix Indian Medical Center,Enterobacter cloacae,Urine,2019,1,6,3
-Phoenix Indian Medical Center::Enterobacter cloacae::Wound::2019::1,Phoenix Indian Medical Center,Enterobacter cloacae,Wound,2019,1,6,6
-Phoenix Indian Medical Center::Enterococcus faecalis::Skin::2019::1,Phoenix Indian Medical Center,Enterococcus faecalis,Skin,2019,1,6,2
-Phoenix Indian Medical Center::Enterococcus faecalis::Urine::2019::1,Phoenix Indian Medical Center,Enterococcus faecalis,Urine,2019,1,6,17
-Phoenix Indian Medical Center::Enterococcus faecalis::Wound::2019::1,Phoenix Indian Medical Center,Enterococcus faecalis,Wound,2019,1,6,4
-Phoenix Indian Medical Center::Enterococcus faecium::Urine::2019::1,Phoenix Indian Medical Center,Enterococcus faecium,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Escherichia coli::Anus::2019::1,Phoenix Indian Medical Center,Escherichia coli,Anus,2019,1,6,2
-Phoenix Indian Medical Center::Escherichia coli::Blood::2019::1,Phoenix Indian Medical Center,Escherichia coli,Blood,2019,1,6,4
-Phoenix Indian Medical Center::Escherichia coli::Ear::2019::1,Phoenix Indian Medical Center,Escherichia coli,Ear,2019,1,6,1
-Phoenix Indian Medical Center::Escherichia coli::Fluid (Cerebral/Spinal)::2019::1,Phoenix Indian Medical Center,Escherichia coli,Fluid (Cerebral/Spinal),2019,1,6,1
-Phoenix Indian Medical Center::Escherichia coli::Skin::2019::1,Phoenix Indian Medical Center,Escherichia coli,Skin,2019,1,6,1
-Phoenix Indian Medical Center::Escherichia coli::Sputum::2019::1,Phoenix Indian Medical Center,Escherichia coli,Sputum,2019,1,6,1
-Phoenix Indian Medical Center::Escherichia coli::Urine::2019::1,Phoenix Indian Medical Center,Escherichia coli,Urine,2019,1,6,387
-Phoenix Indian Medical Center::Escherichia coli::Wound::2019::1,Phoenix Indian Medical Center,Escherichia coli,Wound,2019,1,6,4
-Phoenix Indian Medical Center::Escherichia coli (ESBL)::Blood::2019::1,Phoenix Indian Medical Center,Escherichia coli (ESBL),Blood,2019,1,6,1
-Phoenix Indian Medical Center::Escherichia coli (ESBL)::Urine::2019::1,Phoenix Indian Medical Center,Escherichia coli (ESBL),Urine,2019,1,6,60
-Phoenix Indian Medical Center::Klebsiella oxytoca::Blood::2019::1,Phoenix Indian Medical Center,Klebsiella oxytoca,Blood,2019,1,6,1
-Phoenix Indian Medical Center::Klebsiella oxytoca::Ear::2019::1,Phoenix Indian Medical Center,Klebsiella oxytoca,Ear,2019,1,6,2
-Phoenix Indian Medical Center::Klebsiella oxytoca::Skin::2019::1,Phoenix Indian Medical Center,Klebsiella oxytoca,Skin,2019,1,6,3
-Phoenix Indian Medical Center::Klebsiella oxytoca::Urine::2019::1,Phoenix Indian Medical Center,Klebsiella oxytoca,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Klebsiella oxytoca::Wound::2019::1,Phoenix Indian Medical Center,Klebsiella oxytoca,Wound,2019,1,6,5
-Phoenix Indian Medical Center::Klebsiella oxytoca (ESBL)::Urine::2019::1,Phoenix Indian Medical Center,Klebsiella oxytoca (ESBL),Urine,2019,1,6,1
-Phoenix Indian Medical Center::Klebsiella pneumoniae::Anus::2019::1,Phoenix Indian Medical Center,Klebsiella pneumoniae,Anus,2019,1,6,1
-Phoenix Indian Medical Center::Klebsiella pneumoniae::Blood::2019::1,Phoenix Indian Medical Center,Klebsiella pneumoniae,Blood,2019,1,6,1
-Phoenix Indian Medical Center::Klebsiella pneumoniae::Skin::2019::1,Phoenix Indian Medical Center,Klebsiella pneumoniae,Skin,2019,1,6,1
-Phoenix Indian Medical Center::Klebsiella pneumoniae::Sputum::2019::1,Phoenix Indian Medical Center,Klebsiella pneumoniae,Sputum,2019,1,6,1
-Phoenix Indian Medical Center::Klebsiella pneumoniae::Urine::2019::1,Phoenix Indian Medical Center,Klebsiella pneumoniae,Urine,2019,1,6,29
-Phoenix Indian Medical Center::Klebsiella pneumoniae::Wound::2019::1,Phoenix Indian Medical Center,Klebsiella pneumoniae,Wound,2019,1,6,6
-Phoenix Indian Medical Center::Klebsiella pneumoniae (ESBL)::Urine::2019::1,Phoenix Indian Medical Center,Klebsiella pneumoniae (ESBL),Urine,2019,1,6,6
-Phoenix Indian Medical Center::Pantoea agglomerans::Blood::2019::1,Phoenix Indian Medical Center,Pantoea agglomerans,Blood,2019,1,6,1
-Phoenix Indian Medical Center::Pantoea agglomerans::Skin::2019::1,Phoenix Indian Medical Center,Pantoea agglomerans,Skin,2019,1,6,2
-Phoenix Indian Medical Center::Pantoea agglomerans::Sputum::2019::1,Phoenix Indian Medical Center,Pantoea agglomerans,Sputum,2019,1,6,1
-Phoenix Indian Medical Center::Pantoea agglomerans::Wound::2019::1,Phoenix Indian Medical Center,Pantoea agglomerans,Wound,2019,1,6,2
-Phoenix Indian Medical Center::Proteus mirabilis::Skin::2019::1,Phoenix Indian Medical Center,Proteus mirabilis,Skin,2019,1,6,3
-Phoenix Indian Medical Center::Proteus mirabilis::Urine::2019::1,Phoenix Indian Medical Center,Proteus mirabilis,Urine,2019,1,6,6
-Phoenix Indian Medical Center::Proteus mirabilis::Wound::2019::1,Phoenix Indian Medical Center,Proteus mirabilis,Wound,2019,1,6,2
-Phoenix Indian Medical Center::Proteus mirabilis (ESBL)::Wound::2019::1,Phoenix Indian Medical Center,Proteus mirabilis (ESBL),Wound,2019,1,6,1
-Phoenix Indian Medical Center::Proteus vulgaris::Urine::2019::1,Phoenix Indian Medical Center,Proteus vulgaris,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Pseudomonas aeruginosa::Anus::2019::1,Phoenix Indian Medical Center,Pseudomonas aeruginosa,Anus,2019,1,6,1
-Phoenix Indian Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Phoenix Indian Medical Center,Pseudomonas aeruginosa,Ear,2019,1,6,9
-Phoenix Indian Medical Center::Pseudomonas aeruginosa::Skin::2019::1,Phoenix Indian Medical Center,Pseudomonas aeruginosa,Skin,2019,1,6,4
-Phoenix Indian Medical Center::Pseudomonas aeruginosa::Sputum::2019::1,Phoenix Indian Medical Center,Pseudomonas aeruginosa,Sputum,2019,1,6,2
-Phoenix Indian Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Phoenix Indian Medical Center,Pseudomonas aeruginosa,Urine,2019,1,6,8
-Phoenix Indian Medical Center::Pseudomonas aeruginosa::Wound::2019::1,Phoenix Indian Medical Center,Pseudomonas aeruginosa,Wound,2019,1,6,3
-Phoenix Indian Medical Center::Pseudomonas stutzeri::Skin::2019::1,Phoenix Indian Medical Center,Pseudomonas stutzeri,Skin,2019,1,6,1
-Phoenix Indian Medical Center::Serratia marcescens::Urine::2019::1,Phoenix Indian Medical Center,Serratia marcescens,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Serratia marcescens::Wound::2019::1,Phoenix Indian Medical Center,Serratia marcescens,Wound,2019,1,6,2
-Phoenix Indian Medical Center::Shigella flexneri::Fecal::2019::1,Phoenix Indian Medical Center,Shigella flexneri,Fecal,2019,1,6,2
-Phoenix Indian Medical Center::Staphylococcus aureus::Anus::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Anus,2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus aureus::Blood::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Blood,2019,1,6,5
-Phoenix Indian Medical Center::Staphylococcus aureus::Ear::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Ear,2019,1,6,8
-Phoenix Indian Medical Center::Staphylococcus aureus::Eye Swab::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Eye Swab,2019,1,6,2
-Phoenix Indian Medical Center::Staphylococcus aureus::Nose::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Nose,2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus aureus::Skin::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Skin,2019,1,6,63
-Phoenix Indian Medical Center::Staphylococcus aureus::Sputum::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Sputum,2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus aureus::Urine::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Urine,2019,1,6,6
-Phoenix Indian Medical Center::Staphylococcus aureus::Wound::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus,Wound,2019,1,6,123
-Phoenix Indian Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus (MRSA),Anus,2019,1,6,18
-Phoenix Indian Medical Center::Staphylococcus aureus (MRSA)::Blood::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus (MRSA),Blood,2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus (MRSA),Ear,2019,1,6,9
-Phoenix Indian Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus (MRSA),Skin,2019,1,6,81
-Phoenix Indian Medical Center::Staphylococcus aureus (MRSA)::Sputum::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus (MRSA),Sputum,2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus aureus (MRSA)::Urine::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus (MRSA),Urine,2019,1,6,2
-Phoenix Indian Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Phoenix Indian Medical Center,Staphylococcus aureus (MRSA),Wound,2019,1,6,197
-Phoenix Indian Medical Center::Staphylococcus capitis::Blood::2019::1,Phoenix Indian Medical Center,Staphylococcus capitis,Blood,2019,1,6,4
-Phoenix Indian Medical Center::Staphylococcus epidermidis::Blood::2019::1,Phoenix Indian Medical Center,Staphylococcus epidermidis,Blood,2019,1,6,28
-Phoenix Indian Medical Center::Staphylococcus epidermidis::Fluid (Peritoneal Dialysis)::2019::1,Phoenix Indian Medical Center,Staphylococcus epidermidis,Fluid (Peritoneal Dialysis),2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus epidermidis::Urine::2019::1,Phoenix Indian Medical Center,Staphylococcus epidermidis,Urine,2019,1,6,2
-Phoenix Indian Medical Center::Staphylococcus haemolyticus::Urine::2019::1,Phoenix Indian Medical Center,Staphylococcus haemolyticus,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus hominis::Blood::2019::1,Phoenix Indian Medical Center,Staphylococcus hominis,Blood,2019,1,6,6
-Phoenix Indian Medical Center::Staphylococcus hominis::Wound::2019::1,Phoenix Indian Medical Center,Staphylococcus hominis,Wound,2019,1,6,3
-Phoenix Indian Medical Center::Staphylococcus intermedius::Wound::2019::1,Phoenix Indian Medical Center,Staphylococcus intermedius,Wound,2019,1,6,1
-Phoenix Indian Medical Center::Staphylococcus saprophyticus::Blood::2019::1,Phoenix Indian Medical Center,Staphylococcus saprophyticus,Blood,2019,1,6,1
-Phoenix Indian Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Phoenix Indian Medical Center,Streptococcus (Alpha-hemolytic),Blood,2019,1,6,7
-Phoenix Indian Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Phoenix Indian Medical Center,Streptococcus (Beta-hemolytic),Blood,2019,1,6,6
-Phoenix Indian Medical Center::Streptococcus (Beta-hemolytic)::Urine::2019::1,Phoenix Indian Medical Center,Streptococcus (Beta-hemolytic),Urine,2019,1,6,1
-Phoenix Indian Medical Center::Streptococcus agalactiae (Group B)::Blood::2019::1,Phoenix Indian Medical Center,Streptococcus agalactiae (Group B),Blood,2019,1,6,1
-Phoenix Indian Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Phoenix Indian Medical Center,Streptococcus agalactiae (Group B),Urine,2019,1,6,21
-Phoenix Indian Medical Center::Streptococcus bovis::Fluid (Cerebral/Spinal)::2019::1,Phoenix Indian Medical Center,Streptococcus bovis,Fluid (Cerebral/Spinal),2019,1,6,1
-Phoenix Indian Medical Center::Streptococcus bovis::Urine::2019::1,Phoenix Indian Medical Center,Streptococcus bovis,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Streptococcus pneumoniae::Blood::2019::1,Phoenix Indian Medical Center,Streptococcus pneumoniae,Blood,2019,1,6,12
-Phoenix Indian Medical Center::Streptococcus pneumoniae::Sputum::2019::1,Phoenix Indian Medical Center,Streptococcus pneumoniae,Sputum,2019,1,6,1
-Phoenix Indian Medical Center::Streptococcus pneumoniae::Urine::2019::1,Phoenix Indian Medical Center,Streptococcus pneumoniae,Urine,2019,1,6,1
-Phoenix Indian Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Phoenix Indian Medical Center,Streptococcus pyogenes (Group A),Blood,2019,1,6,9
-Phoenix Indian Medical Center::Streptococcus pyogenes (Group A)::Urine::2019::1,Phoenix Indian Medical Center,Streptococcus pyogenes (Group A),Urine,2019,1,6,1
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Banner Payson Medical Center,Enterobacter cloacae,_,2018,1,8,9
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Banner Payson Medical Center,Escherichia coli,Urine,2018,1,8,168
+Banner Payson Medical Center::Escherichia coli::_::2018::1,Banner Payson Medical Center,Escherichia coli,_,2018,1,8,97
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Banner Payson Medical Center,Staphylococcus aureus,_,2018,1,8,12
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Banner Payson Medical Center,Staphylococcus aureus (MRSA),_,2018,1,8,9
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Cobre Valley Regional Medical Center,Escherichia coli,Urine,2018,1,8,152
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Cobre Valley Regional Medical Center,Escherichia coli,_,2018,1,8,130
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Cobre Valley Regional Medical Center,Klebsiella pneumoniae,Urine,2018,1,8,12
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Cobre Valley Regional Medical Center,Staphylococcus aureus,_,2018,1,8,8
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Cobre Valley Regional Medical Center,Staphylococcus aureus (MRSA),_,2018,1,8,13
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Flagstaff Medical Center,Enterobacter cloacae,_,2018,5,6,111
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Flagstaff Medical Center,Enterobacter cloacae,_,2017,11,6,123
+Flagstaff Medical Center::Escherichia coli::_::2017::11,Flagstaff Medical Center,Escherichia coli,_,2017,11,6,187
+Flagstaff Medical Center::Escherichia coli::_::2018::5,Flagstaff Medical Center,Escherichia coli,_,2018,5,6,205
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Flagstaff Medical Center,Escherichia coli,Urine,2017,11,6,929
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Flagstaff Medical Center,Escherichia coli,Urine,2018,5,6,962
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Flagstaff Medical Center,Klebsiella pneumoniae,_,2017,11,6,104
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Flagstaff Medical Center,Klebsiella pneumoniae,_,2018,5,6,252
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Flagstaff Medical Center,Proteus mirabilis,_,2017,11,6,103
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Flagstaff Medical Center,Proteus mirabilis,_,2018,5,6,122
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Flagstaff Medical Center,Pseudomonas aeruginosa,_,2017,11,6,224
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Flagstaff Medical Center,Pseudomonas aeruginosa,_,2018,5,6,298
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Flagstaff Medical Center,Staphylococcus aureus,_,2017,11,6,470
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Flagstaff Medical Center,Staphylococcus aureus,_,2018,5,6,482
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Flagstaff Medical Center,Staphylococcus aureus (MRSA),_,2017,11,6,360
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Flagstaff Medical Center,Staphylococcus aureus (MRSA),_,2018,5,6,366
+Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11,Flagstaff Medical Center,Streptococcus pneumoniae,Aspirate (Unspecified),2017,11,6,144
+Flagstaff Medical Center::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11,Flagstaff Medical Center,Streptococcus pneumoniae,Fluid (Cerebral/Spinal),2017,11,6,265
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Yavapai Regional Medical Center,Enterobacter cloacae,Wound,2019,1,6,6
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Yavapai Regional Medical Center,Enterococcus faecalis,Urine,2019,1,6,17
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Yavapai Regional Medical Center,Escherichia coli,Urine,2019,1,6,387
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Yavapai Regional Medical Center,Proteus mirabilis,Urine,2019,1,6,6
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Yavapai Regional Medical Center,Pseudomonas aeruginosa,Ear,2019,1,6,9
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Yavapai Regional Medical Center,Pseudomonas aeruginosa,Urine,2019,1,6,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus,Ear,2019,1,6,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus,Skin,2019,1,6,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus,Urine,2019,1,6,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus,Wound,2019,1,6,123
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus (MRSA),Anus,2019,1,6,18
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus (MRSA),Ear,2019,1,6,9
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus (MRSA),Skin,2019,1,6,81
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Yavapai Regional Medical Center,Staphylococcus aureus (MRSA),Wound,2019,1,6,197
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Yavapai Regional Medical Center,Staphylococcus epidermidis,Blood,2019,1,6,28
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Yavapai Regional Medical Center,Staphylococcus hominis,Blood,2019,1,6,6
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Yavapai Regional Medical Center,Streptococcus (Alpha-hemolytic),Blood,2019,1,6,7
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Yavapai Regional Medical Center,Streptococcus (Beta-hemolytic),Blood,2019,1,6,6
+Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Yavapai Regional Medical Center,Streptococcus agalactiae (Group B),Urine,2019,1,6,21
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Yavapai Regional Medical Center,Streptococcus pneumoniae,Blood,2019,1,6,12
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Yavapai Regional Medical Center,Streptococcus pyogenes (Group A),Blood,2019,1,6,9

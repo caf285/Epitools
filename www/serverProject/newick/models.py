@@ -111,6 +111,7 @@ class Bacteria(models.Model):
 
 class Antibiotic(models.Model):
   id = models.CharField('antibioticName', max_length=64, primary_key=True)
+  alias = models.CharField('antibioticType', max_length=64, default="_")
   type = models.CharField('antibioticType', max_length=64, default="_")
   class Meta:
     ordering = ['id']

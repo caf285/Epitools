@@ -1,7 +1,7 @@
 ﻿id,alias,type
-Amikacin,AMIK,Aminoglycoside
-Amoxicillin,AMOX,Penicillin
-Ampicillin,AMP,Penicillin
+Amikacin,Amikacin,Aminoglycoside
+Amoxicillin,Amoxicillin,Penicillin
+Ampicillin,Ampicillin,Penicillin
 Arsphenamine,Arsphenamine,Other
 Azithromycin,Azithromycin,Macrolide
 Azlocillin,Azlocillin,Penicillin
@@ -31,13 +31,13 @@ Ceftazidime,Ceftazidime,Cephalosporin
 Ceftibuten,Ceftibuten,Cephalosporin
 Ceftizoxime,Ceftizoxime,Cephalosporin
 Ceftobiprole,Ceftobiprole,Cephalosporin
-Ceftriaxone,CEFTRIAX,Cephalosporin
+Ceftriaxone,Ceftriaxone,Cephalosporin
 Cefuroxime,Cefuroxime,Cephalosporin
 Cephalothin,Cephalothin,Cephalosporin
 Cephapirin,Cephapirin,Cephalosporin
 Cephradine,Cephradine,Cephalosporin
 Chloramphenicol,Chloramphenicol,Other
-Ciprofloxacin,CIPRO,Quinolone/Fluoroquinolone
+Ciprofloxacin,Ciprofloxacin,Quinolone/Fluoroquinolone
 Clarithromycin,Clarithromycin,Macrolide
 Clindamycin,Clindamycin,Lincosamide
 Clofazimine,Clofazimine,Drugs against mycobacteria
@@ -63,13 +63,13 @@ Fusidic Acid,Fusidic Acid,Other
 Gatifloxacin,Gatifloxacin,Quinolone/Fluoroquinolone
 Geldanamycin,Geldanamycin,Ansamycin
 Gemifloxacin,Gemifloxacin,Quinolone/Fluoroquinolone
-Gentamicin,GENT,Aminoglycoside
+Gentamicin,Gentamicin,Aminoglycoside
 Grepafloxacin,Grepafloxacin,Quinolone/Fluoroquinolone
 Herbimycin,Herbimycin,Ansamycin
-Imipenem (Cilastatin),Imipenem,Carbapenem
+Imipenem (Cilastatin),Imipenem (Cilastatin),Carbapenem
 Isoniazid,Isoniazid,Drugs against mycobacteria
 Kanamycin,Kanamycin,Aminoglycoside
-Levofloxacin,LEVO,Quinolone/Fluoroquinolone
+Levofloxacin,Levofloxacin,Quinolone/Fluoroquinolone
 Lincomycin,Lincomycin,Lincosamide
 Linezolid,Linezolid,Oxazolidinone
 Lomefloxacin,Lomefloxacin,Quinolone/Fluoroquinolone
@@ -97,7 +97,7 @@ Oxacillin,Oxacillin,Penicillin
 Oxytetracycline,Oxytetracycline,Tetracycline
 Paromomycin,Paromomycin,Aminoglycoside
 Phenoxymethylpenicillin (Penicillin V),Penicillin V,Penicillin
-Piperacillin,PIP,Penicillin
+Piperacillin,Piperacillin,Penicillin
 Platensimycin,Platensimycin,Other
 Polymyxin B,Polymyxin B,Polypeptide
 Posizolid,Posizolid,Oxazolidinone
@@ -132,7 +132,7 @@ Thiamphenicol,Thiamphenicol,Other
 Ticarcillin,Ticarcillin,Penicillin
 Tigecycline,Tigecycline,Other
 Tinidazole,Tinidazole,Other
-Tobramycin,TOBRA,Aminoglycoside
+Tobramycin,Tobramycin,Aminoglycoside
 Torezolid,Torezolid,Oxazolidinone
 Trimethoprim-Sulfamethoxazole (Tmp-Smx),Tmp-Smx,Sulfonamide
 Trovafloxacin,Trovafloxacin,Quinolone/Fluoroquinolone
