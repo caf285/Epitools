@@ -1,23 +1,125 @@
 /*
-1 - event listeners and functions
-  1DRW - draw on canvas (scale bar)
+  Individually set parameters for Phylocanvas. Markers in this list are accompanied
+  by a single short description of phylocanvas functionality. Each major function is
+  labelled with a number in the order the function appears. Within each major function
+  is a marker, followed by a short description of what functionality is represented
+  by the code at that marker.
 
-7 - 
-  7SCP - set click parameters (bounds for mouse detection)
-  7SND - set node bounded dimensions (on mouseover dimensions)
-  7SHD - set highlight dimensions
-  7GLS - get label start x
-  7BDP - branch decimal places (set to whole number)
+  Each marker in this table of contents is listed only twice; here, and the section
+  of code described in the marker. This will make each of the markers easily searchable.
 
-12 - draws tree at every canvas event
-  12FIN - fill internal nodes
+  // ================================================== ( Primary Tree )
+  0. (return) Return publicly available Phylocanvas module
+    - added Clade as publicly avail mod
+  1. (Tree) Canvas Variables; Event Listeners and Functions
+    1CLD: define "clades" object to fill with clade bounds and data from DB
+    1SCF: set clades function, used to import clade XY bounds for drawing polygons/text around bounds
+    1DRW: draw on canvas (scale bar) ********** TODO: add 50% opacity white fill box behind scale **********
 
-26 -
-  26DLN - draw leaf node
+  // ================================================== (  )
+  2. (Utils) Export required utilities
+  3. (canvas2)
+  4. (dom)/(dom2)
+  5. (events)/(events2)
+  6. (constants)/(constants2)
+  7. (Branch) Per branch rendering functions
+    7SCP: set click parameters (bounds for mouse detection)
+    7SND: set node bounded dimensions (on mouseover dimensions)
+    7SHD: set highlight dimensions
+    7GLS: get label start x
+    7BDP: branch decimal places (set to whole number)
+  8. (treeTypes)
 
-27 - floating tooltips for mouse over internal nodes
-  27CNT - child node tooltips
+  // ================================================== ( Renderers )
+  9. (rectangular)
+  10. (BranchRenderer) draws a branch
+  11. (Prerenderer)
+  12. (branchRenderer) draws tree at every canvas event
+    12FIN: fill internal nodes
+  13. (prerenderer)
+  14. (circular)
+  15. (branchRenderer)
+  16. (prerenderer)
+  17. (radial)
+  18. (branchRenderer)
+  19. (prerenderer)
+  20. (diagonal)
+  21. (branchRenderer)
+  22. (prerenderer)
+  23. (hierarchical)
+  24. (branchRenderer)
+  25. (prerenderer)
+  26. (nodeRenderers)
+    26DLN: draw leaf node
+
+  // ================================================== (  )
+  27. (Tooltip) floating tooltips for mouse over internal nodes
+    27CNT: child node tooltips
+  28. (parsers)
+  29. (Parser)
+  30. (newick)
+  31. (nexus)
+
+  // ================================================== (  )
+  32. (Clade) Custom Clades webpack
+  33. (CladeRenderer)
 */
+
+
+/*
+  Interactive functionality. Describes desired or intended interactive functionality
+  for each object in phylocanvas. Actions for each object include clicking, mouse in,
+  mouse out, right click, scroll wheel up/down/click, and keyboard shortcuts.
+
+  + branch (lines and nodes)
+    + click
+      - select branch
+      - return ["selected", <all connected leaves and clades>]
+    + right click
+      + context menu
+        - rebuild tree from branch
+        - 
+    + mouse over
+      - 
+  + leaves (nodes and labels)
+    + click
+      - 
+    + right click
+      - 
+    + mouse over
+      - 
+*/
+
+
+/*
+  Viewable functionality. Describes viewable drawn elements on the canvas such as
+  mouse tracked popup windows, or stationary clade windows.
+
+  + Personal Sample Stats Window
+    - all owned samples
+    - included m-types
+  + Mouse Follow Div (context window for mouse over)
+    - Branch
+    - Leaves
+  + Clade Window
+    + inate context for each clade
+      - Clade Name (M-type)
+      - clade reference
+      - reference assembly stats
+*/
+
+
+/*
+  Output. Initial and per draw output for querying DB and returning sample/clade data.
+
+  + Initial Draw
+    - all sample node [x, y, length] stats
+    - list of samples associated with "user/group"
+  + Every Draw
+    - "selected/hover/null"
+    - mouse over object
+*/
+
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -90,6 +192,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
+  var _Clade = __webpack_require__(32);
+
+  var _Clade2 = _interopRequireDefault(_Clade);
+
 	var _Prerenderer = __webpack_require__(11);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
@@ -140,6 +246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.Tree = _Tree2.default;
 	exports.Branch = _Branch2.default;
+  exports.Clade = _Clade2.default;
 	exports.Prerenderer = _Prerenderer2.default;
 	exports.Tooltip = _Tooltip2.default;
 	exports.Parser = _Parser2.default;
@@ -167,7 +274,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function createTree(element) {
 	  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
 	  return new _Tree2.default(element, config);
 	}
 
@@ -190,6 +296,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Branch = __webpack_require__(7);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
+
+  var _Clade = __webpack_require__(32);
+
+  var _Clade2 = _interopRequireDefault(_Clade);
 
 	var _Tooltip = __webpack_require__(27);
 
@@ -261,6 +371,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @type Array.<Branch>
 	     */
 	    this.leaves = [];
+
+      // 1CLD - clades list init
+      this.clades = [];
 
 	    /**
 	     * The root node of the tree
@@ -819,6 +932,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 
 	  }, {
+      // 1SCF - Set Clade Function
+      key: 'addClade',
+      value: function setClades(id, xStart, xWidth, yStart, yHeight) {
+        let clade = new _Clade2.default();
+        clade.setTree(this)
+        clade.setId(id)
+        clade.setBounds(xStart, xWidth, yStart, yHeight)
+	      this.clades.push(clade);
+      }
+    }, {
+      // 1SCF - Set Clade Function
+      key: 'clearClades',
+      value: function setClades() {
+	      this.clades = []
+      }
+    }, {
 	    key: 'setInitialCollapsedBranches',
 
 
@@ -855,6 +984,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _root;
 
 	      return (_root = this.root).clicked.apply(_root, _toConsumableArray(translateClick(event, this)));
+	    }
+
+	    /**
+	     * @returns {Branch[]} Selected leaves
+	     */
+
+	  }, {
+	    key: 'getCladeAtMousePosition',
+	    value: function getCladeAtMousePosition(event) {
+        return this.clades.filter(x => x.clicked.apply(x, _toConsumableArray(translateClick(event, x.tree))))[0];
 	    }
 
 	    /**
@@ -904,9 +1043,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.dragging = false;
 	          return;
 	        }
-
 	        if (!this.root) return false;
 	        node = this.getNodeAtMousePosition(e);
+          let cd = this.getCladeAtMousePosition(e);
+          if (cd) {
+//THIS
+            console.log(cd.id)
+          }
 	        var isMultiSelectActive = this.multiSelect && (e.metaKey || e.ctrlKey);
 	        if (node && node.interactive) {
 	          if (isMultiSelectActive) {
@@ -952,7 +1095,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function drag(event) {
 	      // get window ratio
 	      var ratio = getPixelRatio(this.canvas);
-
+        setCursorDragging(this.containerElement)
 	      if (!this.drawn) return false;
 
 	      if (this.pickedup) {
@@ -968,7 +1111,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // hover
 	        var e = event;
 	        var nd = this.getNodeAtMousePosition(e);
-
+          let cd = this.getCladeAtMousePosition(e);
+          // pointer type
+          if (cd || nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
+	          this.containerElement.style.cursor = 'pointer';
+          } else {
+	          this.containerElement.style.cursor = 'auto';
+          }
+          // highlight
+          if (cd) {
+            this.clades.filter(x => x.hovered).forEach(function (clade) {clade.hovered = false})
+            cd.hovered = true
+          } else {
+            this.clades.filter(x => x.hovered).forEach(function (clade) {clade.hovered = false})
+          }
 	        if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
 	          this.root.cascadeFlag('hovered', false);
 	          nd.hovered = true;
@@ -976,15 +1132,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (!nd.leaf && !nd.hasCollapsedAncestor()) {
 	            this.tooltip.open(e.clientX, e.clientY, nd);
 	          }
-	          this.containerElement.style.cursor = 'pointer';
 	        } else {
 	          this.tooltip.close();
 	          this.root.cascadeFlag('hovered', false);
 	          if (this.shiftKeyDrag && e.shiftKey) {
 	            setCursorDrag(this.containerElement);
-	          } else {
-	            this.containerElement.style.cursor = 'auto';
-	          }
+            }
 	        }
 	        this.draw();
 	      }
@@ -1020,39 +1173,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.fitInPanel();
 	        }
 	      }
+        // resize canvas for interactive tree draw
 	      var pixelRatio = getPixelRatio(this.canvas);
 	      this.canvas.lineWidth = this.lineWidth / this.zoom;
 	      this.canvas.translate(this.offsetx * pixelRatio, this.offsety * pixelRatio);
 	      this.canvas.scale(this.zoom, this.zoom);
+        this.clades.forEach(function (clade) {
+          clade.draw()
+        });
 	      this.branchRenderer.render(this, this.root);
-
 	      this.highlighters.forEach(function (render) {
 	        return render();
 	      });
-
 	      this.drawn = true;
-
+        // restore canvas to original size
 	      this.canvas.restore();
-
         // 1DRW - draw on canvas
-          //this.canvas.fillRect(20, this.canvas.canvas.height - 50, 300, 30)
-          // draw scale frame
-	        this.canvas.beginPath();
-    	    this.canvas.moveTo(20, this.canvas.canvas.height - 20);
-    	    this.canvas.lineTo(20, this.canvas.canvas.height - 40);
-    	    this.canvas.lineTo(320, this.canvas.canvas.height - 40);
-    	    this.canvas.lineTo(320, this.canvas.canvas.height - 20);
-    	    this.canvas.stroke();
-          // draw scale text
-          let tmpTxt = [this.canvas.font, this.canvas.textAlign]
-          this.canvas.font = "20px " + tmpTxt[0].split(" ")[1]
-          this.canvas.textAlign = "center"
-          this.canvas.fillText((300 / this.branchScalar / this.zoom).toFixed(2), 160, this.canvas.canvas.height - 20)
-          this.canvas.font = tmpTxt[0]
-          this.canvas.textAlign = tmpTxt[1]
-    	    this.canvas.closePath();
-        //
-
+        //this.canvas.fillRect(20, this.canvas.canvas.height - 50, 300, 30)
+        // draw scale frame
+	      this.canvas.beginPath();
+    	  this.canvas.moveTo(20, this.canvas.canvas.height - 20);
+        this.canvas.lineTo(20, this.canvas.canvas.height - 40);
+  	    this.canvas.lineTo(320, this.canvas.canvas.height - 40);
+  	    this.canvas.lineTo(320, this.canvas.canvas.height - 20);
+    	  this.canvas.stroke();
+        // draw scale text
+        //this.canvas.font = "20px " + tmpTxt[0].split(" ")[1]
+        //this.canvas.textAlign = "center"
+        this.canvas.fillText((300 / this.branchScalar / this.zoom).toFixed(2), 160, this.canvas.canvas.height - 20)
+        //this.canvas.font = tmpTxt[0]
+        //this.canvas.textAlign = tmpTxt[1]
+  	    this.canvas.closePath();
 	    }
 
 	    /**
@@ -1071,7 +1222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (event.button === 0) {
 	          this.pickedup = true;
-	          setCursorDragging(this.containerElement);
+	          //setCursorDragging(this.containerElement);
 	        }
 
 	        this.startx = event.clientX;
@@ -1091,7 +1242,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.shiftKeyDrag && event.shiftKey) {
 	        setCursorDrag(this.containerElement);
 	      } else {
-	        this.containerElement.style.cursor = 'auto';
+          this.drag(event)
+	        //this.containerElement.style.cursor = 'auto';
 	      }
 	    }
 
@@ -1289,6 +1441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
+
 	      var _iteratorNormalCompletion7 = true;
 	      var _didIteratorError7 = false;
 	      var _iteratorError7 = undefined;
@@ -1434,6 +1587,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        _this2.loadCompleted();
 	      });
+        
 	    }
 
 	    /**
@@ -2783,7 +2937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
         // 7SCP - set click parameters (bounds for mouse detection)
         // check root branch first
-        else if (this == tree.root && x < this.startx+bw && x > this.startx-100 && y < this.starty+bw && y > this.starty-bw) {
+        else if (this == this.tree.root && x < this.startx+bw && x > this.startx-100 && y < this.starty+bw && y > this.starty-bw) {
           return this;
         // check any other branch
         } else if (x < this.startx+bw && x > this.startx-bw && y < this.centery+bw && y > this.starty-bw || x < this.startx+bw && x > this.startx-bw && y < this.starty+bw && y > this.centery-bw || x < this.centerx+bw && x > this.startx-bw && y < this.centery+bw && y > this.centery-bw) {
@@ -3027,7 +3181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var radius = this.getHighlightRadius();
 
         // 7SHD - set internal node highlight highlight dimensions
-        if (this == tree.root) {
+        if (this == this.tree.root) {
 	        this.canvas.beginPath();
     	    this.canvas.moveTo(this.startx - (tree.baseNodeSize * 2 / 3), this.starty);
     	    this.canvas.lineTo(this.startx - 100, this.starty);
@@ -3038,40 +3192,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.canvas.stroke();
 	        this.canvas.closePath();
         } else {
-	      this.canvas.beginPath();
-        if (this.starty > centerY) {
-    	    this.canvas.moveTo(this.startx, this.starty - Math.min(this.starty - centerY, tree.baseNodeSize * 2 / 3));
-        } else {
-    	    this.canvas.moveTo(this.startx, this.starty + Math.min(centerY - this.starty, tree.baseNodeSize * 2 / 3));
-        }
-    	  this.canvas.lineTo(this.startx, centerY);
-	      this.canvas.stroke();
-	      this.canvas.closePath();
+	        this.canvas.beginPath();
+          if (this.starty > centerY) {
+    	      this.canvas.moveTo(this.startx, this.starty - Math.min(this.starty - centerY, this.tree.baseNodeSize * 2 / 3));
+          } else {
+    	      this.canvas.moveTo(this.startx, this.starty + Math.min(centerY - this.starty, this.tree.baseNodeSize * 2 / 3));
+          }
+      	  this.canvas.lineTo(this.startx, centerY);
+  	      this.canvas.stroke();
+  	      this.canvas.closePath();
 
 
-	      this.canvas.beginPath();
-    	  if (Math.abs(this.starty - centerY) < tree.baseNodeSize * 2 / 3)  {
-    	    this.canvas.moveTo(this.startx + Math.min(centerX - this.startx, tree.baseNodeSize * 2 / 3), this.starty);
-        } else {
-          this.canvas.moveTo(this.startx, centerY);
-        }
-        if (this.leaf) {
-    	    this.canvas.lineTo(centerX - tree.baseNodeSize, centerY);
-        } else {
-    	    this.canvas.lineTo(centerX - (tree.baseNodeSize * 2 / 3), centerY);
-        }
-	      this.canvas.stroke();
-	      this.canvas.closePath();
+  	      this.canvas.beginPath();
+      	  if (Math.abs(this.starty - centerY) < this.tree.baseNodeSize * 2 / 3)  {
+      	    this.canvas.moveTo(this.startx + Math.min(centerX - this.startx, this.tree.baseNodeSize * 2 / 3), this.starty);
+          } else {
+            this.canvas.moveTo(this.startx, centerY);
+          }
+          if (this.leaf) {
+      	    this.canvas.lineTo(centerX - this.tree.baseNodeSize, centerY);
+          } else {
+      	    this.canvas.lineTo(centerX - (this.tree.baseNodeSize * 2 / 3), centerY);
+          }
+  	      this.canvas.stroke();
+  	      this.canvas.closePath();
 
 
-	      this.canvas.beginPath();
-        if (this.leaf) {
-	        this.canvas.arc(centerX, centerY, tree.baseNodeSize, 0, Angles.FULL, false);
-        } else {
-	        this.canvas.arc(centerX, centerY, tree.baseNodeSize * 2 / 3, 0, Angles.FULL, false);
-        }
-	      this.canvas.stroke();
-	      this.canvas.closePath();
+  	      this.canvas.beginPath();
+          if (this.leaf) {
+  	        this.canvas.arc(centerX, centerY, this.tree.baseNodeSize, 0, Angles.FULL, false);
+          } else {
+  	        this.canvas.arc(centerX, centerY, this.tree.baseNodeSize * 2 / 3, 0, Angles.FULL, false);
+          }
+  	      this.canvas.stroke();
+  	      this.canvas.closePath();
         }
 	      //this.canvas.arc(centerX, centerY, radius, 0, Angles.FULL, false);
 
@@ -5391,6 +5545,173 @@ return /******/ (function(modules) { // webpackBootstrap
 	  fileExtension: fileExtension,
 	  validator: validator
 	};
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _utils = __webpack_require__(2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * A Clade of the tree.
+	 *
+	 * @class
+	 */
+
+	var Clade = function () {
+	  function Clade() {
+	    _classCallCheck(this, Clade);
+
+      // xStart, xWidth, yStart, yHeight parameters for draw and click bounds
+	    this.xStart = 0;
+      this.xWidth = 0;
+      this.yStart = 0;
+      this.yHeight = 0;
+
+      // id for DB access via clade return
+      this.id = '';
+
+      // hovered for additional draw if mouse over
+      this.hovered = false;
+
+      // tree reference
+      this.tree = null;
+
+      // clade draw gradient
+      this.grd = null;
+
+      // for saving canvas stack before use
+      this.style = null;
+
+	  }
+	  _createClass(Clade, [{
+	    key: 'clicked',
+	    value: function clicked(x, y) {
+        if (this.id === "ALL") {
+          return
+        }
+	      if (x > this.xStart && x < this.xStart + this.xWidth && y > this.yStart && y < this.yStart + this.yHeight) {
+	        return this;
+	      } else {
+          return null;
+        }
+	    }
+	  }, {
+	    key: 'setBounds',
+	    value: function setBounds(xStart, xWidth, yStart, yHeight) {
+  	    this.xStart = xStart;
+        this.xWidth = xWidth;
+        this.yStart = yStart - 3;
+        this.yHeight = yHeight + 6;
+        this.setGrd()
+      }
+	  }, {
+	    key: 'setId',
+	    value: function setId(str) {
+	      this.id = str;
+	    }
+	  }, {
+      key: 'setTree',
+      value: function setTree(tree) {
+        this.tree = tree
+      }
+    }, {
+      key: 'setGrd',
+      value: function setGrd() {
+        this.grd = this.tree.canvas.createLinearGradient(this.xStart*this.getBranchScale(), this.yStart, this.xStart*this.getBranchScale() + this.xWidth, this.yStart);
+        this.grd.addColorStop(0, "#e0fcff");
+        this.grd.addColorStop(1, "#abf8ff");
+      }
+    }, {
+      key: 'getBranchScale',
+      value: function getBranchScale() {
+        return this.tree.branchScalar/this.tree.initialBranchScalar;
+      }
+    }, {
+      key: 'saveCanvas',
+      value: function saveCanvas() {
+        this.style = {}
+        for (let i of ['strokeStyle','fillStyle','lineWidth','lineCap','lineJoin','font','textAlign','textBaseline','direction']) {
+          this.style[i] = this.canvas[i]
+        }
+      }
+    }, {
+      key: 'restoreCanvas',
+      value: function restoreCanvas() {
+        for (let i in this.style) {
+          this.canvas[i] = this.style[i]
+        }
+        this.style = null
+      }
+    }, {
+      // initial clade draw
+	    key: 'draw',
+	    value: function draw() {
+        if (this.id === "ALL") {
+          return
+        }
+        // save font
+        this.saveCanvas()
+        this.canvas.font = "15px " + this.tree.font
+        // clade box color gradient
+        this.canvas.fillStyle = this.grd;
+        // fill clade box
+        this.canvas.fillRect(this.xStart*this.getBranchScale(), this.yStart, this.xWidth, this.yHeight)
+        // fill clade text
+        this.canvas.fillStyle = 'black';
+        this.canvas.textAlign = 'right'
+        this.canvas.textBaseline = 'hanging'
+        this.canvas.fillText(this.id, this.xStart*this.getBranchScale() + this.xWidth - 10, this.yStart)
+
+        if (this.isHovered) {
+          this.drawHighlight()
+        }
+
+        // restore font
+        this.restoreCanvas()
+	    }
+	  }, {
+      // initial clade draw
+	    key: 'drawHighlight',
+	    value: function drawHighlight() {
+        if (this.id === "ALL") {
+          return
+        }
+
+	      this.canvas.strokeStyle = this.tree.highlightColour;
+	      this.canvas.lineWidth = this.tree.highlightWidth/this.tree.zoom;
+        this.canvas.rect(this.xStart, this.yStart, this.xWidth, this.yHeight);
+        this.canvas.stroke();
+
+	    }
+	  }, {
+	    key: 'isHovered',
+	    get: function get() {
+	      return this.hovered;
+	    }
+	  }, {
+	    key: 'canvas',
+	    get: function get() {
+	      return this.tree.canvas;
+	    }
+	  }]);
+
+	  return Clade;
+	}();
+
+	exports.default = Clade;
 
 /***/ }])
 });

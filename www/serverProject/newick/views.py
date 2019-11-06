@@ -188,8 +188,21 @@ class DemoPrevHarmView(LoginRequiredMixin, generic.ListView):
         amr['region'][region][line['bacteria'] + "::" + line['drug']][line['date']].append([line['tested'], line['susceptible']])
     return amr
 '''
+
+class DemoBioModView(LoginRequiredMixin, generic.ListView):
+  template_name = 'demo/demoBioMod.html'
+  context_object_name = 'demoBioMod'
+  def get_queryset(self):
+    query = {}
+    query["gas"] = {}
+    samples = json.loads(serializers.serialize('json', GAS.objects.all()))
+    for line in samples:
+      query["gas"][line["pk"]] = line["fields"]
+    return query
+
 class TestView(LoginRequiredMixin, generic.ListView):
 #class IndexView(generic.ListView):
   template_name = 'newick/test.html'
   def get_queryset(self):
     return ""
+

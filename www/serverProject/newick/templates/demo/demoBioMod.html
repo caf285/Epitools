@@ -1,0 +1,188 @@
+{% extends "demo/demo.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+  {% load static %}
+
+  <!-- CSS -->
+
+  <!-- Javascript -->
+  <script src="{% static '/newick/js/trees.js' %}"></script>
+  <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
+  <script>
+    // load database
+    var DB = {{ demoBioMod | safe }}
+    var groups = []
+    {% for group in user.groups.all %}
+      groups.push("{{ group.name }}")
+    {% endfor %}
+    function getCladeXY(master) {
+      let cladeBounds = {}
+      if (document.getElementById("gasMtypeButton").innerHTML === "ALL") {
+        console.log(trees)
+        for (clade in trees[master]) {
+          cladeBounds[clade] = [Infinity, Infinity, 0]
+          sample = []
+          for (i of trees[master][clade]) {
+            if (['(', ')', ',', ':'].indexOf(i) === -1) {
+              sample.push(i)
+            } else {
+              sample = sample.join("")
+              if (Object.keys(tree.branches).filter(x => x.toLowerCase() !== "reference").indexOf(sample) > -1) {
+                if (tree.branches[sample]['centerx'] < cladeBounds[clade][0]) {
+                  cladeBounds[clade][0] = tree.branches[sample]['centerx']
+                }
+                if (tree.branches[sample]['centery'] < cladeBounds[clade][1]) {
+                  cladeBounds[clade][1] = tree.branches[sample]['centery']
+                }
+                if (tree.branches[sample]['centery'] > cladeBounds[clade][2]) {
+                  cladeBounds[clade][2] = tree.branches[sample]['centery']
+                }
+              }
+              sample = []
+            }
+          }
+          cladeBounds[clade][2] = cladeBounds[clade][2] - cladeBounds[clade][1]
+          tree.addClade(clade, cladeBounds[clade][0], 500, cladeBounds[clade][1], cladeBounds[clade][2])
+        }
+        console.log(cladeBounds)
+      }
+      return cladeBounds
+    }
+
+    function updateSampleNames() {
+      let fields = Array.from(document.getElementsByClassName("sampleNamesCheck")).filter(x => x.checked).map(x => x.name)
+      console.log(fields)
+      for (sample of tree.leaves) {
+        let newName = []
+        for (field of fields) {
+          try {
+            if (field === "id") {
+              newName.push(sample.id)
+            } else if (DB.gas[sample.id][field] === "" ) {
+              newName.push("_")
+            } else {
+                    newName.push(DB.gas[sample.id][field])
+            }
+          } catch {
+            newName.push("_")
+          }
+        }
+        sample.label = newName.join("::")
+      }
+    }
+
+    function fullDraw() {
+      for (var branch in tree.branches) {
+        //console.log(DB.gas[branch], branch)
+        if (DB.gas[branch] && groups.indexOf(DB.gas[branch].facility) >= 0) { 
+          tree.branches[branch].colour = "red"
+        }
+      }
+      updateSampleNames()
+      tree.draw()
+    }
+  </script>
+{% endblock %}
+
+
+{% block sideContent %}
+{% endblock %}
+
+{% block BioMod %}
+  <!-- DEVELOPE BIOMOD HERE -->
+  <div class="biomod biomod-container">
+    <div class="biomod biomod-options">
+      Master Reference:
+      <div class="dropdown">
+        <button id="masterButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+        <div id="masterDropdown" class="dropdown-menu">
+        </div>
+      </div>
+      </br>
+
+      M-Type:
+      <div class="dropdown">
+        <button id="gasMtypeButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+        <div id="gasMtypeDropdown" class="dropdown-menu">
+        </div>
+      </div>
+      </br>
+
+      Sample Names:
+      <div class="dropdown">
+        <button class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sample Names</button>
+        <div id="samplesDropdown" class="dropdown-menu dropdown-menu">
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="id"> Sample Name&nbsp;<br>
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="tg"> TG Number&nbsp;<br>
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="az" checked> AZ Number&nbsp;<br>
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="mType" checked> M-Type&nbsp;<br>
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="facility"> Facility Name&nbsp;<br>
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="collectionDate" checked> Collection Date&nbsp;<br>
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="sequenceDate"> Sequence Date&nbsp;<br>
+        </div>
+      </div>
+      </br>
+
+      Zoom:
+      <input type="range" min=1 max=20 value=1 oninput="tree.zoom = this.value/10; tree.draw()">
+      </br>
+
+      Base Node Size:
+      <input type="range" min=0 max=50 value=0 oninput="tree.baseNodeSize = this.value/2; tree.draw()">
+      </br>
+
+      Leaf Text Size:
+      <input  type="range" min=1 max=50 value=1 oninput="tree.textSize = this.value; tree.draw()">
+      </br>
+
+      Branch Text Size:
+      <input type="range" min=1 max=50 value=1 oninput="tree.canvas.font = this.value + 'px ' + tree.canvas.font.split(' ')[1]; tree.draw()">
+      </br>
+
+      Branch Scale:
+      <input type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
+      </br>
+
+      Line Width:
+      <input type="range" min=1 max=20 value=1 oninput="tree.lineWidth = this.value/2; tree.draw()">
+      </br>
+    </div>
+    <div class="biomod biomod-content">
+      <div class="biomod biomod-row">
+        <div class="biomod biomod-module" id="phylocanvas">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- -->
+{% endblock %}
+
+{% block mainContent %}
+    <script>
+      var tree = Phylocanvas.default.createTree('phylocanvas')
+      tree.baseNodeSize = 2
+      tree.setTreeType('rectangular')
+      tree.showBranchLengthLabels = true
+      for (var i in trees) {
+        document.getElementById("masterDropdown").innerHTML += "<a class='dropdown-item' onclick='resetM(\"" + i + "\")'>" + i + "</a>"
+      }
+      function resetM(i) {
+        document.getElementById("masterButton").innerHTML = i
+        document.getElementById("gasMtypeButton").innerHTML = "ALL"
+        tree.load(trees[i]["ALL"])
+        getCladeXY(i)
+        fullDraw()
+        document.getElementById("gasMtypeDropdown").innerHTML = ""
+        for (var j in trees[i]) {
+         document.getElementById("gasMtypeDropdown").innerHTML  += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[i][j] + "\");tree.setClades(getCladeXY(\"" + i + "\")); fullDraw()'>" + j.substring(0,30) + "</a>"
+        }
+      }
+      resetM(Object.keys(trees)[0])
+
+    </script>
+{% endblock %}
+

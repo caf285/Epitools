@@ -115,7 +115,7 @@ def main():
         line = line.split(",")
         print(line)
         Facility.objects.get_or_create(id=line[0], type=FacilityType.objects.filter(type1=line[1].split("::")[0], type2=line[1].split("::")[-1])[0], capacity=line[2], certification=line[3], mpc=MPC.objects.filter(id=line[4])[0], address=line[5], zip=line[6], phone=line[7], fax=line[8], lat=line[9], lon=line[10])
-
+    '''
     ##### Group A Strep
     # GAS
     if model == "GAS":
@@ -128,8 +128,8 @@ def main():
         try:
           GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate=line[3], facility=Facility.objects.filter(id=line[4])[0], r1=line[5], r2=line[6], sequenceDate=line[7], m1=line[8], mType=line[9])
         except:
-          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], facility=Facility.objects.filter(id=line[4])[0], r1=line[5], r2=line[6], sequenceDate=line[7], m1=line[8], mType=line[10])
-
+          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate="2000-01-01", facility=Facility.objects.filter(id=line[4])[0], r1=line[5], r2=line[6], sequenceDate=line[7], m1=line[8], mType=line[9])
+    '''
     ##### Prevent HAARM
     # Bacteria
     if model == "Bacteria":
@@ -160,7 +160,6 @@ def main():
         line = line.split(",")
         print(line)
         CollectionMethod.objects.get_or_create(id=line[0], sterile=line[1])
-    '''
     # AMR
     if model == "AMR":
       for x in AMR.objects.all():
@@ -181,6 +180,6 @@ def main():
         print(line)
         tempAMR = line[1].split("::")
         Resistance.objects.get_or_create(amr=AMR.objects.filter(facility=tempAMR[0], bacteria=tempAMR[1], site=tempAMR[2], year=tempAMR[3], month=tempAMR[4])[0], antibiotic=Antibiotic.objects.filter(id=line[2])[0], pTested=line[3].split("%")[0], nTested=line[4], pSusceptible=line[5].split("%")[0], nSusceptible=line[6])
-
+    '''
 if __name__ == "__main__":
   main()

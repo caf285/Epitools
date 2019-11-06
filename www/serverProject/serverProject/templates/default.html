@@ -20,12 +20,12 @@
   {% endblock %}
 
 </head>
-<body class="bg-dark">
+<body>
   <div id="container">
 
     <!-- HEADER () -->
     <div id="header">
-      <nav class="navbar navbar-expand navbar-dark bg-dark">
+      <nav class="navbar navbar-expand">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -40,6 +40,7 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <a class="dropdown-item" href="/demo/prevharm/">Prevent HAARM</a>
                   <a class="dropdown-item" href="/demo/gas/">Group A Strep</a>
+                  <a class="dropdown-item" href="/demo/biomod/">BioMod Modules</a>
                 </div>
               </li>
               <!-- <li class="nav-item {% block demo %}{% endblock %}"><a class="nav-link" href="/demo/" target="_blank">Demo</a></li> -->
@@ -59,6 +60,9 @@
       </nav>
     </div>
 
+    <!-- BIOMOD -->
+    {% block BioMod %}{% endblock %}
+
     <!-- CONTENT -->
     <div id="content">                                                                                                            
       <div id="sideWindow" class="tog">
@@ -73,12 +77,12 @@
     </div>
 
     <!-- FOOTER -->
-    <div class="bg-dark" id="footer">
+    <div class="navbar" id="footer">
       {% if user.is_authenticated %}
-        <div style="float: left; text-transform: lowercase;">{{ user.get_username }}</div>, last login: {{ user.last_login }}
+        <div class="navbar-text" style="float: left; text-transform: lowercase;">{{ user.get_username }}, last login: {{ user.last_login }}</div>
       {% endif %} 
       {% block footer %}{% endblock %}
-      <div id="cr"> © All Rights Reserved TGen North</div>
+      <div class="navbar-text" id="cr"> © All Rights Reserved TGen North</div>
     </div>
 
   </div>

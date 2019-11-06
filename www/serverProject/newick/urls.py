@@ -9,8 +9,6 @@ urlpatterns = [
   path('newick/test', views.TestView.as_view(), name='testView'),
   path('demo/prevharm/', views.DemoPrevHarmView.as_view(), name='demoPrevHarm'),
   path('demo/gas/', views.DemoGASView.as_view(), name='demoGAS'),
-#  path('demo/antibiogram/', views.DemoAntibiogramView.as_view(), name='demoAntibiogram'),
-#  path('demo/query/', views.DemoQueryView.as_view(), name='demoQuery'),
-#  path('demo/emmtype/', views.DemoEmmtypeView.as_view(), name='demoEmmtype'),
+  path('demo/biomod/', views.DemoBioModView.as_view(), name='demoBioMod'),
 ]
 
