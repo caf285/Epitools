@@ -934,17 +934,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
       // 1SCF - Set Clade Function
       key: 'addClade',
-      value: function setClades(id, xStart, xWidth, yStart, yHeight) {
+      value: function addClade(id, xStart, xWidth, yStart, yHeight, nwk) {
         let clade = new _Clade2.default();
-        clade.setTree(this)
-        clade.setId(id)
-        clade.setBounds(xStart, xWidth, yStart, yHeight)
+        clade.setTree(this);
+        clade.setId(id);
+        clade.setBounds(xStart, xWidth, yStart, yHeight);
+        clade.setNwk(nwk);
 	      this.clades.push(clade);
       }
     }, {
       // 1SCF - Set Clade Function
       key: 'clearClades',
-      value: function setClades() {
+      value: function clearClades() {
 	      this.clades = []
       }
     }, {
@@ -993,7 +994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getCladeAtMousePosition',
 	    value: function getCladeAtMousePosition(event) {
-        return this.clades.filter(x => x.clicked.apply(x, _toConsumableArray(translateClick(event, x.tree))))[0];
+        return this.clades.filter(x => x.mouseOver.apply(x, _toConsumableArray(translateClick(event, x.tree))))[0];
 	    }
 
 	    /**
@@ -1045,10 +1046,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (!this.root) return false;
 	        node = this.getNodeAtMousePosition(e);
-          let cd = this.getCladeAtMousePosition(e);
-          if (cd) {
-//THIS
-            console.log(cd.id)
+          let cld = this.getCladeAtMousePosition(e);
+          if (cld) {
+            cld.clicked()
           }
 	        var isMultiSelectActive = this.multiSelect && (e.metaKey || e.ctrlKey);
 	        if (node && node.interactive) {
@@ -1111,17 +1111,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // hover
 	        var e = event;
 	        var nd = this.getNodeAtMousePosition(e);
-          let cd = this.getCladeAtMousePosition(e);
+          let cld = this.getCladeAtMousePosition(e);
           // pointer type
-          if (cd || nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
+          if (cld || nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
 	          this.containerElement.style.cursor = 'pointer';
           } else {
 	          this.containerElement.style.cursor = 'auto';
           }
           // highlight
-          if (cd) {
+          if (cld) {
             this.clades.filter(x => x.hovered).forEach(function (clade) {clade.hovered = false})
-            cd.hovered = true
+            cld.hovered = true
           } else {
             this.clades.filter(x => x.hovered).forEach(function (clade) {clade.hovered = false})
           }
@@ -1150,20 +1150,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 
 	  }, {
+      // 1DRW - draw on canvas
 	    key: 'draw',
 	    value: function draw(forceRedraw) {
-
 	      this.highlighters.length = 0;
-
 	      if (this.maxBranchLength === 0) {
 	        this.loadError(new Error('All branches in the tree are identical.'));
 	        return;
 	      }
-
+        // clear canvas
 	      this.canvas.clearRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
 	      this.canvas.lineCap = 'round';
 	      this.canvas.lineJoin = 'round';
-
 	      this.canvas.strokeStyle = this.branchColour;
 	      this.canvas.save();
 
@@ -1173,6 +1171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.fitInPanel();
 	        }
 	      }
+
         // resize canvas for interactive tree draw
 	      var pixelRatio = getPixelRatio(this.canvas);
 	      this.canvas.lineWidth = this.lineWidth / this.zoom;
@@ -1188,28 +1187,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.drawn = true;
         // restore canvas to original size
 	      this.canvas.restore();
-        // 1DRW - draw on canvas
-        //this.canvas.fillRect(20, this.canvas.canvas.height - 50, 300, 30)
-        // draw scale frame
+        this.drawScale();
+	    }
+	  }, {
+	    key: 'drawScale',
+	    value: function drawScale() {
+        this.canvas.save();
+        this.canvas.fillStyle = "rgba(255, 255, 255, 0.75)"
+        this.canvas.font = "24px " + this.font
+        this.canvas.textAlign = "center"
+        this.canvas.fillRect(15, this.canvas.canvas.height - 70, 460, 55)
+
+        this.canvas.fillStyle = "#000"
 	      this.canvas.beginPath();
-    	  this.canvas.moveTo(20, this.canvas.canvas.height - 20);
-        this.canvas.lineTo(20, this.canvas.canvas.height - 40);
-  	    this.canvas.lineTo(320, this.canvas.canvas.height - 40);
-  	    this.canvas.lineTo(320, this.canvas.canvas.height - 20);
+    	  this.canvas.moveTo(25, this.canvas.canvas.height - 25);
+        this.canvas.lineTo(25, this.canvas.canvas.height - 60);
+  	    this.canvas.lineTo(465, this.canvas.canvas.height - 60);
+  	    this.canvas.lineTo(465, this.canvas.canvas.height - 25);
     	  this.canvas.stroke();
-        // draw scale text
-        //this.canvas.font = "20px " + tmpTxt[0].split(" ")[1]
-        //this.canvas.textAlign = "center"
-        this.canvas.fillText((300 / this.branchScalar / this.zoom).toFixed(2), 160, this.canvas.canvas.height - 20)
-        //this.canvas.font = tmpTxt[0]
-        //this.canvas.textAlign = tmpTxt[1]
   	    this.canvas.closePath();
+
+        this.canvas.fillText((440 / this.branchScalar / this.zoom).toFixed(2), 245, this.canvas.canvas.height - 30)
+        this.canvas.restore();
 	    }
 
 	    /**
-	     * Mousedown event listener
-	     *
-	     * @param {MouseEvent} event
+	     * mouseup event listener.
 	     */
 
 	  }, {
@@ -1229,11 +1232,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.starty = event.clientY;
 	      }
 	    }
-
-	    /**
-	     * mouseup event listener.
-	     */
-
 	  }, {
 	    key: 'drop',
 	    value: function drop(event) {
@@ -1566,6 +1564,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      root.id = 'root';
 	      this.branches.root = root;
 	      this.setRoot(root);
+
+        this.clearClades()
 
 	      parser.parse({ formatString: formatString, root: root, options: options }, function (error) {
 	        if (error) {
@@ -5595,18 +5595,26 @@ return /******/ (function(modules) { // webpackBootstrap
       // for saving canvas stack before use
       this.style = null;
 
+      this.nwk = ""
+
 	  }
 	  _createClass(Clade, [{
-	    key: 'clicked',
-	    value: function clicked(x, y) {
+	    key: 'mouseOver',
+	    value: function mouseOver(x, y) {
         if (this.id === "ALL") {
           return
         }
-	      if (x > this.xStart && x < this.xStart + this.xWidth && y > this.yStart && y < this.yStart + this.yHeight) {
+	      if (x > this.xStart * this.getBranchScale() && x < this.xStart * this.getBranchScale() + this.xWidth && y > this.yStart && y < this.yStart + this.yHeight) {
 	        return this;
 	      } else {
           return null;
         }
+	    }
+	  }, {
+	    key: 'clicked',
+	    value: function clicked() {
+        console.log(this.id)
+        this.tree.load(this.nwk)
 	    }
 	  }, {
 	    key: 'setBounds',
@@ -5626,6 +5634,11 @@ return /******/ (function(modules) { // webpackBootstrap
       key: 'setTree',
       value: function setTree(tree) {
         this.tree = tree
+      }
+    }, {
+      key: 'setNwk',
+      value: function setNwk(nwk) {
+        this.nwk = nwk
       }
     }, {
       key: 'setGrd',
@@ -5683,7 +5696,6 @@ return /******/ (function(modules) { // webpackBootstrap
         this.restoreCanvas()
 	    }
 	  }, {
-      // initial clade draw
 	    key: 'drawHighlight',
 	    value: function drawHighlight() {
         if (this.id === "ALL") {
@@ -5692,8 +5704,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.canvas.strokeStyle = this.tree.highlightColour;
 	      this.canvas.lineWidth = this.tree.highlightWidth/this.tree.zoom;
-        this.canvas.rect(this.xStart, this.yStart, this.xWidth, this.yHeight);
+        this.canvas.beginPath();
+        this.canvas.rect(this.xStart * this.getBranchScale(), this.yStart, this.xWidth, this.yHeight);
         this.canvas.stroke();
+        this.canvas.closePath();
 
 	    }
 	  }, {

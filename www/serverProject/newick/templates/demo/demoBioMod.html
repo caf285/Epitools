@@ -22,7 +22,6 @@
     function getCladeXY(master) {
       let cladeBounds = {}
       if (document.getElementById("gasMtypeButton").innerHTML === "ALL") {
-        console.log(trees)
         for (clade in trees[master]) {
           cladeBounds[clade] = [Infinity, Infinity, 0]
           sample = []
@@ -45,8 +44,11 @@
               sample = []
             }
           }
-          cladeBounds[clade][2] = cladeBounds[clade][2] - cladeBounds[clade][1]
-          tree.addClade(clade, cladeBounds[clade][0], 500, cladeBounds[clade][1], cladeBounds[clade][2])
+          if (cladeBounds[clade][0] < Infinity && cladeBounds[clade][1] < Infinity && cladeBounds[clade][2] > 0) {
+            cladeBounds[clade][2] = cladeBounds[clade][2] - cladeBounds[clade][1]
+            let shortClade = clade.split("::")[0]
+            tree.addClade(shortClade, cladeBounds[clade][0], 300, cladeBounds[clade][1], cladeBounds[clade][2], trees[master][clade])
+          }
         }
         console.log(cladeBounds)
       }
@@ -103,7 +105,6 @@
         </div>
       </div>
       </br>
-
       M-Type:
       <div class="dropdown">
         <button id="gasMtypeButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
@@ -174,14 +175,17 @@
         document.getElementById("masterButton").innerHTML = i
         document.getElementById("gasMtypeButton").innerHTML = "ALL"
         tree.load(trees[i]["ALL"])
+        tree.draw()
         getCladeXY(i)
         fullDraw()
         document.getElementById("gasMtypeDropdown").innerHTML = ""
         for (var j in trees[i]) {
-         document.getElementById("gasMtypeDropdown").innerHTML  += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[i][j] + "\");tree.setClades(getCladeXY(\"" + i + "\")); fullDraw()'>" + j.substring(0,30) + "</a>"
+          console.log(j)
+          document.getElementById("gasMtypeDropdown").innerHTML += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[i][j] + "\");getCladeXY(\"" + i + "\"); fullDraw()'>" + j.substring(0,30) + "</a>"
         }
       }
-      resetM(Object.keys(trees)[0])
+      //resetM(Object.keys(trees)[0])
+      resetM('TG92300')
 
     </script>
 {% endblock %}
