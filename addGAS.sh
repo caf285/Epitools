@@ -84,12 +84,12 @@ ls /scratch/GAS/reference/ALL\:\:* | while read ref; do
 
 
     # update GAS.tsv and copy all gatk files > 80% M1 QUALITY BREADTH
-    JOBID=$(sbatch --job-name="GAS-getStats" --output="/dev/null" --time="5:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/getStats.py ${all%*-config.xml} ${refSample}; rm -r /scratch/GAS/.temp/${all} /scratch/GAS/.temp/${all%*-config.xml}")
+    JOBID=$(sbatch --job-name="GAS-getStats" --output="/dev/null" --time="5:00" --mem="100m" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/getStats.py ${all%*-config.xml} ${refSample}; rm -r /scratch/GAS/.temp/${all} /scratch/GAS/.temp/${all%*-config.xml}")
   fi
 
   #----- create bestsnp.fasta for /scratch/GAS/nasp/ALL (only if new GATK, no FASTA, or FASTA/GATK mismatch, or if -f force is in arguments)
   if (( ${JOBID##* } != 0 )); then
-    JOBID=$(sbatch --job-name="GAS-dto" --output="/dev/null" --time="1:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL\:\:${refSample}/")
+    JOBID=$(sbatch --job-name="GAS-dto" --output="/dev/null" --time="1:00" --mem="100m" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL\:\:${refSample}/")
   elif [[ ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrix_dto.xml || ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/bestsnp.fasta || ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/tree.nwk ]] || (( $(( $(cat /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/bestsnp.fasta | grep ">" | wc -l) - 1 )) != $(cat /scratch/GAS/nasp/ALL\:\:${refSample}/matrix_dto.xml | grep "gatk" | wc -l ) )) || [[ $(echo $@ | grep "\-f") ]]; then
     JOBID=$(sbatch --job-name="GAS-dto" --output="/dev/null" --time="1:00" --mem="100m" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL\:\:${refSample}/")
   fi

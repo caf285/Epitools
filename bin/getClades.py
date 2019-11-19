@@ -49,8 +49,8 @@ def main():
         gatk = []
         if os.path.exists("/scratch/GAS/nasp/" + reference[sample] + "::" + sample + "/gatk"):
           gatk = ["Reference"] + list(map(lambda x: x.split("-bwamem-gatk.vcf")[0], os.listdir("/scratch/GAS/nasp/" + reference[sample] + "::" + sample + "/gatk/")))
-        print(reference[sample] + " " + sample + " " + " ".join(list(filter(lambda x: x not in gatk, clade))))
+        #print(reference[sample] + " " + sample + " " + " ".join(list(filter(lambda x: x not in gatk, clade))))
+        print(reference[sample] + " " + sample + " " + " ".join(clade))
         break
-
 if __name__ == "__main__":
   main()

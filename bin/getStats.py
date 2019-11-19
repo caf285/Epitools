@@ -57,7 +57,7 @@ def main():
       subprocess.call("cp " + tempDir + "gatk/" + line[0] + "-bwamem-gatk.vcf " + naspDir + "/gatk/" + line[0] + "-bwamem-gatk.vcf", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
   subprocess.call("cp " + tempDir + "reference/duplicates.txt " + naspDir + "reference/duplicates.txt", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
 
-  write("/scratch/GAS/GAS.tsv", "\n".join(["\t".join(header)] + sorted(map(lambda x: "\t".join(x), gasHash.values()))))
+  #write("/scratch/GAS/GAS.tsv", "\n".join(["\t".join(header)] + sorted(map(lambda x: "\t".join(x), gasHash.values()))))
 
 if __name__ == "__main__":
   main()

@@ -68,12 +68,12 @@ elif [[ -e /scratch/GAS/.temp/${M} ]]; then
     cp /scratch/GAS/reference/${mType}::${referenceSample}.fasta /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/reference/reference.fasta
   fi
 
-  JOBID=$(sbatch --job-name="${mType}::${referenceSample}-${allRef}-gatk" --output="/dev/null" --time="5:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="cp /scratch/GAS/.temp/${M%*-config.xml}/gatk/*gatk.vcf /scratch/GAS/nasp/${mType}::${referenceSample}/gatk/; cp /scratch/GAS/.temp/${M%*-config.xml}/reference/duplicates.txt /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/reference/duplicates.txt; rm -r /scratch/GAS/.temp/${M} /scratch/GAS/.temp/${M%*-config.xml}")
+  JOBID=$(sbatch --job-name="${mType}::${referenceSample}-${allRef}-gatk" --output="/dev/null" --time="5:00" --mem="100m" --dependency=afterany:"${JOBID##* }" --wrap="cp /scratch/GAS/.temp/${M%*-config.xml}/gatk/*gatk.vcf /scratch/GAS/nasp/${mType}::${referenceSample}/gatk/; cp /scratch/GAS/.temp/${M%*-config.xml}/reference/duplicates.txt /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/reference/duplicates.txt; rm -r /scratch/GAS/.temp/${M} /scratch/GAS/.temp/${M%*-config.xml}")
 fi
 
 #----- create bestsnp.fasta for /scratch/GAS/nasp/${mType} (only if new GATK, no FASTA, or FASTA/GATK mismatch)
 if (( ${JOBID##* } != 0 )); then
-  JOBID=$(sbatch --job-name="${mType}::${referenceSample}-${allRef}-dto" --output="/dev/null" --time="1:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/${mType}::${referenceSample} ${allRef}")
+  JOBID=$(sbatch --job-name="${mType}::${referenceSample}-${allRef}-dto" --output="/dev/null" --time="1:00" --mem="100m" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/${mType}::${referenceSample} ${allRef}")
 elif [[ ! -f /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}_dto.xml || ! -f /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/matrices/bestsnp.fasta || ! -f /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/matrices/tree.nwk ]] || (( $(( $(cat /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/matrices/bestsnp.fasta | grep ">" | wc -l) - 1 )) != $(cat /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/matrix_dto.xml | grep "gatk" | wc -l ) )); then
   JOBID=$(sbatch --job-name="${mType}::${referenceSample}-${allRef}-dto" --output="/dev/null" --time="1:00" --mem="100m" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/${mType}::${referenceSample} ${allRef}")
 fi
