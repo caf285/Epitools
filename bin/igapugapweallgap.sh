@@ -148,8 +148,8 @@ print_batch_script () {
 #SBATCH --array=0-$(( n_reads/2 - 1 ))%5
 #SBATCH --workdir=$PWD
 #SBATCH --cpus-per-task=16
-#SBATCH --time=2:00:00
-#SBATCH --mem=10gb
+#SBATCH --time=5-00:00:00
+#SBATCH --mem=16gb
 
 set -euo pipefail
 
@@ -325,7 +325,8 @@ spades.py \
   -2 "$r_paired_fq" \
   --careful \
   -o "$spades_workdir" \
-  -t "$NCPU"
+  -t "$NCPU" \
+  -m 16
 filter_assembly "$spades_assembly" "$keep_n_bases"
 align_reads "$spades_bam" "$spades_assembly" "$R1" "$R2"
 

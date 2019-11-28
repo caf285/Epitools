@@ -52,7 +52,7 @@ ls /scratch/GAS/reference/ALL\:\:* | while read ref; do
   #echo ${refSample}
   #exit 0
 
-  all=$(/scratch/GAS/bin/mkConfig.py ${ref} ${refSample} -m _)
+  all=$(/scratch/GAS/bin/mkConfig.py ${ref} ${refSample} /scratch/GAS/GAS.tsv $(echo `/scratch/GAS/bin/queryGAS.py -s -m _`))
   echo ${all}
 
   # get jobID for nasp run (only if "_" QUALITY BREADTH)
@@ -84,27 +84,36 @@ ls /scratch/GAS/reference/ALL\:\:* | while read ref; do
 
 
     # update GAS.tsv and copy all gatk files > 80% M1 QUALITY BREADTH
-    JOBID=$(sbatch --job-name="GAS-getStats" --output="/dev/null" --time="5:00" --mem="100m" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/getStats.py ${all%*-config.xml} ${refSample}; rm -r /scratch/GAS/.temp/${all} /scratch/GAS/.temp/${all%*-config.xml}")
+    JOBID=$(sbatch --job-name="${refSample}-getStats" --output="/dev/null" --time="10:00" --mem="1g" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/getStats.py ${all%*-config.xml} ${refSample}; rm -r /scratch/GAS/.temp/${all} /scratch/GAS/.temp/${all%*-config.xml}")
   fi
 
-  #----- create bestsnp.fasta for /scratch/GAS/nasp/ALL (only if new GATK, no FASTA, or FASTA/GATK mismatch, or if -f force is in arguments)
-  if (( ${JOBID##* } != 0 )); then
-    JOBID=$(sbatch --job-name="GAS-dto" --output="/dev/null" --time="1:00" --mem="100m" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL\:\:${refSample}/")
-  elif [[ ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrix_dto.xml || ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/bestsnp.fasta || ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/tree.nwk ]] || (( $(( $(cat /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/bestsnp.fasta | grep ">" | wc -l) - 1 )) != $(cat /scratch/GAS/nasp/ALL\:\:${refSample}/matrix_dto.xml | grep "gatk" | wc -l ) )) || [[ $(echo $@ | grep "\-f") ]]; then
-    JOBID=$(sbatch --job-name="GAS-dto" --output="/dev/null" --time="1:00" --mem="100m" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL\:\:${refSample}/")
-  fi
+  #----- for each date delta of ALL, 12, & 6 months; create trees in date ranges
+  for months in 1200 12 6 3; do (
+    /scratch/GAS/bin/queryGAS.py -d $(date -d @$(( (($(date +%s)/2629000)-${months})*2629000 )) +%Y-%m-%d) > /scratch/GAS/tsv/${months}.tsv
 
-  #----- create tree.nwk for /scratch/GASnasp/ALL (only if new MATRIX_DTO.XML created)
-  if (( ${JOBID##* } != 0 )); then
-    JOBID=$(sbatch --job-name="GAS-matrix" --output="/dev/null" --time="1:00:00" --mem="1g" --dependency=afterok:"${JOBID##* }" --wrap="module load nasp; nasp matrix --dto-file /scratch/GAS/nasp/ALL\:\:${refSample}/matrix_dto.xml;")
-    JOBID=$(sbatch --job-name="GAS-fasta" --output="/dev/null" --time="1:00" --mem="100m"  --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkFasta.py /scratch/GAS/nasp/ALL\:\:${refSample}/")
-    JOBID=$(sbatch --job-name="GAS-tree" --output="/dev/null" --time="2:00" --mem="32g" --partition="hmem" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/bestsnp.fasta")
-  fi
+    #----- create bestsnp.fasta for /scratch/GAS/nasp/ALL (only if new GATK, no FASTA, or FASTA/GATK mismatch, or if -f force is in arguments)
+    if (( ${JOBID##* } != 0 )); then
+      JOBID=$(sbatch --job-name="${refSample}-${months}-dto" --output="/dev/null" --time="10:00" --mem="1g" --dependency=afterany:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL\:\:${refSample}/ /scratch/GAS/tsv/${months}.tsv")
+    #elif [[ ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrix_dto.xml || ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/bestsnp.fasta || ! -f /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/tree.nwk ]] || (( $(( $(cat /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/bestsnp.fasta | grep ">" | wc -l) - 1 )) != $(cat /scratch/GAS/nasp/ALL\:\:${refSample}/matrix_dto.xml | grep "gatk" | wc -l ) )) || [[ $(echo $@ | grep "\-f") ]]; then
+    else
+      JOBID=$(sbatch --job-name="${refSample}-${months}-dto" --output="/dev/null" --time="10:00" --mem="1g" --wrap="/scratch/GAS/bin/mkMatrix.py /scratch/GAS/nasp/ALL\:\:${refSample}/ /scratch/GAS/tsv/${months}.tsv")
+    fi
 
-  #----- recursively build nasp run per clade
-  if (( ${JOBID##* } != 0 )); then
-    JOBID=$(sbatch --job-name="GAS-clades" --output="/dev/null" --time="1:00" --mem="100m" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/getClades.py ${refSample} | while read line; do /scratch/GAS/bin/cladeGAS.sh ${refSample} \${line}; done")
-  fi
+    #----- create tree.nwk for /scratch/GASnasp/ALL (only if new MATRIX_DTO.XML created)
+    if (( ${JOBID##* } != 0 )); then
+      JOBID=$(sbatch --job-name="${refSample}-${months}-matrix" --output="/dev/null" --time="1:00:00" --mem="1g" --dependency=afterok:"${JOBID##* }" --wrap="module load nasp; nasp matrix --dto-file /scratch/GAS/nasp/ALL\:\:${refSample}/${months}_dto.xml;")
+      JOBID=$(sbatch --job-name="${refSample}-${months}-fasta" --output="/dev/null" --time="10:00" --mem="1g"  --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkFasta.py /scratch/GAS/nasp/ALL\:\:${refSample} ${months}")
+      JOBID=$(sbatch --job-name="${refSample}-${months}-bestsnpTree" --output="/dev/null" --time="10:00" --mem="50g" --partition="hmem" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/${months}/bestsnp.fasta")
+      JOBID=$(sbatch --job-name="${refSample}-${months}-missingdataTree" --output="/dev/null" --time="10:00" --mem="50g" --partition="hmem" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/${months}/missingdata.fasta")
+    fi
+
+    #----- recursively build nasp run per clade
+    if (( ${JOBID##* } != 0 )); then
+      JOBID=$(sbatch --job-name="${refSample}-${months}-clades" --output="/dev/null" --time="10:00" --mem="1g" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/getClades.py ${refSample} ${months} | while read line; do /scratch/GAS/bin/cladeGAS.sh ${refSample} ${months} \${line}; done")
+    fi
+
+
+  ) done
 
   #----- TODO find best reference per clade
 done

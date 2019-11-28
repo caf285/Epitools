@@ -33,30 +33,42 @@ def main():
     printHelp()
   else:
     DIR = sys.argv[1]
+    months = sys.argv[2:]
 
   if not os.path.exists(DIR):
     printHelp()
   else:
     DIR = os.path.abspath(DIR)
-    TSV = DIR + "/matrices/bestsnp.tsv"
-    FASTA = DIR + "/matrices/bestsnp.fasta"
+    if months:
+      months = months[0]
+      best = DIR + "/matrices/" + months + "/bestsnp.tsv"
+      bestFasta = DIR + "/matrices/" + months + "/bestsnp.fasta"
+      missing = DIR + "/matrices/" + months + "/missingdata.tsv"
+      missingFasta = DIR + "/matrices/" + months + "/missingdata.fasta"
+    else:
+      best = DIR + "/matrices/bestsnp.tsv"
+      bestFasta = DIR + "/matrices/bestsnp.fasta"
+      missing = DIR + "/matrices/missingdata.tsv"
+      missingFasta = DIR + "/matrices/missingdata.fasta"
 
   #----- convert TSV to FASTA
   print("fasta")
-  subprocess.call("module load nasp; nasp export --type fasta " + TSV + " > " + FASTA, universal_newlines=True, shell=True)
+  subprocess.call("module load nasp; nasp export --type fasta " + best + " > " + bestFasta, universal_newlines=True, shell=True)
+  subprocess.call("module load nasp; nasp export --type fasta " + missing + " > " + missingFasta, universal_newlines=True, shell=True)
 
   #----- fix fasta for AUGUR naming convention
   # pull out all python escape characters
-  seq = "\n".join(list(map(lambda x: re.sub(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]', '', x), read(FASTA).split("\n"))))
-  seq = seq.split(">")[1:]
+  for fasta in [bestFasta, missingFasta]:
+    seq = "\n".join(list(map(lambda x: re.sub(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]', '', x), read(fasta).split("\n"))))
+    seq = seq.split(">")[1:]
 
-  # remove ':' and all characters following from all headers
-  for i in range(len(seq)):
-    seq[i] = seq[i].split("\n")
-    seq[i][0] = seq[i][0].split("::")[0]
-    seq[i] = "\n".join(seq[i])
-  seq = ">" + ">".join(seq)
-  write(FASTA, seq)
+    # remove ':' and all characters following from all headers
+    for i in range(len(seq)):
+      seq[i] = seq[i].split("\n")
+      seq[i][0] = seq[i][0].split("::")[0]
+      seq[i] = "\n".join(seq[i])
+    seq = ">" + ">".join(seq)
+    write(fasta, seq)
 
 if __name__ == "__main__":
   main()

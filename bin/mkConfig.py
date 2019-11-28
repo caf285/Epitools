@@ -39,16 +39,17 @@ def main():
   else:
     ref = sys.argv[1]
     refSample = sys.argv[2]
-    query = " ".join(sys.argv[3:])
+    tsv = sys.argv[3]
+    samples = sys.argv[4:]
 
   if not os.path.exists(ref):
     printHelp()
   else:
     ref = ref.split("/")[-1].split(".fasta")[0]
+    gatk = list(map(lambda x: x.split("-bwamem-gatk")[0], list(filter(lambda x: len(x.split(".vcf")) == 2 and x.split(".vcf")[-1] == "", os.listdir("/scratch/GAS/nasp/" + ref + "/gatk/")))))
 
-  # get all samples with no M1 data
-  gas = subprocess.Popen("/scratch/GAS/bin/queryGAS.py " + query, universal_newlines=True, shell=True, stdout=subprocess.PIPE)
-  gas = list(map(lambda x: x.split("\t"), gas.stdout.read().strip().split("\n")))
+  # get all samples
+  gas = list(map(lambda x: x.split("\t"), read(tsv).strip().split("\n")))
   header = gas.pop(0)
   refIndex = header.index(refSample)
 
@@ -60,7 +61,7 @@ def main():
   # get file list for config template
   files = []
 
-  for line in list(filter(lambda x: x[refIndex] == "_" or "-m _" not in query, gas)):
+  for line in list(filter(lambda x: x[0] not in gatk and x[0] in samples, gas)):
     files.append("        <ReadFolder path=\"" + "/".join(line[3].split("/")[:-1]) + "/\">")
     files.append("            <ReadPair sample=\"" + line[0] + "\">")
     files.append("                <Read1Filename>" + line[2] + "</Read1Filename>")

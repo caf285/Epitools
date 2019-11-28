@@ -121,7 +121,10 @@ func main() {
     fmt.Println(err)
     printHelp()
   }
-  newick := strings.Join(append(strings.Split(fileName, "/")[:len(strings.Split(fileName, "/"))-1], "tree.nwk"), "/")
+  DIR := strings.Join(strings.Split(fileName, "/")[:len(strings.Split(fileName, "/"))-1], "/")
+  fileName = strings.Split(fileName, "/")[len(strings.Split(fileName, "/")) - 1]
+  fileName = strings.Split(fileName, ".fasta")[0]
+  newick := DIR + "/" + fileName + ".nwk"
   fasta := strings.Split(string(f), ">")[1:]
   names := []string{}
 

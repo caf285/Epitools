@@ -7,7 +7,7 @@ import json
 # ==================================================( functions )
 def printHelp():
   print("\nreturns all lines of GAS.tsv that follow arguments given")
-  print("usage: queryGAS.py [-h] [-j | -exact | -n | -e | -d | -m ]")
+  print("usage: queryGAS.py [-h] [-s] [-j | -exact | -n | -e | -d | -m ]")
   print("\t-exact\tExact Sample Name")
   print("\t-n\tSample Name")
   print("\t-e\tExclude Name")
@@ -30,7 +30,7 @@ def main():
 
   # check args
   # fill dictionary for all accepted args
-  args = {"-j":[], "-exact":[], "-n":[], "-e":[], "-d":[], "-m":[]}
+  args = {"-s": [], "-j":[], "-exact":[], "-n":[], "-e":[], "-d":[], "-m":[]}
   flag = ""
   for arg in sys.argv:
     if arg[0] == "-":
@@ -162,7 +162,10 @@ def main():
     # CONGRATULATIONS!!! you have fought bravely and now receive the grand honor of being printed to the screen!
     # Will you be destined to waste away in the endess walls of text, or will your journey continue after piping into another script?
     query.append("\t".join(sample))
-  print("\n".join(query))
+  if "-s" in sys.argv:
+    print(" ".join(list(map(lambda x: x.split("\t")[0], query[1:]))))
+  else:
+    print("\n".join(query))
 
 if __name__ == "__main__":
   main()
