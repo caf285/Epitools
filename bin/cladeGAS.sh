@@ -90,7 +90,7 @@ fi
 #----- create tree.nwk for /scratch/GASnasp/${mType} (only if new MATRIX_DTO.XML created)
 if (( ${JOBID##* } != 0 )); then
   JOBID=$(sbatch --job-name="${allRef}-${mType}::${referenceSample}-${months}-matrix" --output="/dev/null" --time="1:00:00" --mem="1g" --dependency=afterok:"${JOBID##* }" --wrap="module load nasp; nasp matrix --dto-file /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}::${months}_dto.xml;")
-  JOBID=$(sbatch --job-name="${allRef}-${mType}::${referenceSample}-${months}-fasta" --output="/dev/null" --time="10:00" --mem="1g"  --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkFasta.py /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef} ${months}")
+  JOBID=$(sbatch --job-name="${allRef}-${mType}::${referenceSample}-${months}-fasta" --output="/dev/null" --time="10:00" --mem="1g"  --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkFasta.py /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef} ${months} ${referenceSample}")
   JOBID=$(sbatch --job-name="${allRef}-${mType}::${referenceSample}-${months}-tree" --output="/dev/null" --time="10:00" --mem="25g" --partition="hmem" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/matrices/${months}/bestsnp.fasta")
   JOBID=$(sbatch --job-name="${allRef}-${mType}::${referenceSample}-${months}-tree" --output="/dev/null" --time="10:00" --mem="25g" --partition="hmem" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/${mType}::${referenceSample}/${allRef}/matrices/${months}/missingdata.fasta")
 fi

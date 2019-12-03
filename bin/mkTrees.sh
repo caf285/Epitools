@@ -14,37 +14,54 @@ if [[ $(echo $@ | grep "\-h") ]] ; then
   printHelp
 fi
 
-ref=($(ls /scratch/GAS/reference))
+#----- get references & months
+ref=($(ls /scratch/GAS/reference | grep "::"))
 allRef=()
 mRef=()
+months=()
 for line in ${ref[@]}; do
   if [[ $(echo ${line} | grep "ALL::") ]]; then
     line=${line//ALL::/}
     line=${line//.fasta/}
     allRef=("${allRef[@]}" ${line})
-  elif [[ $(echo ${line} | grep "::") ]]; then
+  else
     line=${line//.fasta/}
     mRef=("${mRef[@]}" ${line})
   fi
 done
+for line in $(ls /scratch/GAS/tsv); do
+  months=(${months[@]} ${line//.tsv/})
+done
 
+#----- fill trees
 echo "var trees = new Object();" > /scratch/GAS/nasp/trees.js
 echo >> /scratch/GAS/nasp/trees.js
 
-for all in ${allRef[@]}; do
-  echo "trees[\"${all}\"] = new Object();" >> /scratch/GAS/nasp/trees.js
+# bestsnp
+for nwk in $(echo bestsnp missingdata); do
+  echo "var trees[\"${nwk}\"] = new Object();" >> /scratch/GAS/nasp/trees.js
   echo >> /scratch/GAS/nasp/trees.js
-  if [[ -d /scratch/GAS/nasp/ALL::${all} ]] && [[ -d /scratch/GAS/nasp/ALL::${all}/matrices ]] && [[ -f /scratch/GAS/nasp/ALL::${all}/matrices/tree.nwk ]]; then
-    echo "trees[\"${all}\"][\"ALL\"] = \""`cat /scratch/GAS/nasp/ALL::${all}/matrices/tree.nwk`"\"" >> /scratch/GAS/nasp/trees.js
+  for month in ${months[@]}; do
+    # nwk -> month
+    echo "trees[\"${nwk}\"][\"${month}\"] = new Object();" >> /scratch/GAS/nasp/trees.js
     echo >> /scratch/GAS/nasp/trees.js
-  fi
-done
-
-for all in ${allRef[@]}; do
-  for m in ${mRef[@]}; do
-    if [[ -d /scratch/GAS/nasp/${m}/${all} ]] && [[ -d /scratch/GAS/nasp/${m}/${all}/matrices ]] && [[ -f /scratch/GAS/nasp/${m}/${all}/matrices/tree.nwk ]]; then
-      echo "trees[\"${all}\"][\"${m}\"] = \""`cat /scratch/GAS/nasp/${m}/${all}/matrices/tree.nwk`"\"" >> /scratch/GAS/nasp/trees.js
+    for all in ${allRef[@]}; do
+      # nwk -> month -> all
+      echo "trees[\"${nwk}\"][\"${month}\"][\"${all}\"] = new Object();" >> /scratch/GAS/nasp/trees.js
       echo >> /scratch/GAS/nasp/trees.js
-    fi
+      # nwk -> month -> all -> 'ALL'
+      if [[ -d /scratch/GAS/nasp/ALL::${all} ]] && [[ -d /scratch/GAS/nasp/ALL::${all}/matrices ]] && [[ -d /scratch/GAS/nasp/ALL::${all}/matrices/${month} ]] && [[ -f /scratch/GAS/nasp/ALL::${all}/matrices/${month}/${nwk}.nwk ]]; then
+        echo "trees[\"${nwk}\"][\"${month}\"][\"${all}\"][\"ALL\"] = \""$(cat /scratch/GAS/nasp/ALL::${all}/matrices/${month}/${nwk}.nwk)"\";" >> /scratch/GAS/nasp/trees.js
+        echo >> /scratch/GAS/nasp/trees.js
+      fi
+      # nwk -> month -> all -> m
+      for m in ${mRef[@]}; do
+        if [[ -d /scratch/GAS/nasp/${m}/${all} ]] && [[ -d /scratch/GAS/nasp/${m}/${all}/matrices ]] && [[ -d /scratch/GAS/nasp/${m}/${all}/matrices/${month} ]] && [[ -f /scratch/GAS/nasp/${m}/${all}/matrices/${month}/${nwk}.nwk ]]; then
+          echo "trees[\"${nwk}\"][\"${month}\"][\"${all}\"][\"${m}\"] = \""$(cat /scratch/GAS/nasp/${m}/${all}/matrices/${month}/${nwk}.nwk)"\";" >> /scratch/GAS/nasp/trees.js
+          echo >> /scratch/GAS/nasp/trees.js
+        fi
+      done
+    done
   done
 done
+exit 0

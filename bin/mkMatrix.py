@@ -68,8 +68,9 @@ def main():
   # this is used after the initial ALL tree has completed
   # assume if allRef; then tsv
   if allRef:
+    tsv = tsv.split("/")[-1].split(".tsv")[0]
     allRef = allRef[0]
-    clade = subprocess.Popen("/scratch/GAS/bin/parseNWK.py -c /scratch/GAS/nasp/ALL::" + allRef + "/matrices/tree.nwk", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+    clade = subprocess.Popen("/scratch/GAS/bin/parseNWK.py -c /scratch/GAS/nasp/ALL::" + allRef + "/matrices/" + tsv + "/bestsnp.nwk", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
     clade = json.loads(clade.stdout.read())
     clade = list(filter(lambda x: DIR.split("::")[-1] in x, clade))[0]
     vcf = list(filter(lambda x: x in clade, vcf))

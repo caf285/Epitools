@@ -41,6 +41,19 @@ done
 # pass $ARRAY to "getPath.py", appends all reads in $ARRAY to "GAS.tsv"
 /scratch/GAS/bin/getPath.py $ARRAY
 
+# get reference list query to add to all date queries
+referenceList=""
+for i in $(ls /scratch/GAS/reference/ | grep "::"); do
+  i=${i//.fasta/}
+  i=$(queryGAS.py -exact ${i#*::})
+  i=$(echo -e "${i#*$'\n'}")
+  if [[ $referenceList == "" ]]; then
+    referenceList="$i"
+  else
+    referenceList="$i\n${referenceList}"
+  fi
+done
+
 #----- resolve all M1% in "GAS.tsv"
 # run nasp against each ALL reference; exit is no change
 ls /scratch/GAS/reference/ALL\:\:* | while read ref; do
@@ -88,8 +101,9 @@ ls /scratch/GAS/reference/ALL\:\:* | while read ref; do
   fi
 
   #----- for each date delta of ALL, 12, & 6 months; create trees in date ranges
-  for months in 1200 12 6 3; do (
+  for months in 1200 12 6 3 2 1; do (
     /scratch/GAS/bin/queryGAS.py -d $(date -d @$(( (($(date +%s)/2629000)-${months})*2629000 )) +%Y-%m-%d) > /scratch/GAS/tsv/${months}.tsv
+    echo -e "${referenceList}" >> /scratch/GAS/tsv/${months}.tsv
 
     #----- create bestsnp.fasta for /scratch/GAS/nasp/ALL (only if new GATK, no FASTA, or FASTA/GATK mismatch, or if -f force is in arguments)
     if (( ${JOBID##* } != 0 )); then
@@ -102,7 +116,7 @@ ls /scratch/GAS/reference/ALL\:\:* | while read ref; do
     #----- create tree.nwk for /scratch/GASnasp/ALL (only if new MATRIX_DTO.XML created)
     if (( ${JOBID##* } != 0 )); then
       JOBID=$(sbatch --job-name="${refSample}-${months}-matrix" --output="/dev/null" --time="1:00:00" --mem="1g" --dependency=afterok:"${JOBID##* }" --wrap="module load nasp; nasp matrix --dto-file /scratch/GAS/nasp/ALL\:\:${refSample}/${months}_dto.xml;")
-      JOBID=$(sbatch --job-name="${refSample}-${months}-fasta" --output="/dev/null" --time="10:00" --mem="1g"  --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkFasta.py /scratch/GAS/nasp/ALL\:\:${refSample} ${months}")
+      JOBID=$(sbatch --job-name="${refSample}-${months}-fasta" --output="/dev/null" --time="10:00" --mem="1g"  --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/mkFasta.py /scratch/GAS/nasp/ALL\:\:${refSample} ${months} ${refSample}")
       JOBID=$(sbatch --job-name="${refSample}-${months}-bestsnpTree" --output="/dev/null" --time="10:00" --mem="50g" --partition="hmem" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/${months}/bestsnp.fasta")
       JOBID=$(sbatch --job-name="${refSample}-${months}-missingdataTree" --output="/dev/null" --time="10:00" --mem="50g" --partition="hmem" --dependency=afterok:"${JOBID##* }" --wrap="/scratch/GAS/bin/NJ /scratch/GAS/nasp/ALL\:\:${refSample}/matrices/${months}/missingdata.fasta")
     fi

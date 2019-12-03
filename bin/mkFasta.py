@@ -34,6 +34,7 @@ def main():
   else:
     DIR = sys.argv[1]
     months = sys.argv[2:]
+    ref = sys.argv[3:]
 
   if not os.path.exists(DIR):
     printHelp()
@@ -58,14 +59,20 @@ def main():
 
   #----- fix fasta for AUGUR naming convention
   # pull out all python escape characters
+  if ref:
+    ref = ref[0]
   for fasta in [bestFasta, missingFasta]:
     seq = "\n".join(list(map(lambda x: re.sub(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]', '', x), read(fasta).split("\n"))))
     seq = seq.split(">")[1:]
+    if ref:
+      seq = list(filter(lambda x: "reference" not in x.lower(), seq))
 
     # remove ':' and all characters following from all headers
     for i in range(len(seq)):
       seq[i] = seq[i].split("\n")
       seq[i][0] = seq[i][0].split("::")[0]
+      if ref and ref in seq[i][0]:
+        seq[i][0] = seq[i][0] + "-reference"
       seq[i] = "\n".join(seq[i])
     seq = ">" + ">".join(seq)
     write(fasta, seq)
