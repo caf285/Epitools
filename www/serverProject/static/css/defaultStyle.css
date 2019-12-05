@@ -51,23 +51,22 @@ html, body {
 }
 /* nav bg-color*/
 .navbar {
-  background-color: rgba(16,66,92, 0.95);
+  background-color: rgba(255,255,255, 0.95);
 }
 /* nav text */
 .navbar .navbar-brand,
 .navbar .navbar-text {
-  color: rgba(255,255,255,.75);
+  color: rgba(0,0,0,.75);
 }
 /* nav link */
 .navbar .navbar-nav .nav-link {
-  color: rgba(255,255,255,.75);
+  color: rgba(0,0,0,.75);
 }
 /* nav hover */
 .navbar .nav-item.active .nav-link,
 .navbar .nav-item:hover .nav-link {
-  color: #FFF;
-}
-
+  color: #19A;
+}                
 
 /* ===========================================================================( v2.0 MODULE MANAGEMENT ) 
   + module rows seperated by "dragbar" to resize height of selected row (NO REDISTRIBUTION!!)
@@ -97,15 +96,20 @@ html, body {
 /* global options menu for container */
 .biomod-options {
   margin-right: 3px;
+  font-size: 18px;
   flex-basis: 30%;
   display: flex;
   flex-flow: column nowrap;
+  flex-grow: 1;
   position: relative;
-  width: 100%;
   align-items: stretch;
   color: rgba(0,0,0,.85);
   background: rgba(200, 210, 210, 0.95);
   padding: 10px;
+}
+
+.biomod-options.tog {
+  display: none;
 }
 
 /* container for all rows */
@@ -119,9 +123,8 @@ html, body {
 
 /* each row contains at least 1 module */
 .biomod-row {
-  flex-grow: 1;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   flex-flow: row nowrap;
   height: 700px;
   margin-bottom: 3px;
@@ -129,11 +132,45 @@ html, body {
 
 /* flexbox for map/graph/table object */
 .biomod-module {
-  flex-basis: 100%;
-  height: 100%;
   min-width: 10%;
+  flex-grow: 1;
   margin-right: 3px;
   background: white;
+}
+
+.biomod-module.tog {
+  width: 0%;
+  flex-grow: 0;
+}
+
+.biomod-options-icon {
+  height: 32px;
+  width: 32px;
+  position: absolute;
+  background: #2ba687;
+  top: 5px;
+  left: -14px;
+  z-index: 5000;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.25);
+}
+
+.biomod-options-icon:hover {
+  cursor: pointer;
+  background: #4dc9aa;
+}
+
+.biomod-options-icon > img {
+  height: 21px;
+  width: 21px;
+  pointer-events: none;
+  -webkit-filter: brightness(0) invert(1);
+  filter: brightness(0) invert(1);
 }
 
 /* module spacific icon */

@@ -26,11 +26,18 @@
     <!-- HEADER () -->
     <div id="header">
       <nav class="navbar navbar-expand">
+
+        <a class="navbar-brand" href="/newick/"><img style="height:40px;" src="{% static '/newick/images/tgen.png' %}" alt=""></a>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
+            One Health Genomic Epi Tools
+          </ul>
+        </div>
+        <ul class="navbar-nav ml-auto">
             <li class="nav-item {% block home %}{% endblock %}"><a class="nav-link" href="/newick/">Home&nbsp</a></li>
             {% if user.is_authenticated %}
               <li class="nav-item dropdown {% block samples %}{% endblock %}">
@@ -45,9 +52,6 @@
               </li>
               <!-- <li class="nav-item {% block demo %}{% endblock %}"><a class="nav-link" href="/demo/" target="_blank">Demo</a></li> -->
             {% endif %}
-          </ul>
-        </div>
-        <ul class="navbar-nav ml-auto">
           {% if request.user.is_superuser %}
             <li class="nav-item"><a class="nav-link" href="/admin/" target="_blank">Admin</a></li>
           {% endif %} 

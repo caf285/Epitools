@@ -16,24 +16,20 @@
       color: black;
       background: white;
     }
-/* nav bg-color*/
-.navbar {
-  background-color: rgba(255,255,255, 0.95);
-}
-/* nav text */
-.navbar .navbar-brand,
-.navbar .navbar-text {
-  color: rgba(0,0,0,.75);
-}
-/* nav link */
-.navbar .navbar-nav .nav-link {
-  color: rgba(0,0,0,.75);
-}
-/* nav hover */
-.navbar .nav-item.active .nav-link,
-.navbar .nav-item:hover .nav-link {
-  color: #19A;
-} 
+
+    #menu1 {
+      display: flex;
+      height: 100%;
+    }
+    #menu2 {
+      display: none;
+      height: 100%;
+    }
+    #menu3 {
+      display: none;
+      height: 100%;
+    }
+
     .imgLinkContainer {
       margin-left: auto;
       margin-right: auto;
@@ -133,45 +129,146 @@
       right: 0px;
     }
   </style>
-  <div class="imgLinkContainer">
-    <a class="imgLink" href="http://jackie.tgen.org:1440/demo/biomod/">
-      <img src={% static '/newick/images/genome.jpg' %}>
-      <div class="imgLinkCaption">
-        <span>
-          <h4>Genomic Surveillance:</h4>
-          <p> </p>
-          <p>Routine whole genome sequencing and phylogenetic analysis of pathogens to identify clusters that inform public health investigation activities.</p>
-        </span>
+
+  <div id="menu1">
+    <div class="imgLinkContainer">
+      <div class="imgLink" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu2').style.display='flex'">
+        <img src={% static '/newick/images/genome.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+            <h4>Genomic Surveillance:</h4>
+            <p> </p>
+            <p>Routine whole genome sequencing and phylogenetic analysis of pathogens to identify clusters that inform public health investigation activities.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkGenome">
+          Genomic Surveillance
+        </div>
       </div>
-      <div class="imgLinkHeader" id="imgLinkGenome">
-        Genomic Surveillance
-      </div>
+      <a class="imgLink" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu3').style.display='flex'">
+        <img src={% static '/newick/images/virus.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+            <h4>Outbreak Analysis:</h4>
+            <p> </p>
+            <p>Genomic analysis to help identify connections between cases, transmission patterns and suspected sources of ongoing outbreaks that guide the public health response.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkVirus">
+          Outbreak Analysis
+        </div>
       </a>
-    <a class="imgLink" href="http://jackie.tgen.org:1440/newick/">
-      <img src={% static '/newick/images/virus.jpg' %}>
-      <div class="imgLinkCaption">
-        <span>
-          <h4>Outbreak Analysis:</h4>
-          <p> </p>
-          <p>Genomic analysis to help identify connections between cases, transmission patterns and suspected sources of ongoing outbreaks that guide the public health response.</p>
-        </span>
-      </div>
-      <div class="imgLinkHeader" id="imgLinkVirus">
-        Outbreak Analysis
-      </div>
-    </a>
-    <a class="imgLink" href="http://jackie.tgen.org:1440/demo/prevharm/">
-      <img src={% static '/newick/images/pills.jpg' %}>
-      <div class="imgLinkCaption">
-        <span>
-          <h4>Prevent HAARM:</h4>
-          <p> </p>
-          <p>A collaborative initiative to “Prevent HAARM (healthcare associated antimicrobial resistant microbes)” by tracking antimicrobial resistance in Arizona using advanced genomic technology with accessible data.</p>
-        </span>
-      </div>
-      <div class="imgLinkHeader" id="imgLinkPills">
-        Antibiotic Resistance
-      </div>
-    </a>
+      <a class="imgLink" href="http://jackie.tgen.org:1440/demo/prevharm/">
+        <img src={% static '/newick/images/pills.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+                <h4>Prevent HAARM:</h4>
+            <p> </p>
+            <p>A collaborative initiative to “Prevent HAARM (healthcare associated antimicrobial resistant microbes)” by tracking antimicrobial resistance in Arizona using advanced genomic technology with accessible data.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Antibiotic Resistance
+        </div>
+      </a>
+    </div>
   </div>
+
+
+
+  <div id="menu2">
+    <div class="imgLinkContainer" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu2').style.display='flex'">
+      <a class="imgLink" href="http://jackie.tgen.org:1440/demo/biomod/">
+        <img src={% static '/newick/images/gas.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+            <h4>Streptococcus pyogenes:</h4>
+            <p> </p>
+            <p>A group A streptococcal infection is an infection with group A streptococcus (GAS). Streptococcus pyogenes comprises the vast majority of the Lancefield group A streptococci, and is often used as a synonym for GAS.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkVirus">
+          Group A Strep
+        </div>
+      </a>
+      <a class="imgLink" href="{% static '/newick/images/campy-tree.png' %}">
+        <img src={% static '/newick/images/campy.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+                <h4>Campylobacter jejuni:</h4>
+            <p> </p>
+            <p>Campylobacter species generally appear as curved or comma-shaped rods, and are able to move via unipolar or bipolar flagella. They generally survive in environments with low oxygen.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Campylobacter
+        </div>
+      </a>
+    </div>
+  </div>
+
+
+  <div id="menu3">
+    <div class="imgLinkContainer" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu2').style.display='flex'">
+      <a class="imgLink" href="http://jackie.tgen.org:1440/newick/">
+        <img src={% static '/newick/images/ecoli.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkVirus">
+          E. coli
+        </div>
+      </a>
+      <a class="imgLink" href="http://jackie.tgen.org:1440/newick/">
+        <img src={% static '/newick/images/salmonella.png' %}>
+        <div class="imgLinkCaption">
+          <span>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Salmonella
+        </div>
+      </a>
+      <a class="imgLink" href="http://jackie.tgen.org:1440/newick/">
+        <img src={% static '/newick/images/enterobacter.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Enterovirus
+        </div>
+      </a>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% endblock %}

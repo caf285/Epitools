@@ -105,17 +105,18 @@ def main():
         line = line.split(",")
         print(line)
         FacilityType.objects.get_or_create(type1=line[1], type2=line[2])
+    '''
 
     # Facility
-    if model == "Facility":
+    #if model == "Facility":
       #for x in Facility.objects.all():
       #  print("\tremoving ", x)
       #  x.delete()
-      for line in csv:
-        line = line.split(",")
-        print(line)
-        Facility.objects.get_or_create(id=line[0], type=FacilityType.objects.filter(type1=line[1].split("::")[0], type2=line[1].split("::")[-1])[0], capacity=line[2], certification=line[3], mpc=MPC.objects.filter(id=line[4])[0], address=line[5], zip=line[6], phone=line[7], fax=line[8], lat=line[9], lon=line[10])
-    '''
+      #for line in csv:
+      #  line = line.split(",")
+      #  print(line)
+      #  Facility.objects.get_or_create(id=line[0], type=FacilityType.objects.filter(type1=line[1].split("::")[0], type2=line[1].split("::")[-1])[0], capacity=line[2], certification=line[3], mpc=MPC.objects.filter(id=line[4])[0], address=line[5], zip=line[6], phone=line[7], fax=line[8], lat=line[9], lon=line[10])
+
     ##### Group A Strep
     # GAS
     if model == "GAS":
@@ -126,9 +127,9 @@ def main():
         line = line.split(",")
         print(line)
         try:
-          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate=line[3], facility=Facility.objects.filter(id=line[4])[0], r1=line[5], r2=line[6], sequenceDate=line[7], m1=line[8], mType=line[9])
+          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate=line[3] if line[3].lower() not in ['none', 'unknown'] else line[6], facilityStr=line[5], facility=Facility.objects.filter(id=line[5])[0] if Facility.objects.filter(id=line[5]) else Facility.objects.filter(id="_")[0], r1=line[7], r2=line[8], sequenceDate=line[6], m1=line[9], mType=line[4])
         except:
-          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate="2000-01-01", facility=Facility.objects.filter(id=line[4])[0], r1=line[5], r2=line[6], sequenceDate=line[7], m1=line[8], mType=line[9])
+          continue
     '''
     ##### Prevent HAARM
     # Bacteria

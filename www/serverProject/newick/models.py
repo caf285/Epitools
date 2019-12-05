@@ -93,6 +93,7 @@ class GAS(models.Model):
   tg = models.CharField('tgNumber', max_length=64)
   az = models.CharField('azNumber', max_length=64)
   collectionDate = models.DateField('collectionDate', default="2000-1-1")
+  facilityStr = models.CharField('facilityStr', max_length=128, default="_")
   facility = models.ForeignKey(Facility, on_delete=models.CASCADE, null=True)
   r1 = models.CharField('read1', max_length=128)
   r2 = models.CharField('read2', max_length=128)

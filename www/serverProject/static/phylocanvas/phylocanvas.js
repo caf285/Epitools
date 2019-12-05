@@ -374,6 +374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       // 1CLD - clades list init
       this.clades = [];
+      this.title = "Tree!!";
 
 	    /**
 	     * The root node of the tree
@@ -932,6 +933,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 
 	  }, {
+      key: 'getClusters',
+      value: function getClusters(maxLength = 1, minSize = 4) {
+        let clusters = {}
+        for (let leaf of this.leaves) {
+          while (maxLength > 0) {
+            maxLength -= 1
+            console.log(leaf)
+          }
+        }
+      }
+    }, {
+      key: 'setTitle',
+      value: function setTitle(title) {
+	      this.title = title;
+      }
+    }, {
       // 1SCF - Set Clade Function
       key: 'addClade',
       value: function addClade(id, xStart, xWidth, yStart, yHeight, nwk) {
@@ -1187,8 +1204,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.drawn = true;
         // restore canvas to original size
 	      this.canvas.restore();
+        this.drawTitle();
         this.drawScale();
 	    }
+	  }, {
+	    key: 'drawTitle',
+	    value: function drawTitle() {
+        this.canvas.save();
+        this.canvas.fillStyle = "rgba(255, 255, 255, 0.75)"
+        this.canvas.font = "75px " + this.font
+        this.canvas.textAlign = "right"
+        let titleWidth = this.canvas.measureText(this.title).width
+        let titleHeight = this.canvas.measureText(this.title).hangingBaseline
+        if (!titleHeight) {
+          titleHeight = parseInt(this.canvas.font.split("px")[0])*0.9
+        }
+
+        this.canvas.fillRect(this.canvas.canvas.width - 30 - titleWidth, 15, titleWidth, titleHeight)
+        this.canvas.fillStyle = "#000"
+        this.canvas.fillText(this.title, this.canvas.canvas.width -30, 15 + titleHeight)
+        this.canvas.restore();
+
+	    }
+
+	    /**
+	     * mouseup event listener.
+	     */
+
 	  }, {
 	    key: 'drawScale',
 	    value: function drawScale() {
@@ -2647,6 +2689,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Branch() {
 	    _classCallCheck(this, Branch);
 
+      this.markStyle = 0;
+
 	    /**
 	     * The branch's angle clockwise from horizontal in radians (used paricularly
 	     * for circular and radial trees).
@@ -2985,10 +3029,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        tx = -tx - this.labelWidth * 1;
 	      }
 
-	      this.canvas.beginPath();
-	      this.canvas.fillStyle = this.getTextColour();
-	      this.canvas.fillText(label, tx, fSize / 2);
-	      this.canvas.closePath();
+        if (this.markStyle === 1) {
+          this.canvas.beginPath();
+          this.canvas.fillStyle = 'rgba(255, 0, 0, 0.7)'
+          this.canvas.fillRect(tx, (-fSize/2)-1, this.labelWidth, fSize*1.2)
+          this.canvas.fillStyle = "#000"
+  	      this.canvas.fillText(label, tx, fSize / 2);
+	        this.canvas.closePath();
+        } else if (this.markStyle === 2) {
+  	      this.canvas.beginPath();
+  	      this.canvas.fillStyle = 'rgba(0, 0, 0, 0.25)';
+  	      this.canvas.fillText(label, tx, fSize / 2);
+	        this.canvas.closePath();
+        } else {
+  	      this.canvas.beginPath();
+  	      this.canvas.fillStyle = this.getTextColour();
+  	      this.canvas.fillText(label, tx, fSize / 2);
+	        this.canvas.closePath();
+        }
 
 	      // Rotate canvas back to original position
 	      if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
@@ -3149,7 +3207,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _tree2 = this.tree,
 	          alignLabels = _tree2.alignLabels,
 	          canvas = _tree2.canvas;
-
 
 	      if (alignLabels) {
 	        this.drawLabelConnector();
@@ -5613,7 +5670,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'clicked',
 	    value: function clicked() {
-        console.log(this.id)
         this.tree.load(this.nwk)
 	    }
 	  }, {
