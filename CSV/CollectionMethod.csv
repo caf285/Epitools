@@ -1,0 +1,95 @@
+﻿id,sterile
+_,U
+Abscess (Closed),Y
+Abscess (Unspecified),N
+Anus,N
+Ascitic Fluid (Abdominal Fluid),Y
+Aspirate (Needle),Y
+Aspirate (Unspecified),N
+Blood,Y
+Bone,Y
+Bone Marrow,Y
+Brain,Y
+Breast Milk,N
+Bronchial,N
+Bursa,Y
+Cannula,N
+Cardiac Muscle,Y
+Catheter Tip,N
+Cervix,N
+Colostrum,N
+Conjunctiva,N
+Cord Blood,Y
+Cornea,N
+Cyst (Unspecified),N
+Cystic Fibrosis,N
+Cystocentesis,Y
+Cysts (Closed),Y
+Ear,N
+Endocardium,Y
+Endometrium,N
+Eye Swab,N
+Fecal,N
+Fistula,N
+Fluid (Amniotic),Y
+Fluid (Bile),Y
+Fluid (Cerebral/Spinal),Y
+Fluid (Duodenal),Y
+Fluid (Gastric),N
+Fluid (Knee),Y
+Fluid (Ocular),Y
+Fluid (Pancreatic),Y
+Fluid (Paracentesis),Y
+Fluid (Pelvic),N
+Fluid (Pericardial),Y
+Fluid (Peritoneal Ascites),Y
+Fluid (Peritoneal Dialysis),N
+Fluid (Pleural/Thoracentesis),Y
+Fluid (Seminal),N
+Fluid (Synovial/Joint),Y
+Fluid (Vitreous),Y
+Genital,N
+Hair,N
+Intubation Tube,N
+Liver,Y
+Lower Respiratory Tract,N
+Lymph,Y
+Macrophages,Y
+Meconium,N
+Menstrual Blood,N
+Nail,N
+Nose,N
+Operating Room,N
+Ovary,Y
+Picc Line (Peripherally Inserted Central Catheter),Y
+Placenta,N
+Plasma,Y
+Plasma Bag,Y
+Platelets,Y
+Pleura,Y
+Pus,N
+Saliva,N
+Serum,Y
+Skeletal Muscle,Y
+Skin,N
+Sputum,N
+Swab (Unspecified),N
+Sweat,N
+Tears,N
+Throat,N
+Thrombocytes (Platelet),Y
+Tissue (Kidney),Y
+Tissue (Unspecified),N
+Tissue (Gall Bladder),Y
+Tissue (Large Intestine),Y
+Tissue (Lung),Y
+Tissue (Placenta),Y
+Tissue (Small Intestine),Y
+Tissue (Spinal),Y
+Tissue (Spleen),Y
+Tissue (Trachea),Y
+Tissue (Ulcer),Y
+Urethra,N
+Urine,N
+Vomitus,N
+Wound,N

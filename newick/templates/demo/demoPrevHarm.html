@@ -1,0 +1,129 @@
+{% extends "demo/demo.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+  {% load static %}
+
+  <!-- CSS -->
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static '/newick/css/PCA.css' %}" type="text/css"></link>
+  <link rel="stylesheet" href="{% static '/jQRangeSlider/css/classic.css' %}" type="text/css"></link>
+
+  <!-- Javascript -->
+  <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
+  <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
+  <script src="{% static '/newick/js/colorPalette.js' %}"></script>
+  <script src="{% static '/newick/js/mapAZ.js' %}"></script>
+  <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
+  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+  <script src="{% static '/jquery/jquery-1.10.2.min.js' %}"></script>
+  <script src="{% static '/jquery/jquery-ui.min.js' %}"></script>
+  <script src="{% static '/jQRangeSlider/jQAllRangeSliders-min.js' %}"></script>
+  <script src="{% static '/newick/js/antibiogram.js' %}"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+
+  <script>
+    // load database
+    var DB = {{ demoPrevHarm | safe }}
+    var levels = ["state", "region", "county", "pca"]
+    var mapFunctions = []
+    var upImage = '{% static '/newick/images/up.png' %}'
+    var downImage = '{% static '/newick/images/down.png' %}'
+  </script>
+{% endblock %}
+
+{% block sideContent %}
+  Options:
+  <!-- STERILE DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sterile</button>
+    <div id="sterileDropdown" class="dropdown-menu">
+      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="U" checked> Unknown&nbsp;<br>
+      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="Y" checked> Sterile&nbsp;<br>
+      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="N" checked> Non-Sterile&nbsp;<br>
+    </div>
+  </div>
+  </br>
+
+  <!-- FACILITY DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Facility Types</button>
+    <div id="facilityDropdown" class="dropdown-menu">
+    </div>
+  </div>
+  </br>
+
+  <!-- DRUG DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Drugs</button>
+    <div id="drugDropdown" class="dropdown-menu">
+      &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('all')">Select All</button>
+      &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('none')">Select None</button>
+      </br>
+    </div>
+  </div>
+  </br>
+
+  <!-- DATES DROPDOWN -->
+  <div class="dropdown">
+    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dates</button>
+    <div id="dateDropdown" class="dropdown-menu">
+    </div>
+  </div>
+  </br>
+
+  <!-- SUSCEPTIBLE TOGGLE -->
+  <input id="sr" type="checkbox" checked data-toggle="toggle" data-on="Susceptible" data-off="Resistant" data-width="100%" data-onstyle="info" data-offstyle="info">
+  </br>
+
+  Bacteria:
+  <div class="dropdown">
+    <button id="bacteriaButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+    <div id="bacteriaDropdown" class="dropdown-menu">
+    </div>
+  </div>
+  </br>
+
+  Date Range:
+  <div id="slider"></div>
+  </br>
+
+  <div style="visibility: hidden;" class="dropdown">
+    <button id="mapColorButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
+    <div id="mapColorDropdown" class="dropdown-menu">
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block mainContent %}
+  <div class="mainContent">
+    <div style="width: 40%; margin-right: 10px;">
+      {% leaflet_map "main" %}
+    </div>
+    <div id="plot" style="width: 60%;">
+    </div>
+  </div>
+  <div class="mainContent">
+    <table class="table table-bordered table-light">
+      <thead>
+        <tr>
+          <td colspan="100%" style="font-size: 18px;"><center><b><div id="antibiogramHeader"></div></b></center></td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td colspan="100%" style="font-size: 16px;"><center><b><div id="antibiogramSubheader"></div></b></center></td>
+        </tr>
+        <tr id="drug">
+        </tr>
+      </thead>
+      <tbody id="bug">
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+

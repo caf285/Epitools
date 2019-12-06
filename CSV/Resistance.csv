@@ -1,0 +1,555 @@
+﻿id,amr,antibiotic,pTested,nTested,pSusceptible,nSusceptible
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Amoxicillin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Amoxicillin,100%,9,0%,0
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Ampicillin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Ampicillin,100%,9,0%,0
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Cefazolin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Cefazolin,100%,9,0%,0
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Ceftriaxone,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Ceftriaxone,100%,9,74%,7
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Piperacillin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Piperacillin,100%,9,76%,7
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,9,83%,7
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Cefepime,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Cefepime,100%,9,86%,8
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Ciprofloxacin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Ciprofloxacin,100%,9,88%,8
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Levofloxacin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Levofloxacin,100%,9,90%,8
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Tobramycin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Tobramycin,100%,9,94%,8
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Gentamicin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Gentamicin,100%,9,96%,9
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Meropenem,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Meropenem,100%,9,99%,9
+Banner Payson Medical Center::Enterobacter cloacae::_::2018::1::Amikacin,Banner Payson Medical Center::Enterobacter cloacae::_::2018::1,Amikacin,100%,9,100%,9
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Ampicillin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Ampicillin,100%,97,39%,38
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Amoxicillin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Amoxicillin,100%,97,62%,60
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Banner Payson Medical Center::Escherichia coli::_::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,97,62%,60
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Cefazolin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Cefazolin,100%,97,70%,68
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Ciprofloxacin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Ciprofloxacin,100%,97,72%,70
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Levofloxacin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Levofloxacin,100%,97,72%,70
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Ceftriaxone,Banner Payson Medical Center::Escherichia coli::_::2018::1,Ceftriaxone,100%,97,81%,79
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Tobramycin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Tobramycin,100%,97,82%,80
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Gentamicin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Gentamicin,100%,97,86%,83
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Cefepime,Banner Payson Medical Center::Escherichia coli::_::2018::1,Cefepime,100%,97,87%,84
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Piperacillin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Piperacillin,100%,97,90%,87
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Amikacin,Banner Payson Medical Center::Escherichia coli::_::2018::1,Amikacin,100%,97,99%,96
+Banner Payson Medical Center::Escherichia coli::_::2018::1::Imipenem (Cilastatin),Banner Payson Medical Center::Escherichia coli::_::2018::1,Imipenem (Cilastatin),100%,97,100%,97
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Ampicillin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Ampicillin,100%,168,46%,77
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,168,64%,108
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Ciprofloxacin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Ciprofloxacin,100%,168,74%,124
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Amoxicillin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Amoxicillin,100%,168,75%,126
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Levofloxacin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Levofloxacin,100%,168,75%,126
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Cefazolin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Cefazolin,100%,168,82%,138
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Gentamicin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Gentamicin,100%,168,88%,148
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Tobramycin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Tobramycin,100%,168,88%,148
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Ceftriaxone,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Ceftriaxone,100%,168,90%,151
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Cefepime,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Cefepime,100%,168,93%,156
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Piperacillin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Piperacillin,100%,168,95%,160
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Amikacin,Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Amikacin,100%,168,100%,168
+Banner Payson Medical Center::Escherichia coli::Urine::2018::1::Imipenem (Cilastatin),Banner Payson Medical Center::Escherichia coli::Urine::2018::1,Imipenem (Cilastatin),100%,168,100%,168
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Cefazolin,Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Cefazolin,100%,9,0%,0
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Tetracycline,Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Tetracycline,100%,9,3%,0
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Levofloxacin,Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Levofloxacin,100%,9,24%,2
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Clindamycin,Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Clindamycin,100%,9,53%,5
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Penicillin (Unspecified),Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Penicillin (Unspecified),100%,9,82%,7
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Ceftriaxone,Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Ceftriaxone,100%,9,94%,8
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Rifampin,Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Rifampin,100%,9,97%,9
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,9,97%,9
+Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Vancomycin,Banner Payson Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Vancomycin,100%,9,100%,9
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Erythromycin,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Erythromycin,100%,12,69%,8
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Penicillin (Unspecified),Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Penicillin (Unspecified),100%,12,71%,9
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Ceftriaxone,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Ceftriaxone,100%,12,81%,10
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Clindamycin,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Clindamycin,100%,12,82%,10
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Levofloxacin,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Levofloxacin,100%,12,88%,11
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Tetracycline,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Tetracycline,100%,12,96%,12
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,12,99%,12
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Cefazolin,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Cefazolin,100%,12,100%,12
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Rifampin,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Rifampin,100%,12,100%,12
+Banner Payson Medical Center::Staphylococcus aureus::_::2018::1::Vancomycin,Banner Payson Medical Center::Staphylococcus aureus::_::2018::1,Vancomycin,100%,12,100%,12
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Ampicillin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Ampicillin,100%,130,39%,51
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Amoxicillin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Amoxicillin,100%,130,62%,81
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,130,62%,81
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Cefazolin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Cefazolin,100%,130,70%,91
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Ciprofloxacin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Ciprofloxacin,100%,130,72%,94
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Levofloxacin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Levofloxacin,100%,130,72%,94
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Ceftriaxone,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Ceftriaxone,100%,130,81%,105
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Tobramycin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Tobramycin,100%,130,82%,107
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Gentamicin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Gentamicin,100%,130,86%,112
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Cefepime,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Cefepime,100%,130,87%,113
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Piperacillin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Piperacillin,100%,130,90%,117
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Amikacin,Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Amikacin,100%,130,99%,129
+Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1::Imipenem (Cilastatin),Cobre Valley Regional Medical Center::Escherichia coli::_::2018::1,Imipenem (Cilastatin),100%,130,100%,130
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Ampicillin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Ampicillin,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Cefazolin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Cefazolin,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Cefepime,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Cefepime,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Cefotaxime,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Cefotaxime,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Ceftazidime,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Ceftazidime,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Ceftriaxone,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Ceftriaxone,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Cefuroxime,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Cefuroxime,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Cephalothin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Cephalothin,100%,152,0%,0
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Tetracycline,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Tetracycline,100%,152,35%,53
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,152,37%,56
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Ciprofloxacin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Ciprofloxacin,100%,152,60%,91
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Levofloxacin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Levofloxacin,100%,152,60%,91
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Tobramycin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Tobramycin,100%,152,77%,117
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Gentamicin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Gentamicin,100%,152,82%,125
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Amoxicillin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Amoxicillin,100%,152,83%,126
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Nitrofurantoin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Nitrofurantoin,100%,152,83%,126
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Piperacillin,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Piperacillin,100%,152,95%,144
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Cefotetan,Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Cefotetan,100%,152,100%,152
+Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1::Imipenem (Cilastatin),Cobre Valley Regional Medical Center::Escherichia coli::Urine::2018::1,Imipenem (Cilastatin),100%,152,100%,152
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Ampicillin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Ampicillin,100%,12,46%,6
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,12,64%,8
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Ciprofloxacin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Ciprofloxacin,100%,12,74%,9
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Amoxicillin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Amoxicillin,100%,12,75%,9
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Levofloxacin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Levofloxacin,100%,12,75%,9
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Cefazolin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Cefazolin,100%,12,82%,10
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Gentamicin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Gentamicin,100%,12,88%,11
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Tobramycin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Tobramycin,100%,12,88%,11
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Ceftriaxone,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Ceftriaxone,100%,12,90%,11
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Cefepime,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Cefepime,100%,12,93%,11
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Piperacillin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Piperacillin,100%,12,95%,11
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Amikacin,Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Amikacin,100%,12,100%,12
+Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1::Imipenem (Cilastatin),Cobre Valley Regional Medical Center::Klebsiella pneumoniae::Urine::2018::1,Imipenem (Cilastatin),100%,12,100%,12
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Cefazolin,Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Cefazolin,100%,13,0%,0
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Tetracycline,Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Tetracycline,100%,13,3%,0
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Levofloxacin,Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Levofloxacin,100%,13,24%,3
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Clindamycin,Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Clindamycin,100%,13,53%,7
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Penicillin (Unspecified),Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Penicillin (Unspecified),100%,13,82%,11
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Ceftriaxone,Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Ceftriaxone,100%,13,94%,12
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Rifampin,Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Rifampin,100%,13,97%,13
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,13,97%,13
+Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1::Vancomycin,Cobre Valley Regional Medical Center::Staphylococcus aureus (MRSA)::_::2018::1,Vancomycin,100%,13,100%,13
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Erythromycin,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Erythromycin,100%,8,69%,6
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Penicillin (Unspecified),Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Penicillin (Unspecified),100%,8,71%,6
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Ceftriaxone,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Ceftriaxone,100%,8,81%,6
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Clindamycin,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Clindamycin,100%,8,82%,7
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Levofloxacin,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Levofloxacin,100%,8,88%,7
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Tetracycline,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Tetracycline,100%,8,96%,8
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,8,99%,8
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Cefazolin,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Cefazolin,100%,8,100%,8
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Rifampin,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Rifampin,100%,8,100%,8
+Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1::Vancomycin,Cobre Valley Regional Medical Center::Staphylococcus aureus::_::2018::1,Vancomycin,100%,8,100%,8
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Amoxicillin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Amoxicillin,100%,123,0%,0
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Ampicillin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Ampicillin,100%,123,0%,0
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Cefazolin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Cefazolin,100%,123,0%,0
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Piperacillin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Piperacillin,100%,123,64%,79
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Ceftriaxone,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Ceftriaxone,100%,123,71%,87
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,123,91%,112
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Cefepime,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Cefepime,100%,123,97%,119
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Imipenem (Cilastatin),Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Imipenem (Cilastatin),100%,123,97%,119
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Ciprofloxacin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Ciprofloxacin,100%,123,98%,121
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Gentamicin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Gentamicin,100%,123,99%,122
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Levofloxacin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Levofloxacin,100%,123,99%,122
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Amikacin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Amikacin,100%,123,100%,123
+Flagstaff Medical Center::Enterobacter cloacae::_::2017::11::Tobramycin,Flagstaff Medical Center::Enterobacter cloacae::_::2017::11,Tobramycin,100%,123,100%,123
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Amoxicillin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Amoxicillin,100%,111,0%,0
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Ampicillin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Ampicillin,100%,111,0%,0
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Cefazolin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Cefazolin,100%,111,0%,0
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Ceftriaxone,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Ceftriaxone,100%,111,74%,82
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Piperacillin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Piperacillin,100%,111,76%,84
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,111,83%,92
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Cefepime,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Cefepime,100%,111,86%,95
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Ciprofloxacin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Ciprofloxacin,100%,111,88%,98
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Levofloxacin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Levofloxacin,100%,111,90%,100
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Tobramycin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Tobramycin,100%,111,94%,104
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Gentamicin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Gentamicin,100%,111,96%,107
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Meropenem,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Meropenem,100%,111,99%,110
+Flagstaff Medical Center::Enterobacter cloacae::_::2018::5::Amikacin,Flagstaff Medical Center::Enterobacter cloacae::_::2018::5,Amikacin,100%,111,100%,111
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Ampicillin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Ampicillin,100%,187,39%,73
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Amoxicillin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Amoxicillin,100%,187,62%,116
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Escherichia coli::_::2017::11,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,187,62%,116
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Cefazolin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Cefazolin,100%,187,70%,131
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Ciprofloxacin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Ciprofloxacin,100%,187,72%,135
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Levofloxacin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Levofloxacin,100%,187,72%,135
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Ceftriaxone,Flagstaff Medical Center::Escherichia coli::_::2017::11,Ceftriaxone,100%,187,81%,151
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Tobramycin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Tobramycin,100%,187,82%,153
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Gentamicin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Gentamicin,100%,187,86%,161
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Cefepime,Flagstaff Medical Center::Escherichia coli::_::2017::11,Cefepime,100%,187,87%,163
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Piperacillin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Piperacillin,100%,187,90%,168
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Amikacin,Flagstaff Medical Center::Escherichia coli::_::2017::11,Amikacin,100%,187,99%,185
+Flagstaff Medical Center::Escherichia coli::_::2017::11::Imipenem (Cilastatin),Flagstaff Medical Center::Escherichia coli::_::2017::11,Imipenem (Cilastatin),100%,187,100%,187
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Ampicillin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Ampicillin,100%,205,42%,86
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Escherichia coli::_::2018::5,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,205,66%,135
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Amoxicillin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Amoxicillin,100%,205,72%,148
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Cefazolin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Cefazolin,100%,205,72%,148
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Ciprofloxacin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Ciprofloxacin,100%,205,72%,148
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Levofloxacin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Levofloxacin,100%,205,72%,148
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Ceftriaxone,Flagstaff Medical Center::Escherichia coli::_::2018::5,Ceftriaxone,100%,205,84%,172
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Gentamicin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Gentamicin,100%,205,85%,174
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Tobramycin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Tobramycin,100%,205,86%,176
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Cefepime,Flagstaff Medical Center::Escherichia coli::_::2018::5,Cefepime,100%,205,87%,178
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Piperacillin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Piperacillin,100%,205,91%,187
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Amikacin,Flagstaff Medical Center::Escherichia coli::_::2018::5,Amikacin,100%,205,100%,205
+Flagstaff Medical Center::Escherichia coli::_::2018::5::Meropenem,Flagstaff Medical Center::Escherichia coli::_::2018::5,Meropenem,100%,205,100%,205
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Ampicillin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Ampicillin,100%,929,46%,427
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,929,64%,595
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Ciprofloxacin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Ciprofloxacin,100%,929,74%,687
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Amoxicillin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Amoxicillin,100%,929,75%,697
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Levofloxacin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Levofloxacin,100%,929,75%,697
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Cefazolin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Cefazolin,100%,929,82%,762
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Gentamicin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Gentamicin,100%,929,88%,818
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Tobramycin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Tobramycin,100%,929,88%,818
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Ceftriaxone,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Ceftriaxone,100%,929,90%,836
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Cefepime,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Cefepime,100%,929,93%,864
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Piperacillin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Piperacillin,100%,929,95%,883
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Amikacin,Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Amikacin,100%,929,100%,929
+Flagstaff Medical Center::Escherichia coli::Urine::2017::11::Imipenem (Cilastatin),Flagstaff Medical Center::Escherichia coli::Urine::2017::11,Imipenem (Cilastatin),100%,929,100%,929
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Ampicillin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Ampicillin,100%,962,47%,452
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,962,67%,645
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Amoxicillin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Amoxicillin,100%,962,73%,702
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Ciprofloxacin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Ciprofloxacin,100%,962,76%,731
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Levofloxacin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Levofloxacin,100%,962,76%,731
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Cefazolin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Cefazolin,100%,962,78%,750
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Ceftriaxone,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Ceftriaxone,100%,962,88%,847
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Tobramycin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Tobramycin,100%,962,88%,847
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Gentamicin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Gentamicin,100%,962,90%,866
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Cefepime,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Cefepime,100%,962,91%,875
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Piperacillin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Piperacillin,100%,962,94%,904
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Amikacin,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Amikacin,100%,962,99%,952
+Flagstaff Medical Center::Escherichia coli::Urine::2018::5::Meropenem,Flagstaff Medical Center::Escherichia coli::Urine::2018::5,Meropenem,100%,962,100%,962
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Amoxicillin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Amoxicillin,100%,104,89%,93
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Cefazolin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Cefazolin,100%,104,90%,94
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Ceftriaxone,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Ceftriaxone,100%,104,93%,97
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Tobramycin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Tobramycin,100%,104,93%,97
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,104,93%,97
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Gentamicin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Gentamicin,100%,104,95%,99
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Piperacillin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Piperacillin,100%,104,95%,99
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Cefepime,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Cefepime,100%,104,97%,101
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Ciprofloxacin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Ciprofloxacin,100%,104,98%,102
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Imipenem (Cilastatin),Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Imipenem (Cilastatin),100%,104,98%,102
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Levofloxacin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Levofloxacin,100%,104,98%,102
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Amikacin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Amikacin,100%,104,100%,104
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11::Ampicillin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2017::11,Ampicillin,100%,104,100%,104
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Amoxicillin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Amoxicillin,100%,252,89%,224
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Cefazolin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Cefazolin,100%,252,89%,224
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,252,90%,227
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Ceftriaxone,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Ceftriaxone,100%,252,91%,229
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Tobramycin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Tobramycin,100%,252,92%,232
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Gentamicin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Gentamicin,100%,252,93%,234
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Cefepime,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Cefepime,100%,252,94%,237
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Ciprofloxacin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Ciprofloxacin,100%,252,95%,239
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Piperacillin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Piperacillin,100%,252,97%,244
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Levofloxacin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Levofloxacin,100%,252,98%,247
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Amikacin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Amikacin,100%,252,100%,252
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Ampicillin,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Ampicillin,100%,252,100%,252
+Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5::Meropenem,Flagstaff Medical Center::Klebsiella pneumoniae::_::2018::5,Meropenem,100%,252,100%,252
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Ampicillin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Ampicillin,100%,103,58%,60
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Cefazolin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Cefazolin,100%,103,62%,64
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,103,62%,64
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Levofloxacin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Levofloxacin,100%,103,63%,65
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Ciprofloxacin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Ciprofloxacin,100%,103,64%,66
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Ceftriaxone,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Ceftriaxone,100%,103,79%,81
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Cefepime,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Cefepime,100%,103,83%,85
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Gentamicin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Gentamicin,100%,103,90%,93
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Tobramycin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Tobramycin,100%,103,90%,93
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Amikacin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Amikacin,100%,103,98%,101
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Amoxicillin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Amoxicillin,100%,103,98%,101
+Flagstaff Medical Center::Proteus mirabilis::_::2017::11::Piperacillin,Flagstaff Medical Center::Proteus mirabilis::_::2017::11,Piperacillin,100%,103,98%,101
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Ampicillin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Ampicillin,100%,122,68%,83
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Cefazolin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Cefazolin,100%,122,69%,84
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,122,73%,89
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Ciprofloxacin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Ciprofloxacin,100%,122,75%,92
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Levofloxacin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Levofloxacin,100%,122,75%,92
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Gentamicin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Gentamicin,100%,122,87%,106
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Tobramycin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Tobramycin,100%,122,87%,106
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Cefepime,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Cefepime,100%,122,89%,109
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Ceftriaxone,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Ceftriaxone,100%,122,89%,109
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Amoxicillin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Amoxicillin,100%,122,94%,115
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Piperacillin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Piperacillin,100%,122,97%,118
+Flagstaff Medical Center::Proteus mirabilis::_::2018::5::Amikacin,Flagstaff Medical Center::Proteus mirabilis::_::2018::5,Amikacin,100%,122,98%,120
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11::Imipenem (Cilastatin),Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Imipenem (Cilastatin),100%,224,74%,166
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11::Gentamicin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Gentamicin,100%,224,78%,175
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11::Ciprofloxacin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Ciprofloxacin,100%,224,79%,177
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11::Cefepime,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Cefepime,100%,224,83%,186
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11::Amikacin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Amikacin,100%,224,90%,202
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11::Piperacillin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Piperacillin,100%,224,91%,204
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11::Tobramycin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2017::11,Tobramycin,100%,224,92%,206
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5::Ciprofloxacin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Ciprofloxacin,100%,298,81%,241
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5::Piperacillin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Piperacillin,100%,298,87%,259
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5::Cefepime,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Cefepime,100%,298,89%,265
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5::Gentamicin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Gentamicin,100%,298,91%,271
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5::Meropenem,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Meropenem,100%,298,92%,274
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5::Amikacin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Amikacin,100%,298,96%,286
+Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5::Tobramycin,Flagstaff Medical Center::Pseudomonas aeruginosa::_::2018::5,Tobramycin,100%,298,97%,289
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Cefazolin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Cefazolin,100%,360,0%,0
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Levofloxacin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Levofloxacin,100%,360,24%,86
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Clindamycin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Clindamycin,100%,360,53%,191
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Penicillin (Unspecified),Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Penicillin (Unspecified),100%,360,82%,295
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Tetracycline,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Tetracycline,100%,360,93%,335
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Ceftriaxone,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Ceftriaxone,100%,360,94%,338
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Rifampin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Rifampin,100%,360,97%,349
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,360,97%,349
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11::Vancomycin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2017::11,Vancomycin,100%,360,100%,360
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5::Cefazolin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Cefazolin,100%,366,0%,0
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5::Levofloxacin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Levofloxacin,100%,366,14%,51
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5::Clindamycin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Clindamycin,100%,366,48%,176
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5::Tetracycline,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Tetracycline,100%,366,96%,351
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5::Rifampin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Rifampin,100%,366,100%,366
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,366,100%,366
+Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5::Vancomycin,Flagstaff Medical Center::Staphylococcus aureus (MRSA)::_::2018::5,Vancomycin,100%,366,100%,366
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Erythromycin,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Erythromycin,100%,470,69%,324
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Penicillin (Unspecified),Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Penicillin (Unspecified),100%,470,71%,334
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Ceftriaxone,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Ceftriaxone,100%,470,81%,381
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Clindamycin,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Clindamycin,100%,470,82%,385
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Levofloxacin,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Levofloxacin,100%,470,88%,414
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Tetracycline,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Tetracycline,100%,470,96%,451
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,470,99%,465
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Cefazolin,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Cefazolin,100%,470,100%,470
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Rifampin,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Rifampin,100%,470,100%,470
+Flagstaff Medical Center::Staphylococcus aureus::_::2017::11::Vancomycin,Flagstaff Medical Center::Staphylococcus aureus::_::2017::11,Vancomycin,100%,470,100%,470
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5::Clindamycin,Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Clindamycin,100%,482,82%,395
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5::Levofloxacin,Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Levofloxacin,100%,482,88%,424
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5::Tetracycline,Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Tetracycline,100%,482,95%,458
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,482,98%,472
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5::Cefazolin,Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Cefazolin,100%,482,100%,482
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5::Rifampin,Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Rifampin,100%,482,100%,482
+Flagstaff Medical Center::Staphylococcus aureus::_::2018::5::Vancomycin,Flagstaff Medical Center::Staphylococcus aureus::_::2018::5,Vancomycin,100%,482,100%,482
+Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11::Erythromycin,Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11,Erythromycin,100%,144,69%,99
+Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11::Penicillin (Unspecified),Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11,Penicillin (Unspecified),100%,144,71%,102
+Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11::Ceftriaxone,Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11,Ceftriaxone,100%,144,81%,117
+Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11::Clindamycin,Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11,Clindamycin,100%,144,86%,124
+Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11::Levofloxacin,Flagstaff Medical Center::Streptococcus pneumoniae::Aspirate (Unspecified)::2017::11,Levofloxacin,100%,144,99%,143
+Flagstaff Medical Center::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11::Penicillin (Unspecified),Flagstaff Medical Center::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11,Penicillin (Unspecified),100%,265,82%,217
+Flagstaff Medical Center::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11::Ceftriaxone,Flagstaff Medical Center::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11,Ceftriaxone,100%,265,94%,249
+Flagstaff Medical Center::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11::Levofloxacin,Flagstaff Medical Center::Streptococcus pneumoniae::Fluid (Cerebral/Spinal)::2017::11,Levofloxacin,100%,265,99%,262
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Amoxicillin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Amoxicillin,100%,6,0%,0
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Ampicillin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Ampicillin,100%,6,0%,0
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Cefazolin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Cefazolin,100%,6,0%,0
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Cefotetan,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Cefotetan,100%,6,0%,0
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Cefuroxime,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Cefuroxime,100%,6,0%,0
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Cefepime,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Cefepime,100%,6,83%,5
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Cefotaxime,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Cefotaxime,100%,6,83%,5
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Ceftazidime,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Ceftazidime,100%,6,83%,5
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Ceftriaxone,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Ceftriaxone,100%,6,83%,5
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Piperacillin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Piperacillin,100%,6,83%,5
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Ciprofloxacin,100%,6,100%,6
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Gentamicin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Gentamicin,100%,6,100%,6
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Imipenem (Cilastatin),Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Imipenem (Cilastatin),100%,6,100%,6
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Levofloxacin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Levofloxacin,100%,6,100%,6
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Tetracycline,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Tetracycline,100%,6,100%,6
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Tobramycin,Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Tobramycin,100%,6,100%,6
+Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Enterobacter cloacae::Wound::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,6,100%,6
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Cefazolin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Cefazolin,100%,17,0%,0
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Clindamycin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Clindamycin,100%,17,0%,0
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,17,0%,0
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Tetracycline,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Tetracycline,100%,17,18%,3
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Rifampin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Rifampin,100%,17,47%,8
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Ciprofloxacin,100%,17,71%,12
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Levofloxacin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Levofloxacin,100%,17,82%,14
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Ampicillin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Ampicillin,100%,17,100%,17
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Linezolid,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Linezolid,100%,17,100%,17
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Nitrofurantoin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Nitrofurantoin,100%,17,100%,17
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Penicillin (Unspecified),100%,17,100%,17
+Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1::Vancomycin,Yavapai Regional Medical Center::Enterococcus faecalis::Urine::2019::1,Vancomycin,100%,17,100%,17
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Ampicillin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Ampicillin,100%,387,46%,178
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,387,64%,248
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Ciprofloxacin,100%,387,74%,286
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Amoxicillin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Amoxicillin,100%,387,75%,290
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Levofloxacin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Levofloxacin,100%,387,75%,290
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Cefazolin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Cefazolin,100%,387,82%,317
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Gentamicin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Gentamicin,100%,387,88%,341
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Tobramycin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Tobramycin,100%,387,88%,341
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Ceftriaxone,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Ceftriaxone,100%,387,90%,348
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Cefepime,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Cefepime,100%,387,93%,360
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Piperacillin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Piperacillin,100%,387,95%,368
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Amikacin,Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Amikacin,100%,387,100%,387
+Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1::Imipenem (Cilastatin),Yavapai Regional Medical Center::Escherichia coli::Urine::2019::1,Imipenem (Cilastatin),100%,387,100%,387
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Tetracycline,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Tetracycline,100%,6,0%,0
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Nitrofurantoin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Nitrofurantoin,100%,6,17%,1
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Amoxicillin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Amoxicillin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Ampicillin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Ampicillin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Cefazolin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Cefazolin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Cefepime,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Cefepime,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Cefotaxime,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Cefotaxime,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Cefotetan,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Cefotetan,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Ceftazidime,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Ceftazidime,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Ceftriaxone,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Ceftriaxone,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Cefuroxime,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Cefuroxime,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Cephalothin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Cephalothin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Ciprofloxacin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Gentamicin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Gentamicin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Imipenem (Cilastatin),Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Imipenem (Cilastatin),100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Levofloxacin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Levofloxacin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Piperacillin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Piperacillin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Tobramycin,Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Tobramycin,100%,6,100%,6
+Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Proteus mirabilis::Urine::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,6,100%,6
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Gentamicin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Gentamicin,100%,9,78%,7
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Cefepime,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Cefepime,100%,9,89%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Ceftazidime,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Ceftazidime,100%,9,89%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Ciprofloxacin,100%,9,89%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Imipenem (Cilastatin),Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Imipenem (Cilastatin),100%,9,89%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Tobramycin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Tobramycin,100%,9,89%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Levofloxacin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Levofloxacin,100%,9,100%,9
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1::Piperacillin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Ear::2019::1,Piperacillin,100%,9,100%,9
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Cefepime,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Cefepime,100%,8,88%,7
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Ciprofloxacin,100%,8,88%,7
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Levofloxacin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Levofloxacin,100%,8,88%,7
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Ceftazidime,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Ceftazidime,100%,8,100%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Gentamicin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Gentamicin,100%,8,100%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Imipenem (Cilastatin),Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Imipenem (Cilastatin),100%,8,100%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Piperacillin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Piperacillin,100%,8,100%,8
+Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1::Tobramycin,Yavapai Regional Medical Center::Pseudomonas aeruginosa::Urine::2019::1,Tobramycin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Erythromycin,100%,18,6%,1
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Ciprofloxacin,100%,18,11%,2
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Levofloxacin,100%,18,11%,2
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Clindamycin,100%,18,89%,16
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Tetracycline,100%,18,94%,17
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Gentamicin,100%,18,100%,18
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Linezolid,100%,18,100%,18
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Rifampin,100%,18,100%,18
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,18,100%,18
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Anus::2019::1,Vancomycin,100%,18,100%,18
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Ciprofloxacin,100%,9,11%,1
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Erythromycin,100%,9,11%,1
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Levofloxacin,100%,9,11%,1
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Clindamycin,100%,9,67%,6
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Gentamicin,100%,9,100%,9
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Linezolid,100%,9,100%,9
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Rifampin,100%,9,100%,9
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Tetracycline,100%,9,100%,9
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,9,100%,9
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Ear::2019::1,Vancomycin,100%,9,100%,9
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Erythromycin,100%,81,21%,17
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Ciprofloxacin,100%,81,26%,21
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Levofloxacin,100%,81,26%,21
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Clindamycin,100%,81,77%,62
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Tetracycline,100%,81,98%,79
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Rifampin,100%,81,99%,80
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Gentamicin,100%,81,100%,81
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Linezolid,100%,81,100%,81
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,81,100%,81
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Skin::2019::1,Vancomycin,100%,81,100%,81
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Ciprofloxacin,100%,197,18%,35
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Levofloxacin,100%,197,18%,36
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Erythromycin,100%,197,23%,45
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Clindamycin,100%,197,76%,149
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Tetracycline,100%,197,96%,190
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Gentamicin,100%,197,99%,196
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Rifampin,100%,197,99%,196
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,197,99%,196
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Linezolid,100%,197,100%,197
+Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus (MRSA)::Wound::2019::1,Vancomycin,100%,197,100%,197
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Penicillin (Unspecified),100%,8,13%,1
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Ciprofloxacin,100%,8,88%,7
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Levofloxacin,100%,8,88%,7
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Amoxicillin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Amoxicillin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Cefazolin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Cefazolin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Clindamycin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Erythromycin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Gentamicin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Linezolid,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Oxacillin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Oxacillin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Rifampin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Tetracycline,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus::Ear::2019::1,Vancomycin,100%,8,100%,8
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Penicillin (Unspecified),100%,63,11%,7
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Erythromycin,100%,63,81%,51
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Ciprofloxacin,100%,63,83%,52
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Levofloxacin,100%,63,83%,52
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Tetracycline,100%,63,94%,59
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Clindamycin,100%,63,95%,60
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Amoxicillin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Amoxicillin,100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Cefazolin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Cefazolin,100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Gentamicin,100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Linezolid,100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Oxacillin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Oxacillin,100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Rifampin,100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus::Skin::2019::1,Vancomycin,100%,63,100%,63
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Ciprofloxacin,100%,6,67%,4
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Levofloxacin,100%,6,67%,4
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Amoxicillin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Amoxicillin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Cefazolin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Cefazolin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Gentamicin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Linezolid,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Nitrofurantoin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Nitrofurantoin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Oxacillin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Oxacillin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Rifampin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Tetracycline,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus::Urine::2019::1,Vancomycin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Penicillin (Unspecified),100%,123,16%,20
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Erythromycin,100%,123,83%,102
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Ciprofloxacin,100%,123,88%,108
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Levofloxacin,100%,123,89%,109
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Clindamycin,100%,123,89%,110
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Tetracycline,100%,123,98%,121
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Rifampin,100%,123,99%,122
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Amoxicillin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Amoxicillin,100%,123,100%,123
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Cefazolin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Cefazolin,100%,123,100%,123
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Gentamicin,100%,123,100%,123
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Linezolid,100%,123,100%,123
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Oxacillin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Oxacillin,100%,123,100%,123
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,123,100%,123
+Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus aureus::Wound::2019::1,Vancomycin,100%,123,100%,123
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Ampicillin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Ampicillin,100%,28,0%,0
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Penicillin (Unspecified),100%,28,4%,1
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Amoxicillin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Amoxicillin,100%,28,39%,11
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Cefazolin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Cefazolin,100%,28,39%,11
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Oxacillin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Oxacillin,100%,28,39%,11
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Erythromycin,100%,28,43%,12
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Clindamycin,100%,28,50%,14
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,28,71%,20
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Tetracycline,100%,28,86%,24
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Ciprofloxacin,100%,28,96%,27
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Levofloxacin,100%,28,96%,27
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Gentamicin,100%,28,100%,28
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Linezolid,100%,28,100%,28
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Rifampin,100%,28,100%,28
+Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus epidermidis::Blood::2019::1,Vancomycin,100%,28,100%,28
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Ampicillin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Ampicillin,100%,6,0%,0
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Erythromycin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Erythromycin,100%,6,33%,2
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Penicillin (Unspecified),100%,6,33%,2
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Amoxicillin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Amoxicillin,100%,6,50%,3
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Cefazolin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Cefazolin,100%,6,50%,3
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Oxacillin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Oxacillin,100%,6,50%,3
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,6,50%,3
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Clindamycin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Clindamycin,100%,6,83%,5
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Tetracycline,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Tetracycline,100%,6,83%,5
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Ciprofloxacin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Ciprofloxacin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Gentamicin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Gentamicin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Levofloxacin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Levofloxacin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Linezolid,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Linezolid,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Rifampin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Rifampin,100%,6,100%,6
+Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1::Vancomycin,Yavapai Regional Medical Center::Staphylococcus hominis::Blood::2019::1,Vancomycin,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Erythromycin,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Erythromycin,100%,7,29%,2
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Ampicillin,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Ampicillin,100%,7,43%,3
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Penicillin (Unspecified),100%,7,43%,3
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Cefepime,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Cefepime,100%,7,57%,4
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Tetracycline,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Tetracycline,100%,7,57%,4
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Cefotaxime,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Cefotaxime,100%,7,86%,6
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Clindamycin,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Clindamycin,100%,7,86%,6
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Ceftriaxone,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Ceftriaxone,100%,7,100%,7
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Levofloxacin,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Levofloxacin,100%,7,100%,7
+Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1::Vancomycin,Yavapai Regional Medical Center::Streptococcus (Alpha-hemolytic)::Blood::2019::1,Vancomycin,100%,7,100%,7
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Ampicillin,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Ampicillin,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Cefepime,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Cefepime,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Cefotaxime,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Cefotaxime,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Ceftriaxone,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Ceftriaxone,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Clindamycin,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Clindamycin,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Erythromycin,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Erythromycin,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Levofloxacin,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Levofloxacin,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Penicillin (Unspecified),100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Tetracycline,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Tetracycline,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1::Vancomycin,Yavapai Regional Medical Center::Streptococcus (Beta-hemolytic)::Blood::2019::1,Vancomycin,100%,6,100%,6
+Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1::Ampicillin,Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Ampicillin,100%,21,0%,0
+Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1::Tetracycline,Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Tetracycline,100%,21,0%,0
+Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1::Levofloxacin,Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Levofloxacin,100%,21,100%,21
+Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1::Linezolid,Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Linezolid,100%,21,100%,21
+Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Penicillin (Unspecified),100%,21,100%,21
+Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1::Vancomycin,Yavapai Regional Medical Center::Streptococcus agalactiae (Group B)::Urine::2019::1,Vancomycin,100%,21,100%,21
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Erythromycin,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Erythromycin,100%,12,58%,7
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Penicillin (Unspecified),100%,12,75%,9
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Clindamycin,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Clindamycin,100%,12,83%,10
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Tetracycline,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Tetracycline,100%,12,83%,10
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Amoxicillin,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Amoxicillin,100%,12,92%,11
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Cefotaxime,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Cefotaxime,100%,12,92%,11
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Ceftriaxone,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Ceftriaxone,100%,12,92%,11
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Cefuroxime,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Cefuroxime,100%,12,92%,11
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Trimethoprim-Sulfamethoxazole (Tmp-Smx),Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Trimethoprim-Sulfamethoxazole (Tmp-Smx),100%,12,92%,11
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Cefepime,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Cefepime,100%,12,100%,12
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Levofloxacin,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Levofloxacin,100%,12,100%,12
+Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1::Vancomycin,Yavapai Regional Medical Center::Streptococcus pneumoniae::Blood::2019::1,Vancomycin,100%,12,100%,12
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Clindamycin,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Clindamycin,100%,9,89%,8
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Erythromycin,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Erythromycin,100%,9,89%,8
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Tetracycline,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Tetracycline,100%,9,89%,8
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Ampicillin,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Ampicillin,100%,9,100%,9
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Cefepime,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Cefepime,100%,9,100%,9
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Cefotaxime,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Cefotaxime,100%,9,100%,9
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Ceftriaxone,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Ceftriaxone,100%,9,100%,9
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Levofloxacin,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Levofloxacin,100%,9,100%,9
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Penicillin (Unspecified),Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Penicillin (Unspecified),100%,9,100%,9
+Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1::Vancomycin,Yavapai Regional Medical Center::Streptococcus pyogenes (Group A)::Blood::2019::1,Vancomycin,100%,9,100%,9

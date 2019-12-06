@@ -1,0 +1,43 @@
+.leaflet-container {
+  /* all maps */
+  min-height: 800px;
+  width: 100%;
+  z-index: 0;
+}
+
+.leaflet-marker-icon {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+
+.region {
+  font-size: 18px;
+  position: absolute;
+  text-align: center;
+}
+
+.region > div {
+  font-size: 14px;
+  margin: 0;
+}
+
+.county {
+  font-size: 14px;
+  position: absolute;
+  text-align: center;
+}
+
+.county > div {
+  font-size: 12px;
+}
+
+.pca {
+  font-size: 12px;
+  position: absolute;
+  text-align: center;
+}
+
+.pca > div {
+  font-size: 10px;
+}

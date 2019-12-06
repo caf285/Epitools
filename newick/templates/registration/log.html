@@ -1,0 +1,14 @@
+{% extends "default.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block login %}active{% endblock %}
+
+{% if user.is_authenticated %}
+  <script>window.location.href = "/newick/"</script>
+{% endif %}
+
+{% block content %}
+  {{ block.super }}
+
+{% endblock %}

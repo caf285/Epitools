@@ -1,0 +1,40 @@
+﻿id,gram
+Acinetobacter baumannii,negative
+Citrobacter freundii,negative
+Cronobacter sakazakii,negative
+Enterobacter aerogenes,negative
+Enterobacter cloacae,negative
+Enterococcus faecalis,positive
+Enterococcus faecalis (VRE),positive
+Enterococcus faecium,positive
+Escherichia coli,negative
+Escherichia coli (ESBL),negative
+Klebsiella oxytoca,negative
+Klebsiella oxytoca (ESBL),negative
+Klebsiella pneumoniae,negative
+Klebsiella pneumoniae (ESBL),negative
+Pantoea agglomerans,negative
+Proteus mirabilis,negative
+Proteus mirabilis (ESBL),negative
+Proteus vulgaris,negative
+Pseudomonas aeruginosa,negative
+Pseudomonas stutzeri,negative
+Salmonella enterica arizonae,negative
+Serratia marcescens,negative
+Shigella flexneri,negative
+Staphylococcus aureus,positive
+Staphylococcus aureus (MRSA),positive
+Staphylococcus capitis,positive
+Staphylococcus epidermidis,positive
+Staphylococcus haemolyticus,positive
+Staphylococcus hominis,positive
+Staphylococcus intermedius,positive
+Staphylococcus saprophyticus,positive
+Stenotrophomonas maltophilia,negative
+Streptococcus (Alpha-hemolytic),positive
+Streptococcus (Beta-hemolytic),positive
+Streptococcus agalactiae (Group B),positive
+Streptococcus bovis,positive
+Streptococcus dysgalactiae (Group G),positive
+Streptococcus pneumoniae,positive
+Streptococcus pyogenes (Group A),positive

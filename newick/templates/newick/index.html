@@ -1,0 +1,274 @@
+{% extends "default.html" %}
+
+{% block home %}active{% endblock %}
+
+{% block static %}
+  {{ block.super }}
+  {% load static %}
+{% endblock %}
+
+{% block mainContent %}
+  <style>
+    body, html {
+      background: #DDD;
+    }
+    .navbar {
+      color: black;
+      background: white;
+    }
+
+    #menu1 {
+      display: flex;
+      height: 100%;
+    }
+    #menu2 {
+      display: none;
+      height: 100%;
+    }
+    #menu3 {
+      display: none;
+      height: 100%;
+    }
+
+    .imgLinkContainer {
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 80%;
+      height: 100%;
+      display: flex;
+      flex-flow: column;
+      align-items: stretch;
+      justify-content: space-around;
+    }
+    .imgLink {
+      min-width: 400px;
+      min-height: 225px;
+      z-index: 50;
+      position: relative;
+      color: black;
+      font-size: 20px;
+      flex-grow: 1;
+      margin: 15px;
+      border-radius: 20px;
+      box-shadow: 3px 3px 4px 0px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .imgLinkHeader {
+      position: absolute;
+      top: 10px;
+      right: 0px;
+      text-align: right;
+      width: 100%;
+      text-shadow: 1px 1px #000;
+      color: darkgray;
+      padding-right: 15px;
+      background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0.5),rgba(0,0,0,0.5));
+      font-size: 34px;
+      line-height: 40px;
+      -webkit-transition: all 0.2s;
+      transition: all 0.2s;
+    }
+    .imgLink:hover > .imgLinkHeader {
+      color: white;
+      font-size: 36px;
+      line-height: 40px;
+    }
+    .imgLink:hover > #imgLinkGenome {
+      background: linear-gradient(to right, rgba(25, 133, 90,.1),rgba(25, 133, 90,0.8));
+    }
+    .imgLink:hover > #imgLinkPills {
+      background: linear-gradient(to right, rgba(145, 9, 9,.1),rgba(145, 9, 9,0.8));
+    }
+    .imgLink:hover > #imgLinkVirus {
+      background: linear-gradient(to right, rgba(58, 117, 194,.1),rgba(58, 117, 194,0.8));
+    }
+    .imgLink > img {
+      z-index: -1;
+      position: absolute;
+      width: 100%;
+      min-height: 100%;
+      filter: grayscale(70%) blur(2px);
+      -webkit-transition: all 0.3s;
+      transition: all 0.3s
+    }
+    .imgLink:hover > img {
+      width: 110%;
+      filter: grayscale(0%) blur(0px);
+      -webkit-transition: all 0.3s;
+      transition: all 0.3s;
+    }
+    .imgLinkCaption {
+      position: absolute;
+      color: black;
+      height: 100%;
+      width: 600px;
+      background-image: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.7), rgba(255,255,255,0.85),rgba(255,255,255,0.9));
+      right: -400px;
+      -webkit-transition: all 0.1s;
+      transition: all 0.1s;
+    }
+    .imgLink:hover > .imgLinkCaption {
+      right: 0px;
+      -webkit-transition: all 0.2s;
+      transition: all 0.2s;
+    }
+    .imgLinkCaption > span {
+      color: black;
+      text-shadow: 1px 1px rgba(255,255,255,.75), 0px 0px 2px rgba(255,255,255,.5);
+      width: 390px;
+      font-size: 14px;
+      text-align: justify;
+      position: absolute;
+      right: -400px;
+      padding-right: 12px;
+      bottom: 3px;
+      -webkit-transition: all 0.3s;
+      transition: all 0.3s;
+    }
+    .imgLink:hover span {
+      right: 0px;
+    }
+  </style>
+
+  <div id="menu1">
+    <div class="imgLinkContainer">
+      <div class="imgLink" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu2').style.display='flex'">
+        <img src={% static '/newick/images/genome.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+            <h4>Genomic Surveillance:</h4>
+            <p> </p>
+            <p>Routine whole genome sequencing and phylogenetic analysis of pathogens to identify clusters that inform public health investigation activities.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkGenome">
+          Genomic Surveillance
+        </div>
+      </div>
+      <a class="imgLink" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu3').style.display='flex'">
+        <img src={% static '/newick/images/virus.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+            <h4>Outbreak Analysis:</h4>
+            <p> </p>
+            <p>Genomic analysis to help identify connections between cases, transmission patterns and suspected sources of ongoing outbreaks that guide the public health response.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkVirus">
+          Outbreak Analysis
+        </div>
+      </a>
+      <a class="imgLink" href="http://jackie.tgen.org:1440/demo/prevharm/">
+        <img src={% static '/newick/images/pills.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+                <h4>Prevent HAARM:</h4>
+            <p> </p>
+            <p>A collaborative initiative to “Prevent HAARM (healthcare associated antimicrobial resistant microbes)” by tracking antimicrobial resistance in Arizona using advanced genomic technology with accessible data.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Antibiotic Resistance
+        </div>
+      </a>
+    </div>
+  </div>
+
+
+
+  <div id="menu2">
+    <div class="imgLinkContainer" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu2').style.display='flex'">
+      <a class="imgLink" href="http://jackie.tgen.org:1440/demo/biomod/">
+        <img src={% static '/newick/images/gas.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+            <h4>Streptococcus pyogenes:</h4>
+            <p> </p>
+            <p>A group A streptococcal infection is an infection with group A streptococcus (GAS). Streptococcus pyogenes comprises the vast majority of the Lancefield group A streptococci, and is often used as a synonym for GAS.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkVirus">
+          Group A Strep
+        </div>
+      </a>
+      <a class="imgLink" href="{% static '/newick/images/campy-tree.png' %}">
+        <img src={% static '/newick/images/campy.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+                <h4>Campylobacter jejuni:</h4>
+            <p> </p>
+            <p>Campylobacter species generally appear as curved or comma-shaped rods, and are able to move via unipolar or bipolar flagella. They generally survive in environments with low oxygen.</p>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Campylobacter
+        </div>
+      </a>
+    </div>
+  </div>
+
+
+  <div id="menu3">
+    <div class="imgLinkContainer" onclick="document.getElementById('menu1').style.display='none';document.getElementById('menu2').style.display='flex'">
+      <a class="imgLink" href="http://jackie.tgen.org:1440/newick/">
+        <img src={% static '/newick/images/ecoli.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkVirus">
+          E. coli
+        </div>
+      </a>
+      <a class="imgLink" href="http://jackie.tgen.org:1440/newick/">
+        <img src={% static '/newick/images/salmonella.png' %}>
+        <div class="imgLinkCaption">
+          <span>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Salmonella
+        </div>
+      </a>
+      <a class="imgLink" href="http://jackie.tgen.org:1440/newick/">
+        <img src={% static '/newick/images/enterobacter.jpg' %}>
+        <div class="imgLinkCaption">
+          <span>
+          </span>
+        </div>
+        <div class="imgLinkHeader" id="imgLinkPills">
+          Enterovirus
+        </div>
+      </a>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
