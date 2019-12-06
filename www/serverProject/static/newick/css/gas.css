@@ -1,9 +1,0 @@
-#newSamples {
-  color: red;
-  font-size: 18px;
-}
-
-#newSamples:hover {
-  cursor: pointer;
-  color: #FF8888
-}
