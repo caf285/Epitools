@@ -210,26 +210,31 @@
       <div style="white-space: nowrap;">New Sample Range (<span id="newRangeValue"></span> months):</div>
       <input type="range" min=2 max=12 value=3 oninput="newRange = this.value; addMarks()">
 
-      Tree Dates:
-      <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw()">
+      <span id=treeDatesLabel></span>
+      <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw(); document.getElementById('treeDatesLabel').innerHTML = 'Tree Dates: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'">
 
+      <!--
       Zoom:
       <input type="range" min=1 max=20 value=1 oninput="tree.zoom = this.value/10; tree.draw()">
 
       Base Node Size:
       <input type="range" min=0 max=50 value=0 oninput="tree.baseNodeSize = this.value/2; tree.draw()">
 
-      Leaf Text Size:
-      <input  type="range" min=1 max=50 value=1 oninput="tree.textSize = this.value; tree.draw()">
-
-      Branch Text Size:
-      <input type="range" min=1 max=50 value=1 oninput="tree.canvas.font = this.value + 'px ' + tree.canvas.font.split(' ')[1]; tree.draw()">
-
-      Branch Scale:
-      <input type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
-
       Line Width:
       <input type="range" min=1 max=20 value=1 oninput="tree.lineWidth = this.value/2; tree.draw()">
+      -->
+
+      Leaf Text Size:
+      <input id="leafSize" type="range" min=1 max=50 value=1 oninput="tree.textSize = this.value; tree.draw()">
+
+      Branch Text Size:
+      <input id="branchSize" type="range" min=1 max=50 value=1 oninput="tree.canvas.font = this.value + 'px ' + tree.canvas.font.split(' ')[1]; tree.draw()">
+
+      Branch Scale:
+      <input id="branchScale" type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
+
+      <script>
+      </script>
 
       <button class="btn btn-block btn-info" type="button" aria-haspopup="true" aria-expanded="false">Print PDF</button>
       <button class="btn btn-block btn-info" type="button" aria-haspopup="true" aria-expanded="false">FAQ</button>
@@ -271,6 +276,7 @@
         treeDate = Object.keys(trees[treeType])[this.value]
         resetM(Object.keys(trees[treeType][treeDate])[0])
       })
+      document.getElementById('treeDatesLabel').innerHTML = 'Tree Dates: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'
 
       // edit load function to run script after each load
       var tree = Phylocanvas.default.createTree('phylocanvas')
@@ -306,6 +312,15 @@
       }
       //resetM(Object.keys(trees)[0])
       resetM(Object.keys(trees[treeType][treeDate])[0])
+
+      // adjust scalars
+      tree.canvas.font = String(tree.textSize + 4) + 'px ' + tree.canvas.font.split(' ')[1]
+      tree.draw()
+      document.getElementById("leafSize").value = tree.textSize
+      document.getElementById("branchSize").value = tree.textSize + 4
+      console.log(parseInt(200/tree.maxBranchLength))
+      document.getElementById("branchScale").value = parseInt(tree.branchScalar/200*tree.maxBranchLength)
+
 
     </script>
 
