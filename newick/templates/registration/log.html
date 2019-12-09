@@ -5,7 +5,7 @@
 {% block login %}active{% endblock %}
 
 {% if user.is_authenticated %}
-  <script>window.location.href = "/newick/"</script>
+  <script>window.location.href = "{% url init %}"</script>
 {% endif %}
 
 {% block content %}

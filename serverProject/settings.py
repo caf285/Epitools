@@ -24,7 +24,7 @@ SECRET_KEY = 'ml)j)2fmq7!l+9or(4jvcd2h2!18r72%g5!5yo7^9_b(j(=cjv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['jackie.tgen.org']
+ALLOWED_HOSTS = ['jackie.tgen.org', '10.56.0.21']
 
 # Application definition
 
@@ -121,20 +121,22 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+SITE_URL = "epitools/"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 
 STATICFILES_DIRS = [
-  os.path.join(BASE_DIR, "serverProject/static"),
+  os.path.join(BASE_DIR, "/static"),
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+#STATIC_ROOT = os.path.join("/static")
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
-LOGIN_REDIRECT_URL = '/newick/'
+LOGIN_REDIRECT_URL = 'newick/'
 
 # map setting
 LEAFLET_CONFIG = {

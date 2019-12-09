@@ -13,18 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from django.conf import settings
+
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', include('newick.urls')),
-    path('api-auth/', include('rest_framework.urls')),
-    path('admin/', admin.site.urls),
+  path(settings.SITE_URL + '', include('newick.urls')),
+  path(settings.SITE_URL + 'api-auth/', include('rest_framework.urls')),
+  path(settings.SITE_URL + 'admin/', admin.site.urls),
 ]
 
 #Add Django site authentication urls (for login, logout, password management)
 urlpatterns += [
-    path('accounts/', include('django.contrib.auth.urls')),
+  #path(settings.SITE_URL + 'accounts/', include('django.contrib.auth.urls')),
 ]
 
 

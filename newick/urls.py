@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 
 from . import views
-
-app_name = 'newick'
+'''
+urlpatterns = [
+  path('', views.InitView.as_view(), name='init'),
+  path(r'^$', views.IndexView.as_view(), name='index')
+]
+'''
 urlpatterns = [
   path('', views.InitView.as_view(), name='init'),
   path('newick/', views.IndexView.as_view(), name='index'),
@@ -12,3 +16,7 @@ urlpatterns = [
   path('demo/biomod/', views.DemoBioModView.as_view(), name='demoBioMod'),
 ]
 
+#django auth
+urlpatterns += [
+  path('accounts/', include('django.contrib.auth.urls'))
+]
