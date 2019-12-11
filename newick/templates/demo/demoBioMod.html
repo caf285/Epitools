@@ -197,7 +197,6 @@
           {% if 'state' == user.groups.all.0.name %}
             &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="facilityStr"> Facility Name&nbsp;<br>
           {% endif %}
-            &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="facilityStr"> Facility Name&nbsp;<br>
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="collectionDate" checked> Collection Date&nbsp;<br>
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="sequenceDate"> Sequence Date&nbsp;<br>
         </div>
@@ -211,7 +210,7 @@
       <input type="range" min=2 max=12 value=3 oninput="newRange = this.value; addMarks()">
 
       <span id=treeDatesLabel></span>
-      <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw(); document.getElementById('treeDatesLabel').innerHTML = 'Tree Dates: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'">
+      <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw(); document.getElementById('treeDatesLabel').innerHTML = 'Tree Date Range: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'">
 
       <!--
       Zoom:
@@ -224,10 +223,10 @@
       <input type="range" min=1 max=20 value=1 oninput="tree.lineWidth = this.value/2; tree.draw()">
       -->
 
-      Leaf Text Size:
+      Sample Name Font Size:
       <input id="leafSize" type="range" min=1 max=50 value=1 oninput="tree.textSize = this.value; tree.draw()">
 
-      Branch Text Size:
+      SNP Font Size:
       <input id="branchSize" type="range" min=1 max=50 value=1 oninput="tree.canvas.font = this.value + 'px ' + tree.canvas.font.split(' ')[1]; tree.draw()">
 
       Branch Scale:
@@ -270,13 +269,14 @@
       })
 
       // prep treeDates slider
-      var treeDate = Object.keys(trees[treeType])[document.getElementById("treeDates").value]
       document.getElementById("treeDates").max = Object.keys(trees[treeType]).length - 1
+      document.getElementById("treeDates").value = document.getElementById("treeDates").max
+      var treeDate = Object.keys(trees[treeType])[document.getElementById("treeDates").value]
       document.getElementById("treeDates").addEventListener('input', function() {
         treeDate = Object.keys(trees[treeType])[this.value]
         resetM(Object.keys(trees[treeType][treeDate])[0])
       })
-      document.getElementById('treeDatesLabel').innerHTML = 'Tree Dates: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'
+      document.getElementById('treeDatesLabel').innerHTML = 'Tree Date Range: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'
 
       // edit load function to run script after each load
       var tree = Phylocanvas.default.createTree('phylocanvas')

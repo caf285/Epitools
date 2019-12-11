@@ -1,10 +1,10 @@
-#!/usr/bin/env python3.4
+#!/home/cfrench/env/TacoTime/bin/python
 
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "serverProject.settings")
 
 import sys
-sys.path.append('/home/cfrench/serverEnv/lib/python3.4/site-packages/')
+sys.path.append('~/env/TacoTime/lib/python3.4/site-packages/')
 
 import django
 django.setup()
@@ -127,9 +127,12 @@ def main():
         line = line.split(",")
         print(line)
         try:
-          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate=line[3] if line[3].lower() not in ['none', 'unknown'] else line[6], facilityStr=line[5], facility=Facility.objects.filter(id=line[5])[0] if Facility.objects.filter(id=line[5]) else Facility.objects.filter(id="_")[0], r1=line[7], r2=line[8], sequenceDate=line[6], m1=line[9], mType=line[4])
+          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate=line[3] if line[3].lower() not in ['none', 'unknown'] else line[6], facilityStr=line[5], facility=Facility.objects.filter(id=line[5])[0] if Facility.objects.filter(id=line[5]) else Facility.objects.filter(id="_")[0], r1=line[7], r2=line[8], sequenceDate=line[6], m1=line[9], mType=line[4]) 
         except:
-          continue
+          print(line[3], line[3][0])
+          if len(line[3].split("-")) < 3:
+            line[3] = str(int(float(line[3].strip()))) + "-01-01"
+          GAS.objects.get_or_create(id=line[0], tg=line[1], az=line[2], collectionDate=line[3] if line[3].lower() not in ['none', 'unknown'] else line[6], facilityStr=line[5], facility=Facility.objects.filter(id=line[5])[0] if Facility.objects.filter(id=line[5]) else Facility.objects.filter(id="_")[0], r1=line[7], r2=line[8], sequenceDate=line[6], m1=line[9], mType=line[4])
     '''
     ##### Prevent HAARM
     # Bacteria
