@@ -5733,16 +5733,16 @@ return /******/ (function(modules) { // webpackBootstrap
         }
         // save font
         this.saveCanvas()
-        this.canvas.font = "15px " + this.tree.font
+        this.canvas.font = String(25/this.tree.zoom)+"px " + this.tree.font
         // clade box color gradient
         this.canvas.fillStyle = this.grd;
         // fill clade box
         this.canvas.fillRect(this.xStart*this.getBranchScale(), this.yStart, this.xWidth, this.yHeight)
         // fill clade text
         this.canvas.fillStyle = 'black';
-        this.canvas.textAlign = 'right'
+        this.canvas.textAlign = 'left'
         this.canvas.textBaseline = 'hanging'
-        this.canvas.fillText(this.id, this.xStart*this.getBranchScale() + this.xWidth - 10, this.yStart)
+        this.canvas.fillText(this.id, this.xStart*this.getBranchScale() + this.xWidth + 3, this.yStart)
 
         if (this.isHovered) {
           this.drawHighlight()

@@ -170,21 +170,21 @@
   <!-- DEVELOPE BIOMOD HERE -->
   <div class="biomod biomod-container">
     <div class="biomod biomod-options">
-      <!--span style="display: none;"-->
+      <span style="display: none;">
       Master Reference:
       <div class="dropdown">
         <button id="masterButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
         <div id="masterDropdown" class="dropdown-menu">
         </div>
       </div>
+      </span>
 
-      M-Type:
+      emmType:
       <div class="dropdown">
         <button id="gasMtypeButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
         <div id="gasMtypeDropdown" class="dropdown-menu">
         </div>
       </div>
-      <!--/span-->
 
       Sample Names:
       <div class="dropdown">
@@ -201,10 +201,13 @@
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="sequenceDate"> Sequence Date&nbsp;<br>
         </div>
       </div>
+      </br>
 
+      <span style="display: none;">
       Tree Type:
       <!-- SUSCEPTIBLE TOGGLE -->
       <input id="bestsnp" type="checkbox" checked data-toggle="toggle" data-on="bestsnp" data-off="missingdata" data-width="100%" data-onstyle="info" data-offstyle="info">
+      </span>
 
       <div style="white-space: nowrap;">New Sample Range (<span id="newRangeValue"></span> months):</div>
       <input type="range" min=2 max=12 value=3 oninput="newRange = this.value; addMarks()">
@@ -231,9 +234,7 @@
 
       Branch Scale:
       <input id="branchScale" type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
-
-      <script>
-      </script>
+      </br>
 
       <button class="btn btn-block btn-info" type="button" aria-haspopup="true" aria-expanded="false">Print PDF</button>
       <button class="btn btn-block btn-info" type="button" aria-haspopup="true" aria-expanded="false">FAQ</button>
