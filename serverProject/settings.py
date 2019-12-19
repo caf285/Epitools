@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'ml)j)2fmq7!l+9or(4jvcd2h2!18r72%g5!5yo7^9_b(j(=cjv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['jackie.tgen.org', '10.56.0.21']
 

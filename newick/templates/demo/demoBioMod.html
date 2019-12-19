@@ -125,21 +125,25 @@
       for (sample of tree.leaves) {
         
         let newName = []
-        if (sample['id'] === document.getElementById('gasMtypeButton').innerHTML.split("::")[1]) {newName = ['Reference']}
+        if (sample['id'].indexOf("-reference") >= 0) {
+          sample['id'] = sample['id'].split("-reference")[0]
+          newName = ['Reference']
+        }
+//        if (sample['id'] === document.getElementById('gasMtypeButton').innerHTML.split("::")[1]) {newName = ['Reference']}
 
-          for (field of fields) {
-            try {
-              if (field === "id") {
-                newName.push(sample.id)
-              } else if (DB.gas[sample.id][field] === "" ) {
-                newName.push("_")
-              } else {
-                newName.push(DB.gas[sample.id][field])
-              }
-            } catch {
+        for (field of fields) {
+          try {
+            if (field === "id") {
+              newName.push(sample.id)
+            } else if (DB.gas[sample.id][field] === "" ) {
               newName.push("_")
+            } else {
+              newName.push(DB.gas[sample.id][field])
             }
+          } catch {
+            newName.push("_")
           }
+        }
         sample.label = newName.join("::")
       }
     }
@@ -186,8 +190,7 @@
         </div>
       </div>
 
-      Sample Names:
-      <div class="dropdown">
+      <div class="dropdown" style="margin-top: 7px">
         <button class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sample Names</button>
         <div id="samplesDropdown" class="dropdown-menu dropdown-menu">
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="id"> Sample Name&nbsp;<br>
@@ -315,12 +318,12 @@
       resetM(Object.keys(trees[treeType][treeDate])[0])
 
       // adjust scalars
-      tree.canvas.font = String(tree.textSize + 4) + 'px ' + tree.canvas.font.split(' ')[1]
+      tree.canvas.font = String(tree.textSize + 8) + 'px ' + tree.canvas.font.split(' ')[1]
       tree.draw()
       document.getElementById("leafSize").value = tree.textSize
-      document.getElementById("branchSize").value = tree.textSize + 4
+      document.getElementById("branchSize").value = tree.canvas.font
       console.log(parseInt(200/tree.maxBranchLength))
-      document.getElementById("branchScale").value = parseInt(tree.branchScalar/200*tree.maxBranchLength)
+      document.getElementById("branchScale").value = parseInt(tree.branchScalar/200*tree.maxBranchLength)-1
 
 
     </script>
