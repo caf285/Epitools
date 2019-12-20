@@ -14,7 +14,7 @@
   1. (Tree) Canvas Variables; Event Listeners and Functions
     1CLD: define "clades" object to fill with clade bounds and data from DB
     1SCF: set clades function, used to import clade XY bounds for drawing polygons/text around bounds
-    1DRW: draw on canvas (scale bar) ********** TODO: add 50% opacity white fill box behind scale **********
+    1DRW: draw on canvas (scale bar)
 
   // ================================================== (  )
   2. (Utils) Export required utilities

@@ -111,8 +111,11 @@
           if (cladeBounds[clade][0] < Infinity && cladeBounds[clade][1] < Infinity && cladeBounds[clade][2] > 0) {
             cladeBounds[clade][2] = cladeBounds[clade][2] - cladeBounds[clade][1]
             let shortClade
-            if (clade === "ALL") {shortClade = "ALL"} else {
-          shortClade = "emm" + clade.split("::")[0].split("M").slice(1)}
+            if (clade === "ALL") {
+              shortClade = "ALL"
+            } else {
+              shortClade = "emm" + clade.split("::")[0].split("M").slice(1)
+            }
             tree.addClade(shortClade, cladeBounds[clade][0], 300, cladeBounds[clade][1], cladeBounds[clade][2], trees[treeType][treeDate][master][clade])
           }
         }
@@ -149,11 +152,7 @@
     }
 
     function fullDraw() {
-      if (document.getElementById("gasMtypeButton").innerHTML === "ALL") {
-        tree.setTitle(document.getElementById("gasMtypeButton").innerHTML)
-      } else {
-        tree.setTitle('emm' + document.getElementById("gasMtypeButton").innerHTML.split("::")[0].split("M").slice(1))
-      }
+      tree.setTitle(document.getElementById("gasMtypeButton").innerHTML)
       for (var branch in tree.branches) {
         if (DB.gas[branch] && groups.indexOf(DB.gas[branch].facility) >= 0) { 
           tree.branches[branch].colour = "red"
@@ -288,10 +287,13 @@
         var cached = tree.load;
         return function() {
           var result = cached.apply(this, arguments)
-          document.getElementById("gasMtypeButton").innerHTML = Object.keys(trees[treeType][treeDate][document.getElementById("masterButton").innerHTML]).filter(x => trees[treeType][treeDate][document.getElementById("masterButton").innerHTML][x] === arguments[0])[0]
+          let emm = Object.keys(trees[treeType][treeDate][document.getElementById("masterButton").innerHTML]).filter(x => trees[treeType][treeDate][document.getElementById("masterButton").innerHTML][x] === arguments[0])[0]
+          console.log('emm', emm)
+          document.getElementById("gasMtypeButton").innerHTML = ((emm == 'ALL') ? 'ALL' : 'emm' + emm.split('M')[1].split('::')[0])
           
           addMarks()
           fullDraw()
+
           return result
         }
       })()
@@ -310,8 +312,20 @@
         getCladeXY(i)
         fullDraw()
         document.getElementById("gasMtypeDropdown").innerHTML = ""
+
+        let emm = new Object();
+        console.log(trees[treeType][treeDate][i])
         for (var j in trees[treeType][treeDate][i]) {
-          document.getElementById("gasMtypeDropdown").innerHTML += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[treeType][treeDate][i][j] + "\");getCladeXY(\"" + i + "\"); fullDraw()'>" + j.substring(0,30) + "</a>"
+          if (j == "ALL") {
+            emm[0] = j
+          } else {
+            emm[j.split('M')[1].split('::')[0]] = j
+          }
+        }
+        console.log(emm)
+
+        for (var j in emm) {
+          document.getElementById("gasMtypeDropdown").innerHTML += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + ((j == 0) ? 'ALL' : 'emm' + j) + "\"; tree.load(\"" + trees[treeType][treeDate][i][emm[j]] + "\");getCladeXY(\"" + i + "\"); fullDraw();'>" + ((j == 0) ? 'ALL' : 'emm' + j) + "</a>"
         }
       }
       //resetM(Object.keys(trees)[0])
