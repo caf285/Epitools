@@ -1,156 +1,154 @@
-{% extends "demo/demo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-{% block static %}
-  {{ block.super }}
-  {% load leaflet_tags %}
-  {% leaflet_css %}
-  {% leaflet_js %}
-  {% load static %}
+  <meta charset="utf-8"></meta>
+  <!-- <meta http-equiv="Cache-control" content="no-cache"> -->                                                                                         
+  <title>{% block title %}TGen North{% endblock %}</title>
+  <base href="/epitools/">
+  {% block static %}
+    {% load static %}
+    <!-- CSS -->
+    <!-- Javascript -->
+  {% endblock %}
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="{% static '/newick/css/PCA.css' %}"></link>
-
-  <!-- Javascript -->
-  <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
-  <script src="{% static '/newick/js/pcaCoordinates.js' %}"></script>
-  <script src="{% static '/newick/js/colorPalette.js' %}"></script>
-  <script src="{% static '/newick/js/trees.js' %}"></script>
-  <script src="{% static '/newick/js/mapAZ.js' %}"></script>
-  <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
-  <script src="{% static '/leaflet/leaflet-svgicon/demoAntibiogram-svg-icon.js' %}"></script>
-  <script>
-    // load database
-    var DB = {{ demoGAS | safe }}
-    var levels = ["state", "region", "county", "pca"]
-    var mapFunctions = []
-    var groups = []
-    {% for group in user.groups.all %}
-      groups.push("{{ group.name }}")
-    {% endfor %}
-
-    function fullDraw() {
-      for (var branch in tree.branches) {
-        //console.log(DB.gas[branch], branch)
-        if (DB.gas[branch] && groups.indexOf(DB.gas[branch].facility) >= 0) { 
-          tree.branches[branch].colour = "red"
-        }
-      }
-      tree.draw()
-    }
-
-  </script>
-{% endblock %}
-
-{% block sideContent %}
-  Master Reference:
-  <div class="dropdown">
-    <button id="masterButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-    <div id="masterDropdown" class="dropdown-menu">
-    </div>
-  </div>
-  </br>
-
-  M-Type:
-  <div class="dropdown">
-    <button id="gasMtypeButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-    <div id="gasMtypeDropdown" class="dropdown-menu">
-    </div>
-  </div>
-  </br>
-
+</head>
+<body>
 <!--
-  Display By:
-  <div class="dropdown">
-    <button id="gasDisplay" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
-    <div class="dropdown-menu">
-      <a class="dropdown-item" onclick="document.getElementById('gasDisplay').innerHTML = 'Default';">Default</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasDisplay').innerHTML = 'M-Type';">M-Type</a>
-      <a class="dropdown-item" onclick="document.getElementById('gasDisplay').innerHTML = 'Map View';">Map View</a>
+<div style="position: absolute; top: 0; bottom: 0; height: 50%; width: 50%; background: blue">
+  <div class="plate-grid" style="background-color: grey; display: flex; flex-flow: column; align-items: stretch;">
+    <div class="plate-row" style="display: flex; flex-flow: row;">
+      <div class="plate-cell" style="border-radius: 100%; background-color: red;"></div>
+      <div class="plate-cell" style="border-radius: 100%; background-color: red;"></div>
+      <div class="plate-cell" style="border-radius: 100%; background-color: red;"></div>
+    </div>
+    <div class="plate-row" style="display: flex; flex-flow: row;">
+      <div class="plate-cell" style="border-radius: 100%; background-color: red;"></div>
+      <div class="plate-cell" style="border-radius: 100%; background-color: red;"></div>
+      <div class="plate-cell" style="border-radius: 100%; background-color: red;"></div>
     </div>
   </div>
-  </br>
+</div>
 -->
 
-  Reports:
-  <div class="dropdown">
-    <button id="reportsButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-    <div id="reportsDropdown" class="dropdown-menu dropdown-menu-right">
-      <a class='dropdown-item'>Unidentified M-Types</a>
-      <a class='dropdown-item'>Missing Dates</a>
-      <a class='dropdown-item'>My Samples</a>
-      <a class='dropdown-item'>Outbreak Monitor</a>
-    </div>
-  </div>
-  </br>
 
-  Zoom:
-  <input style="width:100%" type="range" min=1 max=20 value=1 oninput="tree.zoom = this.value/10; tree.draw()">
-  </br>
+<div style="position: absolute; top: 0; left: 0; height: 49%; width: 49%; background: blue">
+  <canvas class="plate-grid" style="background: grey;">
+  </canvas>
+</div>
+<div style="position: absolute; top: 0; right: 0; height: 49%; width: 49%; background: blue">
+  <canvas class="plate-grid" style="background: grey;">
+  </canvas>
+</div>
+<div style="position: absolute; bottom: 0; left: 0; height: 49%; width: 49%; background: blue">
+  <canvas class="plate-grid" style="background: grey;">
+  </canvas>
+</div>
+<div style="position: absolute; bottom: 0; right: 0; height: 49%; width: 49%; background: blue">
+  <canvas class="plate-grid" style="background: grey;">
+  </canvas>
+</div>
 
-  Base Node Size:
-  <input style="width:100%" type="range" min=0 max=50 value=0 oninput="tree.baseNodeSize = this.value/2; tree.draw()">
-  </br>
 
-  Leaf Text Size:
-  <input style="width:100%" type="range" min=1 max=50 value=1 oninput="tree.textSize = this.value; tree.draw()">
-  </br>
-
-  Branch Text Size:
-  <input style="width:100%" type="range" min=1 max=50 value=1 oninput="tree.canvas.font = this.value + 'px ' + tree.canvas.font.split(' ')[1]; tree.draw()">
-  </br>
-
-  Branch Scale:
-  <input style="width:100%" type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
-  </br>
-
-  Line Width:
-  <input style="width:100%" type="range" min=1 max=20 value=1 oninput="tree.lineWidth = this.value/2; tree.draw()">
-  </br>
-
-{% endblock %}
-
-{% block mainContent %}
-  <div class="mainContent">
-    <div style="width: 0%; margin-right: 10px;">
-      {% leaflet_map "main" %}
-    </div>
-    <div id="phylocanvas" style="width: 100%; background-color: white; overflow-y: scroll;"></div>
-    <style>#phylocanvas {width: 100%; height: 800px;}</style>
-    <script>
-      var tree = Phylocanvas.default.createTree('phylocanvas')
-      tree.baseNodeSize = 2
-      tree.setTreeType('rectangular')
-      tree.showBranchLengthLabels = true
-      for (var i in trees) {
-        document.getElementById("masterDropdown").innerHTML += "<a class='dropdown-item' onclick='resetM(\"" + i + "\")'>" + i + "</a>"
+<script>
+/*
+  function resizePlate() {
+    for (let grid of document.getElementsByClassName("plate-grid")) {
+      let gridHeight = grid.parentElement.clientHeight
+      let gridWidth = grid.parentElement.clientWidth
+      let heightRatio = 0
+      let widthRatio = 1
+      let rows = grid.getElementsByClassName("plate-row")
+      for (let row of rows) {
+        let cells = row.getElementsByClassName("plate-cell")
+        heightRatio += 1/cells.length
       }
-      function resetM(i) {
-        document.getElementById("masterButton").innerHTML = i
-        document.getElementById("gasMtypeButton").innerHTML = "ALL"
-        tree.load(trees[i]["ALL"])
-        fullDraw()
-        document.getElementById("gasMtypeDropdown").innerHTML = ""
-        for (var j in trees[i]) {
-         document.getElementById("gasMtypeDropdown").innerHTML  += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + j + "\"; tree.load(\"" + trees[i][j] + "\"); fullDraw()'>" + j.substring(0,30) + "</a>"
+
+      if (gridWidth * heightRatio <= gridHeight) {
+        gridHeight = gridWidth * heightRatio
+      } else {
+        gridWidth = gridHeight / heightRatio
+      }
+
+      grid.style.height = String(gridHeight) + "px"
+      grid.style.width = String(gridWidth) + "px"
+
+      for (let row of rows) {
+        let cells = row.getElementsByClassName("plate-cell")
+        row.style.height = String(gridHeight / heightRatio / cells.length) + "px"
+        for (let cell of cells) {
+          cell.style.width = row.style.height
         }
       }
-      resetM(Object.keys(trees)[0])
+    }
 
-    </script>
-  </div>
-  <div class="mainContent">
-    <table class="table table-bordered table-light">
-      <thead>
-        <tr>
-          <td colspan="100%" style="font-size: 18px;"><center><b><div id="gasHeader">Sample Selection</div></b></center></td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td colspan="100%"><center><div id="gasBody">decription</div></center></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-{% endblock %}
+  }
+*/
+  const colSize = 1/13
+  const rowSize = 1/9
 
+  function resizePlate() {
+    // for each instance of plate-grid class
+    for (let grid of document.getElementsByClassName("plate-grid")) {
+
+      // get parent container height and width
+      let gridHeight = grid.parentElement.clientHeight
+      let gridWidth = grid.parentElement.clientWidth
+
+      // get canvas context for editing
+      ctx = grid.getContext("2d");
+
+      // re-render canvas bounds to fit parent container
+      if (gridHeight/9 >= gridWidth/13) {
+        ctx.canvas.height = gridWidth/13*9
+        ctx.canvas.width = gridWidth
+      } else {
+        ctx.canvas.height = gridHeight
+        ctx.canvas.width = gridHeight/9*13
+      }
+
+      let radius = ctx.canvas.height/9/2*0.9
+      let perimeter = 2*Math.PI
+      let x = ctx.canvas.width * colSize
+      let y = ctx.canvas.height * rowSize
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = String(parseInt(ctx.canvas.height/9/2)) + "px Arial";
+      // draw IDs
+      for (let i = 1; i < 13; i++) {
+        ctx.fillText(String(i), x * i + radius, radius)
+      }
+      for (let i = 1; i < 9; i++) {
+        ctx.fillText(String.fromCharCode(i+64), radius, y * i + radius)
+      }
+
+      ctx.font = String(parseInt(ctx.canvas.height/9/3)) + "px Arial";
+      // draw wells
+      for (let i = 1; i < 9; i++) {
+        for (let j = 1; j < 13; j++) {
+          ctx.beginPath();
+          ctx.arc(x * j + radius, y * i + radius, radius, 0, perimeter)
+          ctx.fillStyle = "white";
+          ctx.fill()
+          ctx.stroke()
+          ctx.fillStyle = "black";
+          ctx.fillText(String(i) + "-" + String(j), x * j + radius, y * i + radius)
+          ctx.closePath()
+        }
+      }
+
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", function(e) {
+    resizePlate()
+  })
+  window.addEventListener("resize", function(e) {
+    resizePlate()
+  })
+
+</script>
+
+</body>
+</html>
