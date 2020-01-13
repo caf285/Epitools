@@ -39,7 +39,7 @@ echo >> /scratch/GAS/nasp/trees.js
 
 # bestsnp
 for nwk in $(echo bestsnp missingdata); do
-  echo "var trees[\"${nwk}\"] = new Object();" >> /scratch/GAS/nasp/trees.js
+  echo "trees[\"${nwk}\"] = new Object();" >> /scratch/GAS/nasp/trees.js
   echo >> /scratch/GAS/nasp/trees.js
   for month in ${months[@]}; do
     # nwk -> month

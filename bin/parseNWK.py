@@ -38,6 +38,7 @@ def main():
   ##### parse tree and build all clades
   nwk = read(sys.argv[-1])
   nwk = "_".join(nwk.split(' '))
+  nwk = "".join(nwk.split('-reference'))
   clades = [[]]
   depth = 0
   fltTrigger = False

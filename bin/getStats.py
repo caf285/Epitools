@@ -48,7 +48,7 @@ def main():
     gasHash[line[0]] = line
 
   # get sample list of all samples > M1 80% QUALITY_BREADTH
-  cutoff = 80
+  cutoff = 70
   stats = read(tempDir + "statistics/sample_stats.tsv").split("\n")[5::4]
   for line in stats:
     line = line.split("\t")

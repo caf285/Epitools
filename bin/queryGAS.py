@@ -1,13 +1,22 @@
-#!/usr/bin/env python3
+#!/home/cfrench/env/TacoTime/bin/python
 
 import sys
 import datetime
 import json
+import re
+import openpyxl
 
 # ==================================================( functions )
 def printHelp():
   print("\nreturns all lines of GAS.tsv that follow arguments given")
-  print("usage: queryGAS.py [-h] [-s] [-j | -exact | -n | -e | -d | -m ]")
+  print("usage: queryGAS.py [ -h ] [ -s | -a ] [-j | -exact | -n | -e | -d | -m ]")
+
+  # options
+  print("\t-h\tprints this help")
+  print("\t-s\tprints short version of returned samples")
+  print("\t-a\trestricts samples to TG numbers found in ALLGAS.tsv")
+
+  # query
   print("\t-exact\tExact Sample Name")
   print("\t-n\tSample Name")
   print("\t-e\tExclude Name")
@@ -30,7 +39,7 @@ def main():
 
   # check args
   # fill dictionary for all accepted args
-  args = {"-s": [], "-j":[], "-exact":[], "-n":[], "-e":[], "-d":[], "-m":[]}
+  args = {"-a": [], "-s": [], "-j":[], "-exact":[], "-n":[], "-e":[], "-d":[], "-m":[]}
   flag = ""
   for arg in sys.argv:
     if arg[0] == "-":
@@ -110,6 +119,16 @@ def main():
   cols = {}
   for i in range(len(header)):
     cols[header[i]] = i
+
+  # if -a flag, get all TG numbers from 'All GAS.xlsx' and reduce gas
+  # removes all historic data at the root
+  if "-a" in sys.argv:
+
+    # load workbook
+    allGasBook = openpyxl.load_workbook(filename="/scratch/GAS/All GAS.xlsx", data_only=True)
+    tg = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"Isolate \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
+    az = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"External ID", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
+    gas = list(filter(lambda x: re.findall(r"TG\d+", x.split("\t")[0]) and re.findall(r"TG\d+", x.split("\t")[0])[0] in tg or x.split("\t")[0] in az, gas))
 
   # check query args
   # if the line servives to the end, it added to the output
