@@ -873,7 +873,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * Removes events defined in this.eventListeners. Useful for cleaning up.
 	   */
 
-
 	  _createClass(Tree, [{
 	    key: 'removeEventListeners',
 	    value: function removeEventListeners() {
@@ -2722,7 +2721,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Branch() {
 	    _classCallCheck(this, Branch);
 
-      this.markStyle = 0;
+      this.markStyle = {
+        'primary': false,
+        'secondary': false,
+        'success': false,
+        'info': false,
+        'warning': false,
+        'danger': false,
+        'dark': false,
+        'light': false,
+        'inactive': false
+      };
 
 	    /**
 	     * The branch's angle clockwise from horizontal in radians (used paricularly
@@ -3062,24 +3071,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	        tx = -tx - this.labelWidth * 1;
 	      }
 
-        if (this.markStyle === 1) {
-          this.canvas.beginPath();
-          this.canvas.fillStyle = 'rgba(255, 0, 0, 0.7)'
-          this.canvas.fillRect(tx, (-fSize/2)-1, this.labelWidth, fSize*1.2)
-          this.canvas.fillStyle = "#000"
+        // default text for no highlights
+        if (Object.values(this.markStyle).indexOf(true) === -1) {
+  	      this.canvas.fillStyle = '#000';
   	      this.canvas.fillText(label, tx, fSize / 2);
-	        this.canvas.closePath();
-        } else if (this.markStyle === 2) {
-  	      this.canvas.beginPath();
-  	      this.canvas.fillStyle = 'rgba(0, 0, 0, 0.25)';
-  	      this.canvas.fillText(label, tx, fSize / 2);
-	        this.canvas.closePath();
         } else {
-  	      this.canvas.beginPath();
-  	      this.canvas.fillStyle = this.getTextColour();
-  	      this.canvas.fillText(label, tx, fSize / 2);
+          // fill highlight
+          this.canvas.beginPath();
+          this.canvas.arc(tx + (fSize / 2), 0, (fSize / 2) + 2, 0.5*Math.PI, 1.5*Math.PI)
+          this.canvas.arc(this.labelWidth + (fSize / 2) + 2 + (fSize*1.5*Object.values(this.markStyle).filter(x => x === true).length), 0, (fSize / 2) + 2, 1.5*Math.PI, 0.5*Math.PI)
 	        this.canvas.closePath();
+          this.canvas.fillStyle = 'rgba(1, 1, 1, 0.25)'
+          this.canvas.fill()
+
+          let keys = Object.entries(this.markStyle).filter(x => x[1] === true).map(x => x[0])
+          if (this.markStyle["primary"]) {
+  	        this.canvas.fillStyle = '#F00';
+            this.canvas.beginPath();
+            this.canvas.arc(this.labelWidth + (fSize / 2) + 1 + (fSize*1.5) + (fSize*1.5*keys.indexOf("primary")), 0, (fSize / 2)+1, 0, 2*Math.PI)
+	          this.canvas.closePath();
+            this.canvas.fill()
+  	        this.canvas.fillStyle = '#000';
+  	        this.canvas.fillText(label, tx, fSize / 2);
+          }
+          if (this.markStyle["secondary"]) {
+  	        this.canvas.fillStyle = '#0AF';
+            this.canvas.beginPath();
+            this.canvas.arc(this.labelWidth + (fSize / 2) + 1 + (fSize*1.5) + (fSize*1.5*keys.indexOf("secondary")), 0, (fSize / 2)+1, 0, 2*Math.PI)
+	          this.canvas.closePath();
+            this.canvas.fill()
+  	        this.canvas.fillStyle = '#000';
+  	        this.canvas.fillText(label, tx, fSize / 2);
+          }
+          if (this.markStyle["inactive"]) {
+  	        this.canvas.fillStyle = '#000';
+  	        this.canvas.fillText(label, tx, fSize / 2);
+          }
         }
+
 
 	      // Rotate canvas back to original position
 	      if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {

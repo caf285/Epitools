@@ -31,8 +31,9 @@
 
       function addMarks() {
         document.getElementById("newRangeValue").innerHTML = newRange
-        for (branch in tree.leaves) {
-          tree.leaves[branch]['markStyle'] = 0
+        for (leaf of tree.leaves) {
+          leaf.markStyle["secondary"] = false
+          leaf.markStyle["inactive"] = false
         }
         tree.draw()
         //STATE
@@ -50,7 +51,7 @@
           document.getElementById("treeContext1").innerHTML = "<div id='newSamples'>New Samples: " + recentSamples.length + "</div><div>Total Samples: " + tree.leaves.length + "</div><div></div>"
           document.getElementById("newSamples").addEventListener('click', function() {
             for (sample of recentSamples) {
-              tree.branches[sample]['markStyle'] = 1
+              tree.branches[sample]['markStyle']["secondary"] = true
             }
             tree.draw()
           })
@@ -69,12 +70,12 @@
           document.getElementById("treeContext1").innerHTML = "<div id='newSamples'>New Samples: " + recentSamples.length + "</div><div>Total Samples: " + tree.leaves.length + "</div><div></div>"
           document.getElementById("newSamples").addEventListener('click', function() {
             for (sample of recentSamples) {
-              tree.branches[sample]['markStyle'] = 1
+              tree.branches[sample]['markStyle']["secondary"] = true
             }
             tree.draw()
           })
           for (sample of Object.keys(DB.gas).filter(x => String(DB.gas[x]['facility']).includes('Banner') === false && Object.keys(tree.branches).indexOf(x) >= 0)) {
-            tree.branches[sample]['markStyle'] = 2
+            tree.branches[sample]['markStyle']["inactive"] = true
           }
           tree.draw();
           // FMC context windows
@@ -366,12 +367,12 @@
 
       // cluster detection (move to phylocanvas later)
       function getClusters() {
-        for (let leaf of tree.leaves) {
-          leaf.markStyle = 0
+        for (let leaf of tree.leaves.filter(x => x.markStyle["primary"] === true)) {
+          leaf.markStyle["primary"] = false
         }
         for (let cluster of tree.getClusters(document.getElementById("clusterDistance").value, document.getElementById("clusterAmount").value)) {
           for (let leaf of cluster) {
-            leaf.markStyle = 1
+            leaf.markStyle["primary"] = true
           }
         }
         tree.draw()
