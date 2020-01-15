@@ -27,7 +27,7 @@
       groups.push("{{ group.name }}")
     {% endfor %}
 
-    newRange = 3
+    newRange = 1
 
       function addMarks() {
         document.getElementById("newRangeValue").innerHTML = newRange
@@ -165,7 +165,6 @@
   </script>
 {% endblock %}
 
-
 {% block sideContent %}
 {% endblock %}
 
@@ -212,7 +211,7 @@
       </span>
 
       <div style="white-space: nowrap;">New Sample Range (<span id="newRangeValue"></span> months):</div>
-      <input type="range" min=2 max=12 value=3 oninput="newRange = this.value; addMarks()">
+      <input type="range" min=1 max=12 value=1 oninput="newRange = this.value; addMarks()">
 
       <span id=treeDatesLabel></span>
       <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw(); document.getElementById('treeDatesLabel').innerHTML = 'Tree Date Range: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'">
@@ -236,6 +235,13 @@
 
       Branch Scale:
       <input id="branchScale" type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
+      </br>
+
+      <div>Cluster Distance (<span id="clusterDistanceLabel">0</span>):</div>
+      <input id="clusterDistance" type="range" min=0 max=20 value=0 oninput="document.getElementById('clusterDistanceLabel').innerHTML = this.value; getClusters();">
+
+      <div>Cluster Amount (<span id="clusterAmountLabel">2</span>):</div>
+      <input id="clusterAmount" type="range" min=2 max=20 value=2 oninput="document.getElementById('clusterAmountLabel').innerHTML = this.value; getClusters();">
       </br>
 
       <button class="btn btn-block btn-info" type="button" aria-haspopup="true" aria-expanded="false">Print PDF</button>
@@ -358,12 +364,35 @@
 
 
 
+      // cluster detection (move to phylocanvas later)
+      function getClusters() {
+        for (let leaf of tree.leaves) {
+          leaf.markStyle = 0
+        }
+        for (let cluster of tree.getClusters(document.getElementById("clusterDistance").value, document.getElementById("clusterAmount").value)) {
+          for (let leaf of cluster) {
+            leaf.markStyle = 1
+          }
+        }
+        tree.draw()
+      }
 
 
 
 
 
- 
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
 
 {% endblock %}

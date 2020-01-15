@@ -12,7 +12,7 @@
   0. (return) Return publicly available Phylocanvas module
     - added Clade as publicly avail mod
   1. (Tree) Canvas Variables; Event Listeners and Functions
-    1CLD: define "clades" object to fill with clade bounds and data from DB
+    1CLD: Clade & Cluster objects, checks for and adds objects for defined clades and clusters
     1SCF: set clades function, used to import clade XY bounds for drawing polygons/text around bounds
     1DRW: draw on canvas (scale bar)
 
@@ -372,8 +372,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    this.leaves = [];
 
-      // 1CLD - clades list init
+      // 1CLD - clades and clusters list init
       this.clades = [];
+      this.clusters = [];
       this.title = "Tree!!";
 
 	    /**
@@ -933,23 +934,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 
 	  }, {
+      /* 1SCF - Clade & Cluster Functions
+        
+      */
       key: 'getClusters',
-      value: function getClusters(maxLength = 1, minSize = 4) {
-        let clusters = {}
-        for (let leaf of this.leaves) {
-          while (maxLength > 0) {
-            maxLength -= 1
-            console.log(leaf)
+      value: function getClusters(maxLength = 0, minSize = 2, node = null) {
+        let clusters = []
+        let cluster = []
+        let nodes = []
+        if (node) {
+          cluster = []
+          getCluster([], maxLength, node)
+          if (cluster.length >= minSize) {
+            clusters.push(cluster)
+          }
+        } else {
+          for (let node of this.leaves) {
+            cluster = []
+            if (nodes.indexOf(node) < 0) {
+              getCluster([], maxLength, node)
+            }
+            if (cluster.length >= minSize) {
+              clusters.push(cluster)
+            }
+          }
+        }
+        return clusters
+
+        function getCluster(path, len, node) {
+          if (node.leaf) {
+            cluster.push(node)
+          }
+          nodes.push(node)
+          path.push(node)
+          for (let child of node.children) {
+            if (path.indexOf(child) < 0 && child.branchLength < len) {
+              getCluster(path, len - child.branchLength, child)
+            }
+          }
+          if (node.parent && path.indexOf(node.parent) < 0 && node.branchLength < len) {
+            getCluster(path, len - node.branchLength, node.parent)
           }
         }
       }
     }, {
-      key: 'setTitle',
-      value: function setTitle(title) {
-	      this.title = title;
-      }
-    }, {
-      // 1SCF - Set Clade Function
       key: 'addClade',
       value: function addClade(id, xStart, xWidth, yStart, yHeight, nwk) {
         let clade = new _Clade2.default();
@@ -964,6 +992,11 @@ return /******/ (function(modules) { // webpackBootstrap
       key: 'clearClades',
       value: function clearClades() {
 	      this.clades = []
+      }
+    }, {
+      key: 'setTitle',
+      value: function setTitle(title) {
+	      this.title = title;
       }
     }, {
 	    key: 'setInitialCollapsedBranches',
