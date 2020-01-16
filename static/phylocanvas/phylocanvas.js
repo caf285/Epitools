@@ -967,11 +967,11 @@ return /******/ (function(modules) { // webpackBootstrap
           nodes.push(node)
           path.push(node)
           for (let child of node.children) {
-            if (path.indexOf(child) < 0 && child.branchLength < len) {
+            if (path.indexOf(child) < 0 && child.branchLength <= len) {
               getCluster(path, len - child.branchLength, child)
             }
           }
-          if (node.parent && path.indexOf(node.parent) < 0 && node.branchLength < len) {
+          if (node.parent && path.indexOf(node.parent) < 0 && node.branchLength <= len) {
             getCluster(path, len - node.branchLength, node.parent)
           }
         }
@@ -3081,7 +3081,7 @@ return /******/ (function(modules) { // webpackBootstrap
           this.canvas.arc(tx + (fSize / 2), 0, (fSize / 2) + 2, 0.5*Math.PI, 1.5*Math.PI)
           this.canvas.arc(this.labelWidth + (fSize / 2) + 2 + (fSize*1.5*Object.values(this.markStyle).filter(x => x === true).length), 0, (fSize / 2) + 2, 1.5*Math.PI, 0.5*Math.PI)
 	        this.canvas.closePath();
-          this.canvas.fillStyle = 'rgba(1, 1, 1, 0.25)'
+          this.canvas.fillStyle = 'rgba(1, 1, 1, 0.1)'
           this.canvas.fill()
 
           let keys = Object.entries(this.markStyle).filter(x => x[1] === true).map(x => x[0])
@@ -3095,7 +3095,7 @@ return /******/ (function(modules) { // webpackBootstrap
   	        this.canvas.fillText(label, tx, fSize / 2);
           }
           if (this.markStyle["secondary"]) {
-  	        this.canvas.fillStyle = '#0AF';
+  	        this.canvas.fillStyle = '#07C';
             this.canvas.beginPath();
             this.canvas.arc(this.labelWidth + (fSize / 2) + 1 + (fSize*1.5) + (fSize*1.5*keys.indexOf("secondary")), 0, (fSize / 2)+1, 0, 2*Math.PI)
 	          this.canvas.closePath();

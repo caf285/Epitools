@@ -32,6 +32,7 @@
       function addMarks() {
         document.getElementById("newRangeValue").innerHTML = newRange
         for (leaf of tree.leaves) {
+          leaf.markStyle["primary"] = false
           leaf.markStyle["secondary"] = false
           leaf.markStyle["inactive"] = false
         }
@@ -51,7 +52,7 @@
           document.getElementById("treeContext1").innerHTML = "<div id='newSamples'>New Samples: " + recentSamples.length + "</div><div>Total Samples: " + tree.leaves.length + "</div><div></div>"
           document.getElementById("newSamples").addEventListener('click', function() {
             for (sample of recentSamples) {
-              tree.branches[sample]['markStyle']["secondary"] = true
+              tree.branches[sample]['markStyle']["primary"] = true
             }
             tree.draw()
           })
@@ -70,7 +71,7 @@
           document.getElementById("treeContext1").innerHTML = "<div id='newSamples'>New Samples: " + recentSamples.length + "</div><div>Total Samples: " + tree.leaves.length + "</div><div></div>"
           document.getElementById("newSamples").addEventListener('click', function() {
             for (sample of recentSamples) {
-              tree.branches[sample]['markStyle']["secondary"] = true
+              tree.branches[sample]['markStyle']["primary"] = true
             }
             tree.draw()
           })
@@ -80,6 +81,12 @@
           tree.draw();
           // FMC context windows
         }
+
+        document.getElementById("clusterContext").innerHTML = "<div id='newClusters'>Clusters: " + tree.getClusters(document.getElementById("clusterDistance").value, document.getElementById("clusterAmount").value).length + "</div><div></div>"
+        document.getElementById("newClusters").addEventListener('click', function() {
+          getClusters()
+          tree.draw()
+        })
         //if  (document.getElementById("gasMtypeButton").innerHTML === "ALL") {document.getElementById('treeContext2').innerHTML = "ALL"} else {document.getElementById('treeContext2').innerHTML = "emm" + document.getElementById("gasMtypeButton").innerHTML.split("::")[0].split("M").slice(1)}
       }
 
@@ -211,11 +218,11 @@
       <input id="bestsnp" type="checkbox" checked data-toggle="toggle" data-on="bestsnp" data-off="missingdata" data-width="100%" data-onstyle="info" data-offstyle="info">
       </span>
 
-      <div style="white-space: nowrap;">New Sample Range (<span id="newRangeValue"></span> months):</div>
+      <div style="white-space: nowrap;">New Sample Range (<span id="newRangeValue"></span> months)</div>
       <input type="range" min=1 max=12 value=1 oninput="newRange = this.value; addMarks()">
 
       <span id=treeDatesLabel></span>
-      <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw(); document.getElementById('treeDatesLabel').innerHTML = 'Tree Date Range: (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'">
+      <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw(); document.getElementById('treeDatesLabel').innerHTML = 'Tree Date Range (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'">
 
       <!--
       Zoom:
@@ -238,11 +245,12 @@
       <input id="branchScale" type="range" min=1 max=20 value=1 oninput="tree.branchScalar = this.value/tree.maxBranchLength*200; tree.draw()">
       </br>
 
-      <div>Cluster Distance (<span id="clusterDistanceLabel">0</span>):</div>
-      <input id="clusterDistance" type="range" min=0 max=20 value=0 oninput="document.getElementById('clusterDistanceLabel').innerHTML = this.value; getClusters();">
+      <div>Cluster Detection:</div>
+      <div style="font-size:14px;">Number of SNPs (<span id="clusterDistanceLabel">0</span>)</div>
+      <input id="clusterDistance" type="range" min=0 max=20 value=0 oninput="document.getElementById('clusterDistanceLabel').innerHTML = this.value; addMarks();">
 
-      <div>Cluster Amount (<span id="clusterAmountLabel">2</span>):</div>
-      <input id="clusterAmount" type="range" min=2 max=20 value=2 oninput="document.getElementById('clusterAmountLabel').innerHTML = this.value; getClusters();">
+      <div style="font-size:14px;">Number of Samples in Cluster (<span id="clusterAmountLabel">2</span>)</div>
+      <input id="clusterAmount" type="range" min=2 max=20 value=2 oninput="document.getElementById('clusterAmountLabel').innerHTML = this.value; addMarks();">
       </br>
 
       <button class="btn btn-block btn-info" type="button" aria-haspopup="true" aria-expanded="false">Print PDF</button>
@@ -257,6 +265,7 @@
       </div>
       <div class="biomod biomod-row" style="height: 400px;">
         <div class="biomod biomod-module" id="treeContext1"></div>
+        <div class="biomod biomod-module" id="clusterContext"></div>
       </div>
     </div>
   </div>
@@ -367,12 +376,12 @@
 
       // cluster detection (move to phylocanvas later)
       function getClusters() {
-        for (let leaf of tree.leaves.filter(x => x.markStyle["primary"] === true)) {
-          leaf.markStyle["primary"] = false
+        for (let leaf of tree.leaves.filter(x => x.markStyle["secondary"] === true)) {
+          leaf.markStyle["secondary"] = false
         }
         for (let cluster of tree.getClusters(document.getElementById("clusterDistance").value, document.getElementById("clusterAmount").value)) {
           for (let leaf of cluster) {
-            leaf.markStyle["primary"] = true
+            leaf.markStyle["secondary"] = true
           }
         }
         tree.draw()

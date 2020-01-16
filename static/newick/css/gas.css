@@ -7,3 +7,13 @@
   cursor: pointer;
   color: #FF8888
 }
+
+#newClusters {
+  color: #08C;
+  font-size: 18px;
+}
+
+#newClusters:hover {
+  cursor: pointer;
+  color: #8AF
+}
