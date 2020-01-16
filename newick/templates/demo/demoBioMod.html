@@ -409,10 +409,10 @@
 
       function loadAzTree() {
         let azLen = tree.leaves.filter(x => x.markStyle["info"] === true).length
-        if (azLen > 1) {
+        if (azLen > 1 || azLen < 1) {
           resetM(Object.keys(trees[treeType][treeDate])[0])
         } else if (azLen == 1) {
-          tree.load(Object.entries(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]]).filter(x => x[1].indexOf("TG92300") >= 0 && x[0] != "ALL")[0][1])
+          tree.load(Object.entries(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]]).filter(x => x[1].indexOf(  tree.leaves.filter(x => x.markStyle["info"] === true)[0].id  ) >= 0 && x[0] != "ALL")[0][1])
         }
       }
 
