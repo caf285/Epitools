@@ -8,8 +8,8 @@
   {% load static %}
 
   <!-- CSS -->
-<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
-  <link href="{% static '/newick/css/gas.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css">
+  <link rel="stylesheet" href="{% static '/newick/css/gas.css' %}">
   <link rel="stylesheet" href="{% static '/jQRangeSlider/css/classic.css' %}" type="text/css"></link>
 
   <!-- Javascript -->
@@ -18,7 +18,7 @@
   <script src="{% static '/jquery/jquery-1.10.2.min.js' %}"></script>
   <script src="{% static '/jquery/jquery-ui.min.js' %}"></script>
   <script src="{% static '/jQRangeSlider/jQAllRangeSliders-min.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
   <script>
     // load database
     var DB = {{ demoBioMod | safe }}
@@ -31,10 +31,10 @@
 
       function addMarks() {
         document.getElementById("newRangeValue").innerHTML = newRange
-        for (leaf of tree.leaves) {
-          leaf.markStyle["primary"] = false
-          leaf.markStyle["secondary"] = false
-          leaf.markStyle["inactive"] = false
+        for (let leaf of tree.leaves) {
+          for (let style of Object.keys(leaf.markStyle)) {
+            leaf.markStyle[style] = false
+          }
         }
         tree.draw()
         //STATE
@@ -264,8 +264,18 @@
         <div class="biomod biomod-module" id="phylocanvas"></div>
       </div>
       <div class="biomod biomod-row" style="height: 400px;">
-        <div class="biomod biomod-module" id="treeContext1"></div>
-        <div class="biomod biomod-module" id="clusterContext"></div>
+        <div class="biomod biomod-module">
+          <div id="clusterContext"></div>
+          <div id="treeContext1"></div>
+        </div>
+        <div class="biomod biomod-module">
+          <form onsubmit="loadAzTree(); return false;">
+            <div class="form-group" style="margin: 5px;">
+              <label style="color:#0D0; font-size:18px;">AZ Number Search:</label>
+              <input type="text" class="form-control" id="azNumber" placeholder="Enter AZ Number" oninput="getAZ()">
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -387,7 +397,24 @@
         tree.draw()
       }
 
+      function getAZ() {
+        for (let leaf of tree.leaves.filter(x => x.markStyle["info"] === true)) {
+          leaf.markStyle["info"] = false
+        }
+        for (let leaf of tree.leaves.filter(x => document.getElementById("azNumber").value && DB.gas[x.id]["az"].indexOf(document.getElementById("azNumber").value) >= 0)) {
+          leaf.markStyle["info"] = true
+        }
+        tree.draw()
+      }
 
+      function loadAzTree() {
+        let azLen = tree.leaves.filter(x => x.markStyle["info"] === true).length
+        if (azLen > 1) {
+          resetM(Object.keys(trees[treeType][treeDate])[0])
+        } else if (azLen == 1) {
+          tree.load(Object.entries(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]]).filter(x => x[1].indexOf("TG92300") >= 0 && x[0] != "ALL")[0][1])
+        }
+      }
 
 
 

@@ -3103,6 +3103,15 @@ return /******/ (function(modules) { // webpackBootstrap
   	        this.canvas.fillStyle = '#000';
   	        this.canvas.fillText(label, tx, fSize / 2);
           }
+          if (this.markStyle["info"]) {
+  	        this.canvas.fillStyle = '#0D0';
+            this.canvas.beginPath();
+            this.canvas.arc(this.labelWidth + (fSize / 2) + 1 + (fSize*1.5) + (fSize*1.5*keys.indexOf("info")), 0, (fSize / 2)+1, 0, 2*Math.PI)
+	          this.canvas.closePath();
+            this.canvas.fill()
+  	        this.canvas.fillStyle = '#000';
+  	        this.canvas.fillText(label, tx, fSize / 2);
+          }
           if (this.markStyle["inactive"]) {
   	        this.canvas.fillStyle = '#000';
   	        this.canvas.fillText(label, tx, fSize / 2);
