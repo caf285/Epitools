@@ -264,18 +264,27 @@
         <div class="biomod biomod-module" id="phylocanvas"></div>
       </div>
       <div class="biomod biomod-row" style="height: 400px;">
+
+        <!-- TREE CONTEXT MENU -->
         <div class="biomod biomod-module">
           <div id="clusterContext"></div>
           <div id="treeContext1"></div>
         </div>
+
+        <!-- AZ SEARCH BAR -->
         <div class="biomod biomod-module">
-          <form onsubmit="loadAzTree(); return false;">
-            <div class="form-group" style="margin: 5px;">
-              <label style="color:#0D0; font-size:18px;">AZ Number Search:</label>
-              <input type="text" class="form-control" id="azNumber" placeholder="Enter AZ Number" oninput="getAZ()">
-            </div>
-          </form>
+          <div style="display: flex; flex-flow: column; height: 100%;">
+            <form onsubmit="loadAzTree(); return false;" style="margin: 5px;">
+              <div class="form-group">
+                <label style="color:#0D0; font-size:18px;">AZ Number Search:</label>
+                <input type="text" class="form-control" id="azNumber" placeholder="Enter AZ Number" oninput="getAZ()">
+              </div>
+            </form>
+            <div id="azResults" style="flex-grow: 1; overflow-y: scroll; margin: 5px;"></div>
+          </div>
         </div>
+        <!--  -->
+
       </div>
     </div>
   </div>
@@ -401,22 +410,29 @@
         for (let leaf of tree.leaves.filter(x => x.markStyle["info"] === true)) {
           leaf.markStyle["info"] = false
         }
+
+        let azResults = document.getElementById("azResults")
+        azResults.innerHTML = ""
+
         for (let leaf of tree.leaves.filter(x => document.getElementById("azNumber").value && DB.gas[x.id]["az"].indexOf(document.getElementById("azNumber").value) >= 0)) {
           leaf.markStyle["info"] = true
         }
+
+        for (let az of Object.entries(DB.gas).filter(x => document.getElementById("azNumber").value && x[1]["az"].indexOf(document.getElementById("azNumber").value) >= 0).sort(function(a, b) {if (a[0] - b[0]) {return 1} else if (a[0] <= b[0]) {return -1}}          )) {
+
+          m = Object.entries(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]]).filter(x => x[0] !== "ALL" && x[1].indexOf(az[0]) >= 0)[0]
+          if (m) {
+            let emm = m[0].split("M")[1].split("::")[0]
+            azResults.innerHTML += "<div class='azResults' onclick='loadAzTree(\"" + m[0] + "\")'>" + az[1]["az"] + " --> emm" + emm + "</div>"
+          }
+        }
+
         tree.draw()
       }
 
-      function loadAzTree() {
-        let azLen = tree.leaves.filter(x => x.markStyle["info"] === true).length
-        if (azLen > 1 || azLen < 1) {
-          resetM(Object.keys(trees[treeType][treeDate])[0])
-        } else if (azLen == 1) {
-          tree.load(Object.entries(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]]).filter(x => x[1].indexOf(  tree.leaves.filter(x => x.markStyle["info"] === true)[0].id  ) >= 0 && x[0] != "ALL")[0][1])
-        }
+      function loadAzTree(m) {
+        tree.load(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]][m])
       }
-
-
 
 
 
