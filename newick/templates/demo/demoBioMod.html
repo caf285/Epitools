@@ -19,76 +19,49 @@
   <script src="{% static '/jquery/jquery-ui.min.js' %}"></script>
   <script src="{% static '/jQRangeSlider/jQAllRangeSliders-min.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+
   <script>
     // load database
     var DB = {{ demoBioMod | safe }}
     var groups = []
-    {% for group in user.groups.all %}
-      groups.push("{{ group.name }}")
-    {% endfor %}
 
     newRange = 1
 
-      function addMarks() {
-        document.getElementById("newRangeValue").innerHTML = newRange
-        for (let leaf of tree.leaves) {
-          for (let style of Object.keys(leaf.markStyle)) {
-            leaf.markStyle[style] = false
-          }
+
+    
+    function addMarks() {
+      // RESET ALL MARKS
+      for (let leaf of tree.leaves) {
+        for (let style of Object.keys(leaf.markStyle)) {
+          leaf.markStyle[style] = false
+        }
+      }
+      // NEW SAMPLES
+      document.getElementById("newRangeValue").innerHTML = newRange
+      let today = new Date()
+      let recentSamples = []
+      for (sample of Object.keys(DB.gas).filter(x => Object.keys(tree.branches).indexOf(x) >= 0)) {
+        let sampleDate = new Date(DB.gas[sample]['collectionDate'])
+        let monthDelta = parseInt((today.getFullYear() * 12 + today.getMonth()) - (sampleDate.getFullYear() * 12 + sampleDate.getMonth()))
+        if (monthDelta <= newRange) {
+          recentSamples.push(sample)
+        }
+      }
+      document.getElementById("treeContext1").innerHTML = "<div id='newSamples'>New Samples: " + recentSamples.length + "</div><div>Total Samples: " + tree.leaves.length + "</div><div></div>"
+      document.getElementById("newSamples").addEventListener('click', function() {
+        for (sample of recentSamples) {
+          tree.branches[sample]['markStyle']["primary"] = true
         }
         tree.draw()
-        //STATE
-        if (groups.indexOf("state") >= 0) {
-          let today = new Date()
-          let recentSamples = []
-          for (sample of Object.keys(DB.gas).filter(x => Object.keys(tree.branches).indexOf(x) >= 0)) {
-            let sampleDate = new Date(DB.gas[sample]['collectionDate'])
-            let monthDelta = parseInt((today.getFullYear() * 12 + today.getMonth()) - (sampleDate.getFullYear() * 12 + sampleDate.getMonth()))
-            if (monthDelta <= newRange) {
-              recentSamples.push(sample)
-            }
-          }
-          // STATE context windows
-          document.getElementById("treeContext1").innerHTML = "<div id='newSamples'>New Samples: " + recentSamples.length + "</div><div>Total Samples: " + tree.leaves.length + "</div><div></div>"
-          document.getElementById("newSamples").addEventListener('click', function() {
-            for (sample of recentSamples) {
-              tree.branches[sample]['markStyle']["primary"] = true
-            }
-            tree.draw()
-          })
-        // FMC
-        } else if (groups.indexOf("banner") >= 0) {
-          let today = new Date()
-          let recentSamples = []
-          for (sample of Object.keys(DB.gas).filter(x => String(DB.gas[x]['facility']).includes('Banner') && Object.keys(tree.branches).indexOf(x) >= 0)) {
-            let sampleDate = new Date(DB.gas[sample]['collectionDate'])
-            let monthDelta = parseInt((today.getFullYear() * 12 + today.getMonth()) - (sampleDate.getFullYear() * 12 + sampleDate.getMonth()))
-            if (monthDelta <= newRange) {
-              recentSamples.push(sample)
-            }
-          }
-          // STATE context windows
-          document.getElementById("treeContext1").innerHTML = "<div id='newSamples'>New Samples: " + recentSamples.length + "</div><div>Total Samples: " + tree.leaves.length + "</div><div></div>"
-          document.getElementById("newSamples").addEventListener('click', function() {
-            for (sample of recentSamples) {
-              tree.branches[sample]['markStyle']["primary"] = true
-            }
-            tree.draw()
-          })
-          for (sample of Object.keys(DB.gas).filter(x => String(DB.gas[x]['facility']).includes('Banner') === false && Object.keys(tree.branches).indexOf(x) >= 0)) {
-            tree.branches[sample]['markStyle']["inactive"] = true
-          }
-          tree.draw();
-          // FMC context windows
-        }
+      })
 
-        document.getElementById("clusterContext").innerHTML = "<div id='newClusters'>Clusters: " + tree.getClusters(document.getElementById("clusterDistance").value, document.getElementById("clusterAmount").value).length + "</div><div></div>"
-        document.getElementById("newClusters").addEventListener('click', function() {
-          getClusters()
-          tree.draw()
-        })
-        //if  (document.getElementById("gasMtypeButton").innerHTML === "ALL") {document.getElementById('treeContext2').innerHTML = "ALL"} else {document.getElementById('treeContext2').innerHTML = "emm" + document.getElementById("gasMtypeButton").innerHTML.split("::")[0].split("M").slice(1)}
-      }
+      // CLUSTER DETECTION
+      document.getElementById("clusterContext").innerHTML = "<div id='newClusters'>Clusters: " + tree.getClusters(document.getElementById("clusterDistance").value, document.getElementById("clusterAmount").value).length + "</div><div></div>"
+      document.getElementById("newClusters").addEventListener('click', function() {
+        getClusters()
+        tree.draw()
+      })
+    }
 
 
     function getCladeXY(master) {
@@ -132,16 +105,13 @@
     }
 
     function updateSampleNames() {
-      let fields = Array.from(document.getElementsByClassName("sampleNamesCheck")).filter(x => x.checked).map(x => x.name)
       for (sample of tree.leaves) {
-        
+        let fields = Array.from(document.getElementsByClassName("sampleNamesCheck")).filter(x => x.checked).map(x => x.name)
         let newName = []
         if (sample['id'].indexOf("-reference") >= 0) {
           sample['id'] = sample['id'].split("-reference")[0]
           newName = ['Reference']
         }
-//        if (sample['id'] === document.getElementById('gasMtypeButton').innerHTML.split("::")[1]) {newName = ['Reference']}
-
         for (field of fields) {
           try {
             if (field === "id") {
@@ -149,7 +119,21 @@
             } else if (DB.gas[sample.id][field] === "" ) {
               newName.push("_")
             } else {
-              newName.push(DB.gas[sample.id][field])
+              if (field === "facilityStr") {
+                {% if "((Arizona State))" in user.groups.all|safe %}
+                  newName.push(DB.gas[sample.id][field])
+                {% elif " County)" in user.groups.all|safe %}
+                  for (let county of DB.gas[sample.id]["counties"]) {
+                    county = "(" + county + " County)"
+                    if ("{{ user.groups.all|safe }}".indexOf(county) >= 0) {
+                      newName.push(DB.gas[sample.id][field])
+                      break
+                    }
+                  }
+                {% endif %}
+              } else {
+                newName.push(DB.gas[sample.id][field])
+              }
             }
           } catch {
             newName.push("_")
@@ -171,6 +155,7 @@
       tree.draw()
     }
   </script>
+
 {% endblock %}
 
 {% block sideContent %}
@@ -203,9 +188,7 @@
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="tg"> TG Number&nbsp;<br>
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="az" checked> AZ Number&nbsp;<br>
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="mType"> M-Type&nbsp;<br>
-          {% if 'state' == user.groups.all.0.name %}
-            &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="facilityStr"> Facility Name&nbsp;<br>
-          {% endif %}
+          &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="facilityStr"> Facility Name&nbsp;<br>
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="collectionDate" checked> Collection Date&nbsp;<br>
           &nbsp;<input oninput="fullDraw()" type="checkbox" class="sampleNamesCheck" name="sequenceDate"> Sequence Date&nbsp;<br>
         </div>

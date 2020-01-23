@@ -198,6 +198,16 @@ class DemoBioModView(LoginRequiredMixin, generic.ListView):
     samples = json.loads(serializers.serialize('json', GAS.objects.all()))
     for line in samples:
       query["gas"][line["pk"]] = line["fields"]
+      query["gas"][line["pk"]]["counties"] = []
+      if line["fields"]["facility"] != "_":
+        facility = Facility.objects.filter(id=line["fields"]["facility"])
+        mpc = json.loads(serializers.serialize('json', facility))[0]["fields"]["mpc"]
+        pcas = list(map(lambda x: x["pk"], json.loads(serializers.serialize('json', PCA.objects.filter(mpc1=mpc)))))
+        for pk in pcas:
+          counties = list(map(lambda x: x["fields"]["county"], json.loads(serializers.serialize('json', CountyPCA.objects.filter(pca=pk)))))
+          for county in counties:
+            if county not in query["gas"][line["pk"]]["counties"]:
+              query["gas"][line["pk"]]["counties"].append(county)
     return query
 
 class TestView(LoginRequiredMixin, generic.ListView):
@@ -205,4 +215,17 @@ class TestView(LoginRequiredMixin, generic.ListView):
   template_name = 'newick/test.html'
   def get_queryset(self):
     return ""
+
+
+
+
+
+
+
+
+
+
+
+
+
 
