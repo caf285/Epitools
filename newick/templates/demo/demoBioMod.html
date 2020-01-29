@@ -37,7 +37,6 @@
         }
       }
       // NEW SAMPLES
-      document.getElementById("newRangeValue").innerHTML = newRange
       let today = new Date()
       let recentSamples = []
       for (sample of Object.keys(DB.gas).filter(x => Object.keys(tree.branches).indexOf(x) >= 0)) {
@@ -197,26 +196,59 @@
 
       <span style="display: none;">
       Tree Type:
-      <!-- SUSCEPTIBLE TOGGLE -->
       <input id="bestsnp" type="checkbox" checked data-toggle="toggle" data-on="bestsnp" data-off="missingdata" data-width="100%" data-onstyle="info" data-offstyle="info">
       </span>
 
-      <div style="white-space: nowrap;">New Sample Range (<span id="newRangeValue"></span> months)</div>
-      <input type="range" min=1 max=12 value=1 oninput="newRange = this.value; addMarks()">
+      <!-- NEW SAMPLE RANGE SELECTION -->
+      New Sample Range:
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+          <button type="button" class="btn btn-primary" onclick="rangeArrow(this, 'left')">&#8592;</button>
+          <div class="btn-group dropdown btn-block">
+            <button class="btn btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1 Month</button>
+            <div class="dropdown-menu">
+              {% for i in n|rjust:"12" %}
+              <button type="button" class="dropdown-item" onclick="rangeSelect(this)">{{ forloop.counter }} {% if forloop.counter < 2 %}Month{% else %}Months{% endif %}</button>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="rangeArrow(this, 'right')">&#8594;</button>
+        </div>
+      </div>
+      </br>
+      <script>
+        function rangeSelect(obj) {
+          let drop = obj.parentNode.parentNode.getElementsByClassName("btn")[0]
+          let index = Object.values(obj.parentNode.getElementsByClassName("dropdown-item")).map(x => x.innerHTML).indexOf(obj.innerHTML)
+          drop.innerHTML = obj.innerHTML
+          newRange = index + 1
+          addMarks()
+        }
 
+        function rangeArrow(obj, str) {
+          let dropList = obj.parentNode.getElementsByClassName("dropdown")[0]
+          let drop = dropList.getElementsByClassName("btn")[0]
+          dropList = Object.values(dropList.getElementsByClassName("dropdown-item"))
+          let index = dropList.map(x => x.innerHTML).indexOf(drop.innerHTML)
+          index = (str === "left" ? index - 1 : index + 1)
+          try {
+            drop.innerHTML = dropList[index].innerHTML
+            newRange = index + 1
+            addMarks()
+          } catch {}
+        }
+        
+      </script>
+
+      <!-- TREE DATE RANGE SELECTION -->
       <span id=treeDatesLabel></span>
       <input id="treeDates" type="range" min=0 max=0 value=0 oninput="tree.draw(); document.getElementById('treeDatesLabel').innerHTML = 'Tree Date Range (' + Object.keys(trees[treeType])[document.getElementById('treeDates').value] + ' months)'">
 
-      <!--
-      Zoom:
-      <input type="range" min=1 max=20 value=1 oninput="tree.zoom = this.value/10; tree.draw()">
 
-      Base Node Size:
-      <input type="range" min=0 max=50 value=0 oninput="tree.baseNodeSize = this.value/2; tree.draw()">
 
-      Line Width:
-      <input type="range" min=1 max=20 value=1 oninput="tree.lineWidth = this.value/2; tree.draw()">
-      -->
+
+
+
 
       Sample Name Font Size:
       <input id="leafSize" type="range" min=1 max=50 value=1 oninput="tree.textSize = this.value; tree.draw()">

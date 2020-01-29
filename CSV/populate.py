@@ -120,9 +120,9 @@ def main():
     ##### Group A Strep
     # GAS
     if model == "GAS":
-      for x in GAS.objects.all():
-        print("\tremoving ", x)
-        x.delete()
+      #for x in GAS.objects.all():
+      #  print("\tremoving ", x)
+      #  x.delete()
       for line in csv:
         line = line.split(",")
         print(line)
