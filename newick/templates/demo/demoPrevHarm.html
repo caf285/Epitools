@@ -36,94 +36,119 @@
   </script>
 {% endblock %}
 
-{% block sideContent %}
-  Options:
-  <!-- STERILE DROPDOWN -->
-  <div class="dropdown">
-    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sterile</button>
-    <div id="sterileDropdown" class="dropdown-menu">
-      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="U" checked> Unknown&nbsp;<br>
-      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="Y" checked> Sterile&nbsp;<br>
-      &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="N" checked> Non-Sterile&nbsp;<br>
-    </div>
-  </div>
-  </br>
-
-  <!-- FACILITY DROPDOWN -->
-  <div class="dropdown">
-    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Facility Types</button>
-    <div id="facilityDropdown" class="dropdown-menu">
-    </div>
-  </div>
-  </br>
-
-  <!-- DRUG DROPDOWN -->
-  <div class="dropdown">
-    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Drugs</button>
-    <div id="drugDropdown" class="dropdown-menu">
-      &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('all')">Select All</button>
-      &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('none')">Select None</button>
+{% block BioMod %}
+  <!-- DEVELOPE BIOMOD HERE -->
+  <div class="biomod biomod-container" style="overflow-x: scroll;">
+    <div class="biomod biomod-options">
+      Options:
+      <!-- STERILE DROPDOWN -->
+      <div class="dropdown">
+        <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sterile</button>
+        <div id="sterileDropdown" class="dropdown-menu">
+          &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="U" checked> Unknown&nbsp;<br>
+          &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="Y" checked> Sterile&nbsp;<br>
+          &nbsp;<input oninput="updateAll()" type="checkbox" class="sterileCheck" name="N" checked> Non-Sterile&nbsp;<br>
+        </div>
+      </div>
       </br>
+
+      <!-- FACILITY DROPDOWN -->
+      <div class="dropdown">
+        <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Facility Types</button>
+        <div id="facilityDropdown" class="dropdown-menu">
+        </div>
+      </div>
+      </br>
+
+      <!-- DRUG DROPDOWN -->
+      <div class="dropdown">
+        <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Drugs</button>
+        <div id="drugDropdown" class="dropdown-menu">
+          &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('all')">Select All</button>
+          &nbsp<button type="button" class="btn btn-secondary" onclick="selectDrugs('none')">Select None</button>
+          </br>
+        </div>
+      </div>
+      </br>
+
+      <!-- DATES DROPDOWN -->
+      <div class="dropdown">
+        <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dates</button>
+        <div id="dateDropdown" class="dropdown-menu">
+        </div>
+      </div>
+      </br>
+
+      <!-- SUSCEPTIBLE TOGGLE -->
+      <input id="sr" type="checkbox" checked data-toggle="toggle" data-on="Susceptible" data-off="Resistant" data-width="100%" data-onstyle="info" data-offstyle="info">
+      </br>
+
+      Bacteria:
+      <div class="dropdown">
+        <button id="bacteriaButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+        <div id="bacteriaDropdown" class="dropdown-menu">
+        </div>
+      </div>
+      </br>
+
+      Date Range:
+      <div id="slider"></div>
+      </br>
+
+      <div style="visibility: hidden;" class="dropdown">
+        <button id="mapColorButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
+        <div id="mapColorDropdown" class="dropdown-menu">
+        </div>
+      </div>
     </div>
-  </div>
-  </br>
 
-  <!-- DATES DROPDOWN -->
-  <div class="dropdown">
-    <button class="btn btn-block btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dates</button>
-    <div id="dateDropdown" class="dropdown-menu">
+    <div class="biomod biomod-content">
+      <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
+      <div class="biomod biomod-row">
+        <div class="biomod biomod-module" style="min-width: 300px;">
+          {% leaflet_map "main" %}
+        </div>
+        <div class="biomod biomod-module" id="plot">
+        </div>
+      </div>
+      <div class="biomod biomod-row">
+        <div class="biomod biomod-module">
+        <table class="table table-bordered table-light">
+          <thead>
+            <tr>
+              <td colspan="100%"><center><b><div id="antibiogramHeader"></div></b></center></td>
+            </tr>
+            <tr>
+              <td colspan="2"></td>
+              <td colspan="100%"><center><b><div id="antibiogramSubheader"></div></b></center></td>
+            </tr>
+            <tr id="drug">
+            </tr>
+          </thead>
+          <tbody id="bug">
+          </tbody>
+        </table>
+        </div>
+      </div>
     </div>
-  </div>
-  </br>
 
-  <!-- SUSCEPTIBLE TOGGLE -->
-  <input id="sr" type="checkbox" checked data-toggle="toggle" data-on="Susceptible" data-off="Resistant" data-width="100%" data-onstyle="info" data-offstyle="info">
-  </br>
-
-  Bacteria:
-  <div class="dropdown">
-    <button id="bacteriaButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-    <div id="bacteriaDropdown" class="dropdown-menu">
-    </div>
-  </div>
-  </br>
-
-  Date Range:
-  <div id="slider"></div>
-  </br>
-
-  <div style="visibility: hidden;" class="dropdown">
-    <button id="mapColorButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Default</button>
-    <div id="mapColorDropdown" class="dropdown-menu">
-    </div>
   </div>
 
-{% endblock %}
+  <script>
+      document.getElementsByClassName('biomod-options-icon')[0].addEventListener('click', function() {
+        Array.from(document.getElementsByClassName('biomod-module')).forEach(function(container) {
+          container.classList.toggle('tog')
+        })
+        window.dispatchEvent(new Event('resize'));
+        document.getElementsByClassName('biomod-options')[0].classList.toggle('tog');
+        Array.from(document.getElementsByClassName('biomod-module')).forEach(function(container) {
+          container.classList.toggle('tog')
+        })
+        window.dispatchEvent(new Event('resize'));
+      })
+  </script>
 
-{% block mainContent %}
-  <div class="mainContent">
-    <div style="width: 40%; margin-right: 10px;">
-      {% leaflet_map "main" %}
-    </div>
-    <div id="plot" style="width: 60%;">
-    </div>
-  </div>
-  <div class="mainContent">
-    <table class="table table-bordered table-light">
-      <thead>
-        <tr>
-          <td colspan="100%" style="font-size: 18px;"><center><b><div id="antibiogramHeader"></div></b></center></td>
-        </tr>
-        <tr>
-          <td colspan="2"></td>
-          <td colspan="100%" style="font-size: 16px;"><center><b><div id="antibiogramSubheader"></div></b></center></td>
-        </tr>
-        <tr id="drug">
-        </tr>
-      </thead>
-      <tbody id="bug">
-      </tbody>
-    </table>
-  </div>
+
+
 {% endblock %}
 

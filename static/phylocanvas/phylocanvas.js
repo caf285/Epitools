@@ -410,14 +410,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (window.getComputedStyle(this.containerElement).position === 'static') {
 	      this.containerElement.style.position = 'relative';
 	    }
-	    this.containerElement.style.boxSizing = 'border-box';
+	    //this.containerElement.style.boxSizing = 'border-box';
 
 	    var canvasElement = document.createElement('canvas');
 	    canvasElement.id = (this.containerElement.id || '') + '__canvas';
 	    canvasElement.className = 'phylocanvas';
-	    canvasElement.style.position = 'relative';
-	    canvasElement.height = element.offsetHeight || 400;
-	    canvasElement.width = element.offsetWidth || 400;
+	    canvasElement.style.position = 'absolute';
+	    canvasElement.height = this.containerElement.offsetHeight || 100;
+	    canvasElement.width = this.containerElement.offsetWidth || 100;
 	    canvasElement.style.zIndex = '1';
 	    this.containerElement.appendChild(canvasElement);
 
@@ -1819,6 +1819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setSize',
 	    value: function setSize(width, height) {
+        console.log("resize!!!")
 	      this.canvas.canvas.width = width;
 	      this.canvas.canvas.height = height;
 	      if (this.navigator) {
@@ -2137,8 +2138,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'fitInPanel',
 	    value: function fitInPanel(leaves) {
 	      this.zoom = 1; // calculates consistent bounds
+        var canvasSize = [this.canvas.canvas.width - this.padding * 2, this.canvas.canvas.height - this.padding * 2];
 	      var bounds = this.getBounds(leaves);
-	      var canvasSize = [this.canvas.canvas.width - this.padding * 2, this.canvas.canvas.height - this.padding * 2];
 	      var treeSize = [bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]];
 	      var pixelRatio = getPixelRatio(this.canvas);
 	      var xZoomRatio = canvasSize[0] / treeSize[0];

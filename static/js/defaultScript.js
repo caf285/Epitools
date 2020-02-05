@@ -1,5 +1,5 @@
 function main() {
-  let sideWindow = document.getElementById("sideWindow")
+/*  let sideWindow = document.getElementById("sideWindow")
   let sideContent = document.getElementById("sideContent")
 
   if (sideContent.innerHTML.replace(/\s+/g, '') == "") {
@@ -15,7 +15,7 @@ function main() {
       sideWindow.classList.add("tog")
     }
   });
-
+*/
   function getYear() {
     var d = new Date();
     var n = d.getFullYear();
