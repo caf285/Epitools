@@ -1,26 +1,3 @@
-{% extends "demo/demo.html" %}
-
-{% block static %}
-  {{ block.super }}
-  {% load leaflet_tags %}
-  {% leaflet_css %}
-  {% leaflet_js %}
-  {% load static %}
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css">
-  <link rel="stylesheet" href="{% static '/newick/css/gas.css' %}">
-  <link rel="stylesheet" href="{% static '/jQRangeSlider/css/classic.css' %}" type="text/css"></link>
-
-  <!-- Javascript -->
-  <script src="{% static '/newick/js/trees.js' %}"></script>
-  <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
-  <script src="{% static '/jquery/jquery-1.10.2.min.js' %}"></script>
-  <script src="{% static '/jquery/jquery-ui.min.js' %}"></script>
-  <script src="{% static '/jQRangeSlider/jQAllRangeSliders-min.js' %}"></script>
-  <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
-
-  <script>
     // resize window event for Phylocanvas to adjust to flex boxes
     if(document.readyState === "complete") {
       window.dispatchEvent(new Event('resize'));
@@ -32,7 +9,6 @@
     }
 
     // load database
-    var DB = {{ demoBioMod | safe }}
     var groups = []
 
     newRange = 1
@@ -119,111 +95,6 @@
       return cladeBounds
     }
 
-    function updateSampleNames() {
-      for (sample of tree.leaves) {
-        let fields = Array.from(document.getElementsByClassName("sampleNamesCheck")).filter(x => x.checked).map(x => x.name)
-        let newName = []
-        if (sample['id'].indexOf("-reference") >= 0) {
-          sample['id'] = sample['id'].split("-reference")[0]
-          newName = ['Reference']
-        }
-        for (field of fields) {
-          try {
-            if (field === "id") {
-              newName.push(sample.id)
-            } else if (DB.gas[sample.id][field] === "" ) {
-              newName.push("_")
-            } else {
-              if (field === "facilityStr") {
-                {% if "((Arizona State))" in user.groups.all|safe %}
-                  newName.push(DB.gas[sample.id][field])
-                {% elif " County)" in user.groups.all|safe %}
-                  for (let county of DB.gas[sample.id]["counties"]) {
-                    county = "(" + county + " County)"
-                    if ("{{ user.groups.all|safe }}".indexOf(county) >= 0) {
-                      newName.push(DB.gas[sample.id][field])
-                      break
-                    }
-                  }
-                {% endif %}
-              } else {
-                newName.push(DB.gas[sample.id][field])
-              }
-            }
-          } catch {
-            newName.push("_")
-          }
-        }
-        sample.label = newName.join("::")
-      }
-    }
-
-  </script>
-
-{% endblock %}
-
-{% block BioMod %}
-  <!-- DEVELOPE BIOMOD HERE -->
-  <div class="biomod biomod-container">
-    <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
-    <div class="biomod biomod-options">
-      <span style="display: none;">
-      Master Reference:
-      <div class="dropdown">
-        <button id="masterButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div id="masterDropdown" class="dropdown-menu">
-        </div>
-      </div>
-      </span>
-
-      emmType:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-      <div style="width: 90%;" class="dropdown">
-        <button id="gasMtypeButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-        <div id="gasMtypeDropdown" class="dropdown-menu btn-block">
-        </div>
-      </div>
-      </div>
-      </br>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-      <div style="width: 90%;" class="dropdown" style="margin-top: 7px">
-        <button class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sample Names</button>
-        <div id="samplesDropdown" class="dropdown-menu btn-block">
-          &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="id"> Sample Name&nbsp;<br>
-          &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="tg"> TG Number&nbsp;<br>
-          &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="az" checked> AZ Number&nbsp;<br>
-          &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="mType"> M-Type&nbsp;<br>
-          &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="facilityStr"> Facility Name&nbsp;<br>
-          &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="collectionDate" checked> Collection Date&nbsp;<br>
-          &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="sequenceDate"> Sequence Date&nbsp;<br>
-        </div>
-      </div>
-      </div>
-      </br>
-
-      <span style="display: none;">
-      Tree Type:
-      <input id="bestsnp" type="checkbox" checked data-toggle="toggle" data-on="bestsnp" data-off="missingdata" data-width="100%" data-onstyle="info" data-offstyle="info">
-      </span>
-
-      <!-- NEW SAMPLE RANGE SELECTION -->
-      New Sample Range:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleRangeFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1 Month</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"12" %}
-              <button type="button" class="dropdown-item" onclick="sampleRangeFunc(rangeSelect(this))">{{ forloop.counter }} Month{% if forloop.counter >= 2 %}s{% endif %}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="sampleRangeFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-      <script>
         function rangeSelect(obj) {
           let drop = obj.parentNode.parentNode.getElementsByClassName("btn")[0]
           let index = Object.values(obj.parentNode.getElementsByClassName("dropdown-item")).map(x => x.innerHTML).indexOf(obj.innerHTML)
@@ -249,22 +120,7 @@
             addMarks()
           }
         }
-      </script>
 
-      <!-- TREE DATE RANGE SELECTION -->
-      Tree Date Range:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="treeDateFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div id="treeDateDropdown" class="dropdown-menu btn-block"></div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="treeDateFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-      <script>
         // fill dropdown
         let dropDown = document.getElementById("treeDateDropdown")
         var treeDate;
@@ -282,26 +138,7 @@
             
           }
         }
-      </script>
 
-      <div>Cluster Detection:</div>
-      <div style="display: none;font-size:14px;">Number of SNPs (<span id="clusterDistanceLabel">0</span>)</div>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="clusterSamplesDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"15" %}
-                <button type="button" class="dropdown-item" onclick="clusterSamplesFunc(rangeSelect(this))">{{ forloop.counter }} SNP{% if forloop.counter >= 2 %}s{% endif %}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-      <script>
         function clusterSamplesFunc(str) {
           if (typeof str !== "undefined") {
             let dropDown = document.getElementById("clusterSamplesDropdown")
@@ -318,26 +155,7 @@
 
           }
         }
-      </script>
 
-
-      <div style="display: none;font-size:14px;">Number of Samples in Cluster (<span id="clusterAmountLabel">2</span>)</div>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="clusterSnpsFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"15" %}
-                <button type="button" class="dropdown-item" onclick="clusterSnpsFunc(rangeSelect(this))">{{ forloop.counter }} Sample{% if forloop.counter >= 2 %}s{% endif %}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="clusterSnpsFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-      <script>
         function clusterSnpsFunc(str) {
           if (typeof str !== "undefined") {
             let dropDown = document.getElementById("clusterSnpsDropdown")
@@ -353,54 +171,6 @@
 
           }
         }
-      </script>
-
-      
-    </div>
-    <div class="biomod biomod-content">
-      <div class="biomod biomod-row" style="flex-grow: 5">
-        <div class="biomod biomod-module" id="phylocanvas"></div>
-      </div>
-      <div class="biomod biomod-row">
-
-            <div class="biomod biomod-module">
-              <!-- TREE CONTEXT MENU -->
-              <div class="biomod biomod-module">
-                <div id="clusterContext"></div>
-                <div id="treeContext1"></div>
-              </div>
-            </div>
-
-
-            <!-- AZ SEARCH BAR -->
-            <div class="biomod biomod-module" style="display: block; overflow: hidden;">
-              <div style="display: flex; flex-flow: column; height: 100%;">
-                <form onsubmit="loadAzTree(); return false;" style="margin: 5px;">
-                  <div class="form-group">
-                    <label style="color:#0D0; font-size:18px;">AZ Number Search:</label>
-                    <input type="text" class="form-control" id="azNumber" placeholder="Enter AZ Number" oninput="getAZ();">
-                  </div>
-                </form>
-                <div style="margin: 5px; position: relative; overflow: scroll; flex-grow: 1;">
-                  <div id="azResults" style="position: absolute;"></div>
-                </div>
-              </div>
-            </div>
-
-
-
-      </div>
-
-
-
-
-
-    </div>
-  </div>
-  <!-- -->
-
-    <script>
-
 
       // edit load function to run script after each load
       var tree = Phylocanvas.default.createTree('phylocanvas')
@@ -449,10 +219,6 @@
           document.getElementById("gasMtypeDropdown").innerHTML += "<a class='dropdown-item' onclick='document.getElementById(\"gasMtypeButton\").innerHTML = \"" + ((j == 0) ? 'ALL' : 'emm' + j) + "\"; tree.load(\"" + trees[treeType][treeDate][i][emm[j]] + "\");getCladeXY(\"" + i + "\"); tree.draw();'>" + ((j == 0) ? 'ALL' : 'emm' + j) + "</a>"
         }
       }
-
-    </script>
-
-    <script>
 
       clusterSamplesFunc(0)
       clusterSnpsFunc(0)
@@ -506,21 +272,3 @@
       function loadAzTree(m) {
         tree.load(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]][m])
       }
-
-
-
-
-
-
-
-
-
-
-
-
-    </script>
-
-
-{% endblock %}
-
-
