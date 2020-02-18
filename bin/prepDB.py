@@ -42,25 +42,27 @@ def main():
     header = list(filter(lambda x: re.findall(r"Isolate \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].rows))[0]
     header = list(map(lambda x: x.value, header))
 
-    # extract data from workbook
+    # extract historic data from workbook
     for row in list(filter(lambda x: re.findall(r"TG\d+", str(x[1].value)), allGasBook['Historic GAS'].rows)):
       az = row[header.index("External ID")].value
-      tg = row[header.index("Isolate \nBarcode")].value
+      isolate = row[header.index("Isolate \nBarcode")].value
+      dna = row[header.index("DNA \nBarcode")].value
       collectionDate = row[header.index("Date collected\nfrom patient")].value
       try:
         collectionDate = str(datetime.datetime.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + int(collectionDate) - 2)).split(" ")[0]
-        print("asd")
       except:
         collectionDate = str(collectionDate).split(" ")[0]
       emmType = row[header.index("emm-type")].value
       facility = row[header.index("Original\nfacility source")].value
-      tgGas[tg] = [tg, az, collectionDate, emmType, facility]
-      azGas[az] = [tg, az, collectionDate, emmType, facility]
+      tgGas[isolate] = [isolate, az, collectionDate, emmType, facility]
+      tgGas[dna] = [dna, az, collectionDate, emmType, facility]
+      azGas[az] = [isolate, az, collectionDate, emmType, facility]
 
-    # extract data from workbook
+    # extract all data from workbook
     for row in list(filter(lambda x: re.findall(r"TG\d+", str(x[1].value)), allGasBook['MASTER GAS'].rows)):
       az = row[header.index("External ID")].value
-      tg = row[header.index("Isolate \nBarcode")].value
+      isolate = row[header.index("Isolate \nBarcode")].value
+      dna = row[header.index("DNA \nBarcode")].value
       collectionDate = row[header.index("Date collected\nfrom patient")].value
       try:
         collectionDate = str(datetime.datetime.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + int(collectionDate) - 2)).split(" ")[0]
@@ -68,8 +70,9 @@ def main():
         collectionDate = str(collectionDate).split(" ")[0]
       emmType = row[header.index("emm-type")].value
       facility = row[header.index("Original\nfacility source")].value
-      tgGas[tg] = [tg, az, collectionDate, emmType, facility]
-      azGas[az] = [tg, az, collectionDate, emmType, facility]
+      tgGas[isolate] = [isolate, az, collectionDate, emmType, facility]
+      tgGas[dna] = [dna, az, collectionDate, emmType, facility]
+      azGas[az] = [isolate, az, collectionDate, emmType, facility]
 
     # get all TG
     tgList = list(filter(lambda x: re.findall(r"Isolate \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0] + list(filter(lambda x: re.findall(r"Isolate \nBarcode", str(x[1].value)), allGasBook['Historic GAS'].columns))[0]
@@ -89,7 +92,7 @@ def main():
       else:
         gas.append([row[0], tg[0] if tg else None, None, None, None, None] + row[1:])
     gas = "\n".join(list(map(lambda x: ",".join(list(map(lambda y: str(y).split(",")[0], x))), gas)))
-    print(gas)
+    write("/scratch/GAS/GAS.csv", gas)
 
 
 

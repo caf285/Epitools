@@ -41,7 +41,7 @@ def main():
   header = gas.pop(0)
 
   # create temporary M1 directory and run nasp for vcf files
-  randStr = "".join(random.choice(string.ascii_lowercase) for i in range(10))
+  #randStr = "".join(random.choice(string.ascii_lowercase) for i in range(10))
   DIR = "/scratch/GAS/.temp/"
 
   if gas:

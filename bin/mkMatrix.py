@@ -47,7 +47,7 @@ def main():
   else:
     DIR = os.path.abspath(DIR)
 
-  ##### get VCF and reduce bu GAS.tsv and ALL NWK
+  ##### get VCF and reduce by GAS.tsv and ALL NWK
   # get template and vcf file names
   template = read("/scratch/GAS/.templates/TEMPLATE_dto.xml").split("=====")
   vcf = list(map(lambda x: x.split("-bwamem-gatk.vcf")[0], filter(lambda x: x.split("-bwamem-gatk")[-1] == ".vcf", os.listdir(DIR + "/gatk/"))))

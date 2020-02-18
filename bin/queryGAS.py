@@ -126,9 +126,10 @@ def main():
 
     # load workbook
     allGasBook = openpyxl.load_workbook(filename="/scratch/GAS/All GAS.xlsx", data_only=True)
-    tg = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"Isolate \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
+    isolate = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"Isolate \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
+    dna = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"DNA \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
     az = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"External ID", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
-    gas = list(filter(lambda x: re.findall(r"TG\d+", x.split("\t")[0]) and re.findall(r"TG\d+", x.split("\t")[0])[0] in tg or x.split("\t")[0] in az, gas))
+    gas = list(filter(lambda x: re.findall(r"TG\d+", x.split("\t")[0]) and re.findall(r"TG\d+", x.split("\t")[0])[0] in isolate or re.findall(r"TG\d+", x.split("\t")[0]) and  re.findall(r"TG\d+", x.split("\t")[0])[0] in dna or x.split("\t")[0] in az, gas))
 
   # check query args
   # if the line servives to the end, it added to the output

@@ -51,13 +51,15 @@ for nwk in $(echo bestsnp missingdata); do
       echo >> /scratch/GAS/nasp/trees.js
       # nwk -> month -> all -> 'ALL'
       if [[ -d /scratch/GAS/nasp/ALL::${all} ]] && [[ -d /scratch/GAS/nasp/ALL::${all}/matrices ]] && [[ -d /scratch/GAS/nasp/ALL::${all}/matrices/${month} ]] && [[ -f /scratch/GAS/nasp/ALL::${all}/matrices/${month}/${nwk}.nwk ]]; then
-        echo "trees[\"${nwk}\"][\"${month}\"][\"${all}\"][\"ALL\"] = \""$(cat /scratch/GAS/nasp/ALL::${all}/matrices/${month}/${nwk}.nwk)"\";" >> /scratch/GAS/nasp/trees.js
+        echo "writing ${nwk} ${month} ${all} ALL"
+        echo "trees[\"${nwk}\"][\"${month}\"][\"${all}\"][\"ALL\"] = \""$(/scratch/GAS/bin/fixTrees.py /scratch/GAS/nasp/ALL::${all}/matrices/${month}/${nwk}.nwk)"\";" >> /scratch/GAS/nasp/trees.js
         echo >> /scratch/GAS/nasp/trees.js
       fi
       # nwk -> month -> all -> m
       for m in ${mRef[@]}; do
         if [[ -d /scratch/GAS/nasp/${m}/${all} ]] && [[ -d /scratch/GAS/nasp/${m}/${all}/matrices ]] && [[ -d /scratch/GAS/nasp/${m}/${all}/matrices/${month} ]] && [[ -f /scratch/GAS/nasp/${m}/${all}/matrices/${month}/${nwk}.nwk ]]; then
-          echo "trees[\"${nwk}\"][\"${month}\"][\"${all}\"][\"${m}\"] = \""$(cat /scratch/GAS/nasp/${m}/${all}/matrices/${month}/${nwk}.nwk)"\";" >> /scratch/GAS/nasp/trees.js
+          echo "writing ${nwk} ${month} ${all} ${m}"
+          echo "trees[\"${nwk}\"][\"${month}\"][\"${all}\"][\"${m}\"] = \""$(/scratch/GAS/bin/fixTrees.py /scratch/GAS/nasp/${m}/${all}/matrices/${month}/${nwk}.nwk)"\";" >> /scratch/GAS/nasp/trees.js
           echo >> /scratch/GAS/nasp/trees.js
         fi
       done
