@@ -4,7 +4,6 @@ import sys
 import datetime
 import json
 import re
-import openpyxl
 
 # ==================================================( functions )
 def printHelp():
@@ -120,15 +119,16 @@ def main():
   for i in range(len(header)):
     cols[header[i]] = i
 
-  # if -a flag, get all TG numbers from 'All GAS.xlsx' and reduce gas
+  # if -a flag, get all TG numbers from 'googleMaster.json' and reduce gas
   # removes all historic data at the root
   if "-a" in sys.argv:
 
     # load workbook
-    allGasBook = openpyxl.load_workbook(filename="/scratch/GAS/All GAS.xlsx", data_only=True)
-    isolate = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"Isolate \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
-    dna = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"DNA \nBarcode", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
-    az = list(map(lambda x: x.value, list(filter(lambda x: re.findall(r"External ID", str(x[1].value)), allGasBook['MASTER GAS'].columns))[0][2:]))
+    allGas = json.loads(read("/scratch/GAS/googleMaster.json"))[1:]
+    allGasHeader = allGas.pop(0)
+    isolate = list(map(lambda x: x[allGasHeader.index("Isolate \nBarcode")], allGas))
+    dna = list(map(lambda x: x[allGasHeader.index("DNA \nBarcode")], allGas))
+    az = list(map(lambda x: x[allGasHeader.index("External ID")], allGas))
     gas = list(filter(lambda x: re.findall(r"TG\d+", x.split("\t")[0]) and re.findall(r"TG\d+", x.split("\t")[0])[0] in isolate or re.findall(r"TG\d+", x.split("\t")[0]) and  re.findall(r"TG\d+", x.split("\t")[0])[0] in dna or x.split("\t")[0] in az, gas))
 
   # check query args

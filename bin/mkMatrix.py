@@ -67,6 +67,7 @@ def main():
   # reduce by VCF files in gatk
   # this is used after the initial ALL tree has completed
   # assume if allRef; then tsv
+  # TODO: these samples should really be passed in rather than retrieved by existing VCF files
   if allRef:
     tsv = tsv.split("/")[-1].split(".tsv")[0]
     allRef = allRef[0]

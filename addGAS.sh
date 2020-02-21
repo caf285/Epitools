@@ -42,11 +42,13 @@ done
 /scratch/GAS/bin/getPath.py $ARRAY
 
 # get reference list query to add to all date queries
+# these query lines are used to add all references into all queries
+# TODO: this should really be a flag in 'queryGAS.py'
 referenceList=""
 for i in $(ls /scratch/GAS/reference/ | grep "::"); do
-  i=${i//.fasta/}
-  i=$(queryGAS.py -exact ${i#*::})
-  i=$(echo -e "${i#*$'\n'}")
+  i=${i//.fasta/}                   # remove '*.fasta' from reference name
+  i=$(queryGAS.py -exact ${i#*::})  # remove 'M::*' from name and replace with query
+  i=$(echo -e "${i#*$'\n'}")        # remove '\n' from query
   if [[ $referenceList == "" ]]; then
     referenceList="$i"
   else
