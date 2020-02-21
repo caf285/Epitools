@@ -938,27 +938,42 @@ return /******/ (function(modules) { // webpackBootstrap
       */
       key: 'getClusters',
       value: function getClusters(maxLength = 0, minSize = 2, node = null) {
-        let clusters = []
-        let cluster = []
-        let nodes = []
+        let clusters = {}   // all found clusters
+        let cluster = []    // current cluster; resets with each node checked
+        let nodes = []      // list of all checked nodes
+        //----- check single node for cluster
         if (node) {
           cluster = []
           getCluster([], maxLength, node)
           if (cluster.length >= minSize) {
-            clusters.push(cluster)
+            clusters[node.id] = cluster
           }
+        //----- check all nodes for clusters
         } else {
           for (let node of this.leaves) {
             cluster = []
-            if (nodes.indexOf(node) < 0) {
+
+            //if (nodes.indexOf(node) < 0) {
               getCluster([], maxLength, node)
-            }
+            //}
             if (cluster.length >= minSize) {
-              clusters.push(cluster)
+              for (let branch of cluster) {
+                if (branch && typeof clusters[branch.id] == 'undefined') {
+                  clusters[branch.id] = []
+                }
+                if (branch && cluster.length > clusters[branch.id].length) {
+                  clusters[branch.id] = cluster
+                }
+              }
             }
           }
         }
-        return clusters
+        // remove duplicated clusters
+        clusters = Object.entries(clusters).filter(([k, v]) => Object.values(clusters).indexOf(v) === Object.keys(clusters).indexOf(k))
+        let out = {}
+        // convert cluster k, v pairs into dictionary and return
+        clusters.forEach(([k, v]) => out[k] = v)
+        return out
 
         function getCluster(path, len, node) {
           if (node.leaf) {
@@ -1819,7 +1834,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setSize',
 	    value: function setSize(width, height) {
-        console.log("resize!!!")
 	      this.canvas.canvas.width = width;
 	      this.canvas.canvas.height = height;
 	      if (this.navigator) {

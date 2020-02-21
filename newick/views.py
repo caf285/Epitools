@@ -196,6 +196,8 @@ class DemoBioModView(LoginRequiredMixin, generic.ListView):
     query = {}
     query["gas"] = {}
     samples = json.loads(serializers.serialize('json', GAS.objects.all()))
+    query["gas"] = samples
+    return query
     for line in samples:
       query["gas"][line["pk"]] = line["fields"]
       query["gas"][line["pk"]]["counties"] = []
