@@ -54,6 +54,12 @@ class IndexView(LoginRequiredMixin, generic.ListView):
   def get_queryset(self):
     return ""
 
+class DemoCoronaView(LoginRequiredMixin, generic.ListView):
+  template_name = 'demo/demoCorona.html'
+  context_object_name = 'demoCorona'
+  def get_queryset(self):
+    return ""
+
 class DemoEmmtypeView(LoginRequiredMixin, generic.ListView):
   template_name = 'demo/demoEmmtype.html'
   context_object_name = 'demoEmmtype'
