@@ -6,9 +6,12 @@
   {% leaflet_css %}
   {% leaflet_js %}
   {% load static %}
-  <script src="{% static '/newick/js/countyCoordinates.js' %}"></script>
+
+  
   <script src="{% static '/leaflet/leaflet-heat.js' %}"></script>
   <script src="{% static '/leaflet/leaflet-svgicon/svg-icon.js' %}"></script>
+  <script src="{% static '/newick/js/zipAvg.js'%}"></script>
+  <script src="{% static '/newick/js/zipCoordinates.js'%}"></script>
   <style>
     .leaflet-container {  /* all maps */
       width: 100%;
@@ -23,6 +26,7 @@
     //=========================( Wait For Page Load )
     document.onreadystatechange = function () {
       if (document.readyState === 'complete') {
+        // option button
         document.getElementsByClassName('biomod-options-icon')[0].addEventListener('click', function() {
           document.getElementsByClassName('biomod-options')[0].classList.toggle('tog');
           window.dispatchEvent(new Event('resize'));
@@ -53,25 +57,44 @@
 
   <script>
     window.addEventListener("map:init", function (e) {
-
       var detail = e.detail;
 
-      //detail.map.addLayer(sampleMonths[Object.keys(monthChance)[document.getElementById("mScale").value]]["overlay"])
+      //----- add grey and dark heat layers to map
+      var baseLayers = {
+        "Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+        "Dark Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+      };
+      L.control.layers(baseLayers, null).addTo(detail.map);
 
-      /*detail.map.on('overlayadd', function () {
-        fillSamples()
-        updateGraph()
-      })
-      detail.map.on('overlayremove', function () {
-        fillSamples()
-        updateGraph()
-      })*/
+      //----- add all zipAvg to heat map
+      let heatList = []
+      for (let zipCode of Object.values(zipAvg)) {
+        heatList.push([zipCode["lat"], zipCode["long"], 20])
+      }
+      var heatLayers = {
+        "Heat": L.heatLayer(heatList, {radius: 50, blur: 5})
+      }
+      L.control.layers(null, heatLayers).addTo(detail.map);
 
-      //var marker = new L.Marker.SVGMarker([35,-109.3], { iconOptions: { circleText:125 }}).addTo(detail.map);
-      //var marker = new L.Marker.SVGMarker([35.1,-109.4], { iconOptions: { circleText:500 }}).addTo(detail.map);
+      //----- add polygons to map
+      var zipCodeLayers = {}
+      for (let zipCode of Object.keys(zipPolygons)) {
+        zipCodeLayers[zipCode] = L.polygon(zipPolygons[zipCode]["poly"], {
+          title: zipCode,
+          clickable: false,
+          color: 'hsl(0, 100%, 0%)',
+          opacity: 0.7,
+          weight: 1,
+          fillOpacity: 0.0
+        })
+        detail.map.addLayer(zipCodeLayers[zipCode])
+      }
+      L.control.layers(null, zipCodeLayers).addTo(detail.map);
 
 
-      // --------------------( BANNER HEALTH FACILITIES )
+
+
+
 
 /*
       // Banner Baywood Medical Center
@@ -80,32 +103,8 @@
       // Banner Boswell Medical Center
       var marker = L.marker([33.603941, -112.28356],{title:"Banner Boswell Medical Center",clickable:true}).addTo(detail.map); //emm82, 18
 
-      // Banner Del E Webb Medical Center
-      var marker = L.marker([33.659783, -112.373],{title:"Banner Del E Webb Medical Center",clickable:true}).addTo(detail.map);
-
-      // Banner Desert Medical Center
-      var marker = L.marker([33.25561, -111.884167],{title:"Banner Desert Medical Center",clickable:true}).bindPopup("<h4>Banner Desert Medical Center</h4>", {'maxWidth':'600'}).addTo(detail.map); //emm60, 10
-
-      // Banner Estrella Medical Center
-      var marker = L.marker([33.478178, -112.25744],{title:"Banner Estrella Medical Center",clickable:true}).addTo(detail.map);
-
-      // Banner Gateway Medical Center
-      var marker = L.marker([33.450069, -111.71913],{title:"Banner Gateway Medical Center",clickable:true}).addTo(detail.map); //emm59, 23
-
-      // Banner Health Center
-      var marker = L.marker([33.607275, -112.25869],{title:"Banner Health Center",clickable:true}).addTo(detail.map); //emm1, 23
-
-      // Banner Heart Hospital
-      var marker = L.marker([33.41128, -111.68915],{title:"Banner Heart Hospital",clickable:true}).bindPopup("<h4>Weenie Hut General</h4>", {'maxWidth':'600'}).addTo(detail.map); //emm89, 17
-
-      // Banner Thunderbird Medical Center
-      var marker = L.marker([33.609189, -112.17915],{title:"Banner Thunderbird Medical Center",clickable:true}).bindPopup("<h4>Banner Thunderbird Medical Center</h4>", {'maxWidth':'600'}).addTo(detail.map);
 */
       // --------------------( TILE LAYERS & OVERLAYS )
-      var baseLayers = {
-        "Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
-        "Dark Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
-      };
 
         /*var polygon = L.polygon(counties[Object.keys(counties).sort()[i]], {
           title: Object.keys(counties).sort()[i],
@@ -118,7 +117,6 @@
         overlays[Object.keys(counties).sort()[i]] = polygon;
         detail.map.addLayer(polygon)*/
       //L.control.layers(baseLayers, overlays).addTo(detail.map);
-      L.control.layers(baseLayers).addTo(detail.map);
 
       detail.map.addLayer(baseLayers["Grey"])
     }, false);
