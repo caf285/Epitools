@@ -28,7 +28,7 @@ urlpatterns = [
 
 #Add Django site authentication urls (for login, logout, password management)
 urlpatterns += [
-  #path(settings.SITE_URL + 'accounts/', include('django.contrib.auth.urls')),
+  path(settings.SITE_URL + 'accounts/', include('django.contrib.auth.urls')),
 ]
 
 

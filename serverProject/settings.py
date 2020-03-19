@@ -121,11 +121,13 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+#SITE_URL = ""
 SITE_URL = "epitools/"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
+#STATIC_URL = os.path.join("/epitools/static")
 STATIC_URL = os.path.join("/", SITE_URL, "static")
 
 STATICFILES_DIRS = [
@@ -133,10 +135,11 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-#STATIC_ROOT = os.path.join("/static")
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
-LOGIN_REDIRECT_URL = 'newick/'
+#LOGIN_REDIRECT_URL = os.path.join("/epitools/newick/")
+LOGIN_URL = "/" + SITE_URL + "accounts/login/"
+#LOGIN_REDIRECT_URL = "newick/"
 
 # map setting
 LEAFLET_CONFIG = {
