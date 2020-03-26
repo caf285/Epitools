@@ -1,0 +1,105 @@
+{% extends "newick/samples.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load static %}
+
+  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+
+  <!--====================================================================================================( SCRIPTS )-->
+  <style>
+    .covItem:hover {
+      color: #008CBA;
+      cursor: pointer;
+    }
+  </style>
+
+  <script>
+  </script>
+
+{% endblock %}
+
+{% block BioMod %}
+
+  <div class="biomod biomod-container">
+    <!--====================================================================================================( OPTIONS MENU )-->
+    <div class="biomod biomod-options">
+      <h3>Upload Coverage CSV:</h3>
+      <p>After upload, CoV sample names will appear below. Click on a name to render an interactive Plotly graph of the data.</p>
+      <input type='file' onchange='openFile(event)'><br>
+      <div id="covList"></div>
+      <script>
+        document.onreadystatechange = function () {
+          if (document.readyState === 'complete') {
+            //----- option button
+            document.getElementsByClassName('biomod-options-icon')[0].addEventListener('click', function() {
+              document.getElementsByClassName('biomod-options')[0].classList.toggle('tog');
+              window.dispatchEvent(new Event('resize'));
+            })
+            window.dispatchEvent(new Event('resize'));
+          }
+        }
+
+        var openFile = function(event) {
+          var input = event.target;
+          var reader = new FileReader();
+          reader.onload = function(){
+            var data = reader.result;
+            updatePlot(data)
+          };
+          reader.readAsText(input.files[0]);
+        };
+
+        var covHash;
+        function updatePlot(csv) {
+          csv = csv.trim().split("\n").map(x => x.trim().split(","))
+          covHash = new Object();
+          covList = document.getElementById("covList")
+          covList.innerHTML = "<div class='covItem' onclick='fillPlot(this.innerHTML)'>ALL</div>"
+          for (cov of csv) {
+            covHash[cov[0]] = cov.slice(1)
+            covList.innerHTML += "<div class='covItem' onclick='fillPlot(this.innerHTML)'>" + cov[0] + "</div>"
+          }
+        }
+
+        function fillPlot(index) {
+          document.getElementById("covTitle").innerHTML = index
+          let covData = [];
+          let covLayout = {
+            autosize: true,
+          }
+          if (index == "ALL") {
+            for (cov in covHash) {
+              covData.push({
+                y: covHash[cov],
+                type: 'line',
+                name: cov
+              })
+            }
+          } else {
+            covData.push({
+              y: covHash[index],
+              type: 'line',
+              name: index
+            })
+          }
+
+          Plotly.newPlot('covPlot', covData, covLayout)
+        }
+
+      </script>  
+    </div>
+
+    <!--====================================================================================================( MAIN CONTENT )-->
+    <div class="biomod biomod-content">
+      <div class="biomod biomod-row">
+        <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
+        <div class="biomod biomod-module" style="flex-grow: 5;">
+          <h2 id="covTitle"></h2>
+          <div id="covPlot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

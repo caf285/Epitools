@@ -104,7 +104,7 @@ div {
   min-width: 350px;
   max-width: 500px;
   margin-right: 3px;
-  font-size: 18px;
+  /* font-size: 18px; */
   display: flex;
   flex-flow: column nowrap;
   flex-basis: 20%;

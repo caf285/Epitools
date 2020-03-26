@@ -1,0 +1,192 @@
+{% extends "newick/samples.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+  {% load static %}
+
+  
+  <script src="{% static '/leaflet/leaflet-heat.js' %}"></script>
+  <script src="{% static '/newick/js/zipAvg.js'%}"></script>
+  <script src="{% static '/newick/js/zipCoordinates.js'%}"></script>
+  <script src="{% static '/newick/js/CoV.js'%}"></script>
+  <style>
+    .leaflet-container {  /* all maps */
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }   
+  </style>
+
+
+  <!--====================================================================================================( SCRIPTS )-->
+  <script>
+    //----- define xslx sheet list from covTrack
+    var covSheets = ["NAH", "Banner Tucson", "SQL Phoenix"]
+    let tempSheets = []
+    for (let xlsx of Object.keys(covTrack)) {
+      for (let sheet of Object.keys(covTrack[xlsx])) {
+        tempSheets.push(sheet)
+      }
+    }
+    tempSheets = tempSheets.filter(x => covSheets.indexOf(x) >= 0)
+    covSheets = tempSheets
+
+    //----- return [positive, tested] pair
+    function getTested(zipCode) {
+      let tested = 0
+      let positive = 0
+      for (let xlsx of Object.keys(covTrack)) {
+        for (let sheet of Object.keys(covTrack[xlsx]).filter(x => covSheets.indexOf(x) >= 0)) {
+          if (document.getElementById(sheet + "_option").checked) {
+            tested += covTrack[xlsx][sheet].filter(x => x.indexOf(zipCode) >= 0).length
+            positive += covTrack[xlsx][sheet].filter(x => x.indexOf(zipCode) >= 0 && x.indexOf("Positive") >= 0).length
+          }
+        }          
+      }
+      return [positive, tested]
+    }
+
+    //=========================( Initialize and Update Map )
+    //----- map variables
+    var zipCodeLayers = {};
+    var zipCodeMarkers = {};
+    var detail;
+    window.addEventListener("map:init", function (e) {
+      detail = e.detail;
+      fillMap()
+    }, false);
+
+    //----- fill initial map and controls
+    function fillMap() {
+      // add grey and dark heat layers to map
+      var baseLayers = {
+        "Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+        "Dark Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+      };
+      L.control.layers(baseLayers, null).addTo(detail.map);
+
+      // add all zipAvg to heat map
+      /*
+      let heatList = []
+      for (let zipCode of Object.values(zipAvg)) {
+        heatList.push([zipCode["lat"], zipCode["long"], 20])
+      }
+      var heatLayers = {
+        "Heat": L.heatLayer(heatList, {radius: 50, blur: 5})
+      }
+      L.control.layers(null, heatLayers).addTo(detail.map);
+      */
+
+      // add polygons to map
+      for (let zipCode of Object.keys(zipPolygons)) {
+        let ratio = getTested(zipCode)
+        zipCodeLayers[zipCode] = L.polygon(zipPolygons[zipCode]["poly"], {
+          title: zipCode,
+          clickable: false,
+          opacity: 0.3,
+          color: "hsl(0, 100%, 0%)",
+          weight: 1,
+          fillColor: "hsl(0, 100%, " + (ratio[1] ? String(100 - (ratio[0]/ratio[1] * 50)) : "100") + "%)",
+          fillOpacity: 0.9
+        })
+        detail.map.addLayer(zipCodeLayers[zipCode])
+      }
+
+      // add markers to map
+      for (let zipCode of Object.keys(zipAvg)) {
+        let ratio = getTested(zipCode)
+        let icon = L.divIcon({
+          className: "zipIcon",
+          html: zipCode + "</br>" + ratio[0] + "/" + ratio[1]
+        });
+        zipCodeMarkers[zipCode] = L.marker([zipAvg[zipCode]["lat"], zipAvg[zipCode]["long"]], {
+          icon: icon,
+          interactive: false
+        });
+        detail.map.addLayer(zipCodeMarkers[zipCode])
+      }
+      detail.map.addLayer(baseLayers["Grey"])
+      console.log(detail.map)
+    }
+
+    //----- update map
+    function updateMap() {
+      for (let zipCode of Object.keys(zipPolygons)) {
+        detail.map.removeLayer(zipCodeLayers[zipCode])
+        let ratio = getTested(zipCode)
+        zipCodeLayers[zipCode] = L.polygon(zipPolygons[zipCode]["poly"], {
+          title: zipCode,
+          clickable: false,
+          opacity: 0.3,
+          color: "hsl(0, 100%, 0%)",
+          weight: 1,
+          fillColor: "hsl(0, 100%, " + (ratio[1] ? String(100 - (ratio[0]/ratio[1] * 50)) : "100") + "%)",
+          fillOpacity: 0.9
+        })
+        detail.map.addLayer(zipCodeLayers[zipCode])
+      }
+      for (let zipCode of Object.keys(zipAvg)) {
+        detail.map.removeLayer(zipCodeMarkers[zipCode])
+        let ratio = getTested(zipCode)
+        let icon = L.divIcon({
+          className: "zipIcon",
+          html: zipCode + "</br>" + ratio[0] + "/" + ratio[1]
+        });
+        zipCodeMarkers[zipCode] = L.marker([zipAvg[zipCode]["lat"], zipAvg[zipCode]["long"]], {
+          icon: icon,
+          interactive: false
+        });
+        detail.map.addLayer(zipCodeMarkers[zipCode])
+      }
+    }
+
+    //=========================( Wait For Page Load )
+    document.onreadystatechange = function () {
+      if (document.readyState === 'complete') {
+        //----- option button
+        document.getElementsByClassName('biomod-options-icon')[0].addEventListener('click', function() {
+          document.getElementsByClassName('biomod-options')[0].classList.toggle('tog');
+          window.dispatchEvent(new Event('resize'));
+        })
+        window.dispatchEvent(new Event('resize'));
+
+        //----- fill options window with covSheet data toggle
+        let optionColumn = document.getElementById("covOptions")
+        for (let sheet of Object.values(covSheets)) {
+          optionColumn.innerHTML += "<input type='checkbox' id='" + sheet + "_option' value='" + sheet + "_option' checked=true oninput='updateMap()'>"
+          optionColumn.innerHTML += "<label for='" + sheet + "_option'>" + sheet + "</label></br>"
+        }
+      }
+    }
+  </script>
+
+{% endblock %}
+
+{% block BioMod %}
+
+  <div class="biomod biomod-container">
+    <!--====================================================================================================( OPTIONS MENU )-->
+    <div class="biomod biomod-options">
+      Data Types:
+      <div id="covOptions"></div>
+    </div>
+
+    <!--====================================================================================================( MAIN CONTENT )-->
+    <div class="biomod biomod-content">
+      <div class="biomod biomod-row">
+        <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
+        <div class="biomod biomod-module" style="flex-grow: 5;">
+          {% leaflet_map "main" %}
+        </div>
+
+        <div class="biomod biomod-module" style="flex-grow: 0;;">
+          Display Area for Additional Corona Virus Stats.
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -15,7 +15,8 @@ urlpatterns = [
   path('demo/prevharm/', views.DemoPrevHarmView.as_view(), name='demoPrevHarm'),
   path('demo/gas/', views.DemoGASView.as_view(), name='demoGAS'),
   path('demo/biomod/', views.DemoBioModView.as_view(), name='demoBioMod'),
-  path('demo/covid19/', views.DemoCovid19View.as_view(), name='demoCovid19View'),
+  path('covid19/map/', views.Covid19MapView.as_view(), name='covid19MapView'),
+  path('covid19/coverage/', views.Covid19CoverageView.as_view(), name='covid19CoverageView'),
 ]
 
 #django auth
