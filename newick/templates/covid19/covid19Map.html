@@ -7,141 +7,137 @@
   {% leaflet_js %}
   {% load static %}
 
-  
-  <script src="{% static '/leaflet/leaflet-heat.js' %}"></script>
-  <script src="{% static '/newick/js/zipAvg.js'%}"></script>
-  <script src="{% static '/newick/js/zipCoordinates.js'%}"></script>
-  <script src="{% static '/newick/js/CoV.js'%}"></script>
+  <script src="{% static '/newick/js/azCov.js'%}"></script>
   <style>
     .leaflet-container {  /* all maps */
       width: 100%;
       height: 100%;
       z-index: 1;
-    }   
+    }
+    .mapIcon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #555;
+    }
+    .legend {
+      line-height: 18px;
+      background-color: white;
+      padding: 15px;
+      border-radius: 5px;
+      color: #555;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
   </style>
 
 
   <!--====================================================================================================( SCRIPTS )-->
   <script>
-    //----- define xslx sheet list from covTrack
-    var covSheets = ["NAH", "Banner Tucson", "SQL Phoenix"]
-    let tempSheets = []
-    for (let xlsx of Object.keys(covTrack)) {
-      for (let sheet of Object.keys(covTrack[xlsx])) {
-        tempSheets.push(sheet)
-      }
-    }
-    tempSheets = tempSheets.filter(x => covSheets.indexOf(x) >= 0)
-    covSheets = tempSheets
-
-    //----- return [positive, tested] pair
-    function getTested(zipCode) {
-      let tested = 0
-      let positive = 0
-      for (let xlsx of Object.keys(covTrack)) {
-        for (let sheet of Object.keys(covTrack[xlsx]).filter(x => covSheets.indexOf(x) >= 0)) {
-          if (document.getElementById(sheet + "_option").checked) {
-            tested += covTrack[xlsx][sheet].filter(x => x.indexOf(zipCode) >= 0).length
-            positive += covTrack[xlsx][sheet].filter(x => x.indexOf(zipCode) >= 0 && x.indexOf("Positive") >= 0).length
-          }
-        }          
-      }
-      return [positive, tested]
-    }
-
     //=========================( Initialize and Update Map )
-    //----- map variables
-    var zipCodeLayers = {};
-    var zipCodeMarkers = {};
-    var detail;
     window.addEventListener("map:init", function (e) {
+      function getColor(d) {
+        return d > 200 ? '#008026' :
+               d > 100 ? '#00BD26' :
+               d > 50  ? '#1AE31C' :
+               d > 20  ? '#4EFC2A' :
+               d > 10  ? '#8DFD3C' :
+               d > 5   ? '#B2FE4C' :
+               d > 1   ? '#D9FE76' :
+                         '#EDFFA0';
+      }
       detail = e.detail;
-      fillMap()
-    }, false);
-
-    //----- fill initial map and controls
-    function fillMap() {
-      // add grey and dark heat layers to map
+      //----- add grey and dark heat layers to map
       var baseLayers = {
-        "Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
-        "Dark Grey" : L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+        "Grey": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
+        "Dark Grey": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {'attribution': 'Esri &mdash; Esri, DeLorme, NAVTEQ', 'maxZoom': 16}),
       };
       L.control.layers(baseLayers, null).addTo(detail.map);
-
-      // add all zipAvg to heat map
-      /*
-      let heatList = []
-      for (let zipCode of Object.values(zipAvg)) {
-        heatList.push([zipCode["lat"], zipCode["long"], 20])
-      }
-      var heatLayers = {
-        "Heat": L.heatLayer(heatList, {radius: 50, blur: 5})
-      }
-      L.control.layers(null, heatLayers).addTo(detail.map);
-      */
-
-      // add polygons to map
-      for (let zipCode of Object.keys(zipPolygons)) {
-        let ratio = getTested(zipCode)
-        zipCodeLayers[zipCode] = L.polygon(zipPolygons[zipCode]["poly"], {
-          title: zipCode,
-          clickable: false,
-          opacity: 0.3,
-          color: "hsl(0, 100%, 0%)",
-          weight: 1,
-          fillColor: "hsl(0, 100%, " + (ratio[1] ? String(100 - (ratio[0]/ratio[1] * 50)) : "100") + "%)",
-          fillOpacity: 0.9
-        })
-        detail.map.addLayer(zipCodeLayers[zipCode])
-      }
-
-      // add markers to map
-      for (let zipCode of Object.keys(zipAvg)) {
-        let ratio = getTested(zipCode)
-        let icon = L.divIcon({
-          className: "zipIcon",
-          html: zipCode + "</br>" + ratio[0] + "/" + ratio[1]
-        });
-        zipCodeMarkers[zipCode] = L.marker([zipAvg[zipCode]["lat"], zipAvg[zipCode]["long"]], {
-          icon: icon,
-          interactive: false
-        });
-        detail.map.addLayer(zipCodeMarkers[zipCode])
-      }
       detail.map.addLayer(baseLayers["Grey"])
-      console.log(detail.map)
-    }
 
-    //----- update map
-    function updateMap() {
-      for (let zipCode of Object.keys(zipPolygons)) {
-        detail.map.removeLayer(zipCodeLayers[zipCode])
-        let ratio = getTested(zipCode)
-        zipCodeLayers[zipCode] = L.polygon(zipPolygons[zipCode]["poly"], {
-          title: zipCode,
-          clickable: false,
-          opacity: 0.3,
-          color: "hsl(0, 100%, 0%)",
-          weight: 1,
-          fillColor: "hsl(0, 100%, " + (ratio[1] ? String(100 - (ratio[0]/ratio[1] * 50)) : "100") + "%)",
-          fillOpacity: 0.9
-        })
-        detail.map.addLayer(zipCodeLayers[zipCode])
+
+      //----- add all polygon and icon map data
+      var covLayers = new Object();
+      for (let hash in azCov) {
+        covLayers[hash] = new Object();
+        for (let district in azCov[hash]) {
+          // add polygon to map
+          covLayers[hash][district] = new Object();
+          covLayers[hash][district]["polygon"] = L.polygon(azCov[hash][district]["polygon"], {
+            title: district,
+            clickable: false,
+            opacity: 0.75,
+            color: "#555",
+            weight: 1,
+            fillColor: getColor(0),
+            fillOpacity: 1
+          })
+          // mouseover fill display
+          covLayers[hash][district]["polygon"].addEventListener("click", function () {
+            let stats = ["Name: " + district, "Population: " + azCov[hash][district]["population"]]
+            for (let zip5 in azCov[hash][district]["zip5"]) {
+              // TODO: if zip5 has tested and/or positive
+              stats.push(zip5 + ": 0")
+            }
+            document.getElementById("covStats").innerHTML = stats.join("</br>")
+          });
+          
+          // add icon to map
+          let icon = L.divIcon({
+            className: "mapIcon",
+            iconSize: [75, 75],
+            html: district + "</br>" + azCov[hash][district]["population"] + "</br> 0/0"
+          });
+          covLayers[hash][district]["icon"] = L.marker(azCov[hash][district]["average"], {
+            icon: icon,
+            interactive: false
+          });
+        }
       }
-      for (let zipCode of Object.keys(zipAvg)) {
-        detail.map.removeLayer(zipCodeMarkers[zipCode])
-        let ratio = getTested(zipCode)
-        let icon = L.divIcon({
-          className: "zipIcon",
-          html: zipCode + "</br>" + ratio[0] + "/" + ratio[1]
+
+      //----- add markers to map on click
+      for (let drop of document.getElementById("mapDropdown").getElementsByClassName("dropdown-item")) {
+        drop.addEventListener("click", function (e) {
+          document.getElementById("covStats").innerHTML = ""
+          detail.map.eachLayer(function (layer) {
+            for (let hash in covLayers){
+              for (let district in covLayers[hash]) {
+                detail.map.removeLayer(covLayers[hash][district]["polygon"])
+                detail.map.removeLayer(covLayers[hash][district]["icon"])
+              }
+            }
+            for (let hash of Object.keys(covLayers).filter(x => x.indexOf(e.target.innerHTML) >= 0)) {
+              for (let district in covLayers[hash]) {
+                detail.map.addLayer(covLayers[hash][district]["polygon"])
+                detail.map.addLayer(covLayers[hash][district]["icon"])
+              }
+            }
+          });
         });
-        zipCodeMarkers[zipCode] = L.marker([zipAvg[zipCode]["lat"], zipAvg[zipCode]["long"]], {
-          icon: icon,
-          interactive: false
-        });
-        detail.map.addLayer(zipCodeMarkers[zipCode])
       }
-    }
+
+      //----- add color code legend
+      var legend = L.control({position: 'bottomright'});
+      legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend'),
+        grades = [0, 1, 5, 10, 20, 50, 100, 200],
+        labels = [];
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < grades.length; i++) {
+          div.innerHTML += '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' + grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        }
+        return div;
+      };
+      legend.addTo(detail.map);
+    }, false);
+
+
 
     //=========================( Wait For Page Load )
     document.onreadystatechange = function () {
@@ -152,13 +148,6 @@
           window.dispatchEvent(new Event('resize'));
         })
         window.dispatchEvent(new Event('resize'));
-
-        //----- fill options window with covSheet data toggle
-        let optionColumn = document.getElementById("covOptions")
-        for (let sheet of Object.values(covSheets)) {
-          optionColumn.innerHTML += "<input type='checkbox' id='" + sheet + "_option' value='" + sheet + "_option' checked=true oninput='updateMap()'>"
-          optionColumn.innerHTML += "<label for='" + sheet + "_option'>" + sheet + "</label></br>"
-        }
       }
     }
   </script>
@@ -170,8 +159,16 @@
   <div class="biomod biomod-container">
     <!--====================================================================================================( OPTIONS MENU )-->
     <div class="biomod biomod-options">
-      Data Types:
-      <div id="covOptions"></div>
+      <div class="dropdown" id="mapDropdown">
+        <button class="btn btn-secondary btn-block dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Map Type
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item">region</a>
+          <a class="dropdown-item">county</a>
+          <a class="dropdown-item">zip3</a>
+        </div>
+      </div>
     </div>
 
     <!--====================================================================================================( MAIN CONTENT )-->
@@ -182,8 +179,8 @@
           {% leaflet_map "main" %}
         </div>
 
-        <div class="biomod biomod-module" style="flex-grow: 0;;">
-          Display Area for Additional Corona Virus Stats.
+        <div class="biomod biomod-module" style="position: relative; overflow: scroll; flex-grow: 1;">
+          <div id="covStats" style="margin: 5px;position: absolute;"></div>
         </div>
       </div>
     </div>
