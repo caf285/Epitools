@@ -19,7 +19,7 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      color: #555;
+      color: #000;
     }
     .legend {
       line-height: 18px;
@@ -67,6 +67,15 @@
       for (let hash in azCov) {
         covLayers[hash] = new Object();
         for (let district in azCov[hash]) {
+          // get positive/tested
+          let tested = 0
+          let positive = 0
+          for (let test in azCov[hash][district]["tested"]) {
+            tested += 1
+            if (azCov[hash][district]["tested"][test][3] == "+") {
+              positive += 1
+            }    
+          }
           // add polygon to map
           covLayers[hash][district] = new Object();
           covLayers[hash][district]["polygon"] = L.polygon(azCov[hash][district]["polygon"], {
@@ -75,15 +84,24 @@
             opacity: 0.75,
             color: "#555",
             weight: 1,
-            fillColor: getColor(0),
+            fillColor: getColor(positive),
             fillOpacity: 1
           })
           // mouseover fill display
           covLayers[hash][district]["polygon"].addEventListener("click", function () {
             let stats = ["Name: " + district, "Population: " + azCov[hash][district]["population"]]
             for (let zip5 in azCov[hash][district]["zip5"]) {
-              // TODO: if zip5 has tested and/or positive
-              stats.push(zip5 + ": 0")
+              let zipPositive = 0;
+              let zipTested = 0;
+              for (let test in azCov[hash][district]["zip5"][zip5]["tested"]) {
+                zipTested += 1
+                if (azCov[hash][district]["zip5"][zip5]["tested"][test][3] == "+") {
+                  zipPositive += 1;
+                }
+              }
+              if (positive > 0) {
+                stats.push(zip5 + ": " + String(zipPositive) + "/" + String(zipTested))
+              }
             }
             document.getElementById("covStats").innerHTML = stats.join("</br>")
           });
@@ -92,7 +110,7 @@
           let icon = L.divIcon({
             className: "mapIcon",
             iconSize: [75, 75],
-            html: district + "</br>" + azCov[hash][district]["population"] + "</br> 0/0"
+            html: district + "</br>" + azCov[hash][district]["population"] + "</br>" + String(positive) + "/" + String(tested)
           });
           covLayers[hash][district]["icon"] = L.marker(azCov[hash][district]["average"], {
             icon: icon,
