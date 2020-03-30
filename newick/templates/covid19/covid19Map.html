@@ -8,6 +8,7 @@
   {% load static %}
 
   <script src="{% static '/newick/js/azCov.js'%}"></script>
+  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
   <style>
     .leaflet-container {  /* all maps */
       width: 100%;
@@ -42,6 +43,7 @@
   <script>
     //=========================( Initialize and Update Map )
     window.addEventListener("map:init", function (e) {
+      //----- map color code
       function getColor(d) {
         return d > 200 ? '#008026' :
                d > 100 ? '#00BD26' :
@@ -52,6 +54,7 @@
                d > 1   ? '#D9FE76' :
                          '#EDFFA0';
       }
+
       detail = e.detail;
       //----- add grey and dark heat layers to map
       var baseLayers = {
@@ -60,7 +63,6 @@
       };
       L.control.layers(baseLayers, null).addTo(detail.map);
       detail.map.addLayer(baseLayers["Grey"])
-
 
       //----- add all polygon and icon map data
       var covLayers = new Object();
@@ -76,6 +78,7 @@
               positive += 1
             }    
           }
+
           // add polygon to map
           covLayers[hash][district] = new Object();
           covLayers[hash][district]["polygon"] = L.polygon(azCov[hash][district]["polygon"], {
@@ -87,6 +90,7 @@
             fillColor: getColor(positive),
             fillOpacity: 1
           })
+
           // mouseover fill display
           covLayers[hash][district]["polygon"].addEventListener("click", function () {
             let stats = ["Name: " + district, "Population: " + azCov[hash][district]["population"]]
@@ -99,7 +103,7 @@
                   zipPositive += 1;
                 }
               }
-              if (positive > 0) {
+              if (zipPositive > 0) {
                 stats.push(zip5 + ": " + String(zipPositive) + "/" + String(zipTested))
               }
             }
@@ -120,7 +124,7 @@
       }
 
       //----- add markers to map on click
-      for (let drop of document.getElementById("mapDropdown").getElementsByClassName("dropdown-item")) {
+      for (let drop of document.getElementsByClassName("covMapButton")) {
         drop.addEventListener("click", function (e) {
           document.getElementById("covStats").innerHTML = ""
           detail.map.eachLayer(function (layer) {
@@ -153,9 +157,90 @@
         return div;
       };
       legend.addTo(detail.map);
+
+      //----- add all plotly plots
+      let covDate = new Object();
+      let covAge = new Object();
+      let covGender = new Object();
+      for (let hash in covLayers){
+        for (let district in covLayers[hash]) {
+          for (let test of azCov[hash][district]["tested"].filter(x => x[3] == "+")) {
+            // add keys if not in hash tables
+            if (Object.keys(covDate).indexOf(test[0]) == -1) {covDate[test[0]] = 0}
+            if (Object.keys(covAge).indexOf(test[1]) == -1) {covAge[test[1]] = 0; console.log(test[1])}
+            if (Object.keys(covGender).indexOf(test[2]) == -1) {covGender[test[2]] = 0}
+            covDate[test[0]] += 1
+            covAge[test[1]] += 1
+            covGender[test[2]] += 1
+          }
+        }
+      }
+
+      //----- plot all plotly plot data to plotly plots
+      var covConfig = {responsive: true}
+      // date
+      let dateX = []
+      let dateY = []
+      let dateLayout = {
+        autosize: true,
+        height: 200,
+        margin: {t: 0, b: 30, l: 40, r: 20}
+      }
+      for (let entry of Object.entries(covDate).sort()) {
+        dateX.push(entry[0])
+        dateY.push(entry[1])
+      }
+      let dateData = [{
+        x: dateX,
+        y: dateY,
+        type: 'bar',
+        name: "positive"
+      }]
+      Plotly.newPlot('covDatePlot', dateData, dateLayout, covConfig)
+
+      // age
+      let ageX = []
+      let ageY = []
+      let ageLayout = {
+        autosize: true,
+        height: 200,
+        margin: {t: 0, b: 30, l: 40, r: 20},
+        xaxis: {type: "category"}
+      }
+      for (let ageRange of ["<5", "5-19", "20-44", "44-54", "55-64", "65>"]) {
+        let entry = [ageRange, covAge[ageRange]]
+        ageX.push(entry[0])
+        ageY.push(entry[1])
+      }
+      let ageData = [{
+        x: ageX,
+        y: ageY,
+        type: 'bar',
+        name: "positive"
+      }]
+      Plotly.newPlot('covAgePlot', ageData, ageLayout, covConfig)
+
+      // gender
+      let genderX = []
+      let genderY = []
+      let genderLayout = {
+        autosize: true,
+        height: 200,
+        margin: {t: 0, b: 30, l: 40, r: 20},
+      }
+      for (let entry of Object.entries(covGender).sort()) {
+        genderX.push(entry[0])
+        genderY.push(entry[1])
+      }
+      let genderData = [{
+        labels: genderX,
+        values: genderY,
+        type: 'pie',
+        name: "positive"
+      }]
+      Plotly.newPlot('covGenderPlot', genderData, genderLayout, covConfig)
+
     }, false);
-
-
 
     //=========================( Wait For Page Load )
     document.onreadystatechange = function () {
@@ -177,31 +262,60 @@
   <div class="biomod biomod-container">
     <!--====================================================================================================( OPTIONS MENU )-->
     <div class="biomod biomod-options">
-      <div class="dropdown" id="mapDropdown">
-        <button class="btn btn-secondary btn-block dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Map Type
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item">region</a>
-          <a class="dropdown-item">county</a>
-          <a class="dropdown-item">zip3</a>
-        </div>
-      </div>
+      <button type="button" class="btn btn-primary covMapButton">region</button>
+      </br>
+      <button type="button" class="btn btn-primary covMapButton">county</button>
+      </br>
+      <button type="button" class="btn btn-primary covMapButton">zip3</button>
     </div>
 
     <!--====================================================================================================( MAIN CONTENT )-->
     <div class="biomod biomod-content">
       <div class="biomod biomod-row">
         <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
+
         <div class="biomod biomod-module" style="flex-grow: 5;">
           {% leaflet_map "main" %}
         </div>
-
         <div class="biomod biomod-module" style="position: relative; overflow: scroll; flex-grow: 1;">
           <div id="covStats" style="margin: 5px;position: absolute;"></div>
+        </div>
+      </div>
+      <div class="biomod biomod-row" style="flex-grow: 0">
+        <div class="biomod biomod-module" style="flex-grow: 2;">
+          date:
+          <div id="covDatePlot"></div>
+        </div>
+        <div class="biomod biomod-module">
+          age:
+          <div id="covAgePlot"></div>
+        </div>
+        <div class="biomod biomod-module">
+          gender:
+          <div id="covGenderPlot"></div>
         </div>
       </div>
     </div>
   </div>
 
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
