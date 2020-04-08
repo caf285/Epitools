@@ -115,6 +115,20 @@ div {
   padding-top: 40px;
 }
 
+.biomod-options-module {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  border-radius: 5px;
+  padding: 5px;
+  background: #EEE;
+  margin-bottom: 10px;
+}
+
+.biomod-options-module > * {
+  margin: 2px;
+}
+
 .biomod-options.tog {
   display: none;
 }
