@@ -8,7 +8,9 @@
   {% load static %}
 
   <script src="{% static '/newick/js/azCov.js'%}"></script>
+  <script src="{% static '/newick/js/covTree.js'%}"></script>
   <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+  <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
   <style>
     .leaflet-container {  /* all maps */
       width: 100%;
@@ -43,6 +45,24 @@
   <script>
     //=========================( Initialize and Update Map )
     window.addEventListener("map:init", function (e) {
+      //----- load cov tree
+      tree = Phylocanvas.default.createTree('phylocanvas')
+      tree.load = (function() {
+        var cached = tree.load;
+        return function() {
+          var result = cached.apply(this, arguments)
+          tree.baseNodeSize = 2
+          tree.setTreeType('rectangular')
+          tree.showBranchLengthLabels = true
+          tree.setTitle(" ")
+          setTimeout(function() {
+            window.dispatchEvent(new Event('resize'));
+          }, 0);
+          return result
+        }
+      })()
+      tree.load(covTree)
+
       //----- map color code
       function getColor(d) {
         return d > 200 ? '#008026' :
@@ -281,6 +301,7 @@
       <div class="biomod biomod-row">
         <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
 
+        <div class="biomod biomod-module" id="phylocanvas" style="flex-grow: 3;"></div>
         <div class="biomod biomod-module" style="flex-grow: 5;">
           {% leaflet_map "main" %}
         </div>
