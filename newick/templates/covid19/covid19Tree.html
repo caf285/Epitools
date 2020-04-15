@@ -7,9 +7,8 @@
   {% leaflet_js %}
   {% load static %}
 
-  <script src="{% static '/newick/js/azCov.js'%}"></script>
+  <script src="{% static '/newick/js/covMetaTable.js'%}"></script>
   <script src="{% static '/newick/js/covTrees.js'%}"></script>
-  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
   <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
   <style>
     .leaflet-container {  /* all maps */
@@ -70,13 +69,23 @@
             tree.baseNodeSize = 2
             tree.setTreeType('rectangular')
             tree.showBranchLengthLabels = true
-            tree.setTitle("bestsnp")
             sampleFontFunc('name', rangeSelect(document.getElementById("nameFontDrop" + document.getElementById("nameFontBtn").innerHTML)))
             sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
             sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
+
+            for (let branch of Object.keys(tree["branches"]).filter(x => x.indexOf("-TG") >= 0)) {
+              let TG = "TG" + String(branch.split("-TG")[1])
+              let metaCounty = covMeta["County"][covMeta["RNAcode"].indexOf(TG)]
+              let metaDate = covMeta["Datecollected"][covMeta["RNAcode"].indexOf(TG)]
+              let metaName = covMeta["Sample.Name"][covMeta["RNAcode"].indexOf(TG)]
+              tree["branches"][branch]["label"] = TG + "::" + metaName + "::" + metaCounty + "::" + metaDate
+            }
+            tree.draw()
+
             return result
           }
         })()
+        tree.setTitle("bestsnp")
         tree.load(covTrees["bestsnp"])
 
         //----- tree type click events
@@ -84,7 +93,7 @@
           drop.addEventListener("click", function (e) {
             tree.load(covTrees[e.target.innerHTML])
             tree.setTitle(e.target.innerHTML)
-            console.log(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML))
+            tree.draw()
           });
         }
       }
@@ -111,7 +120,7 @@
         <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
           <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'left'))">&#8592;</button>
           <div class="btn-group dropdown btn-block">
-            <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
+            <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">3</button>
             <div class="dropdown-menu btn-block">
               {% for i in n|rjust:"10" %}
                 <button id="nameFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('name', rangeSelect(this))">{{ forloop.counter }}</button>
@@ -126,7 +135,7 @@
         <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
           <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'left'))">&#8592;</button>
           <div class="btn-group dropdown btn-block">
-            <button id="snpFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
+            <button id="snpFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">3</button>
             <div class="dropdown-menu btn-block">
               {% for i in n|rjust:"10" %}
                 <button id="snpFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('size', rangeSelect(this))">{{ forloop.counter }}</button>
@@ -141,7 +150,7 @@
         <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
           <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'left'))">&#8592;</button>
           <div class="btn-group dropdown btn-block">
-            <button id="branchScaleBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
+            <button id="branchScaleBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
             <div class="dropdown-menu btn-block">
               {% for i in n|rjust:"10" %}
                 <button id="branchScaleDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('branch', rangeSelect(this))">{{ forloop.counter }}</button>
