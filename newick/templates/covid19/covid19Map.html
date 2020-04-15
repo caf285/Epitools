@@ -8,7 +8,7 @@
   {% load static %}
 
   <script src="{% static '/newick/js/azCov.js'%}"></script>
-  <script src="{% static '/newick/js/covTree.js'%}"></script>
+  <script src="{% static '/newick/js/covTrees.js'%}"></script>
   <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
   <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
   <style>
@@ -43,8 +43,8 @@
 
   <!--====================================================================================================( SCRIPTS )-->
   <script>
-    //=========================( Initialize and Update Map )
     window.addEventListener("map:init", function (e) {
+      //=========================( Initialize and Update Phylocanvas )
       //----- load cov tree
       tree = Phylocanvas.default.createTree('phylocanvas')
       tree.load = (function() {
@@ -61,18 +61,32 @@
           return result
         }
       })()
-      tree.load(covTree)
+      tree.load(covTrees["bestsnp"])
+
+      //=========================( Initialize and Update Map )
+      var activeMapType = "county"
+      var activeMapColor = "samples"
 
       //----- map color code
-      function getColor(d) {
-        return d > 200 ? '#008026' :
-               d > 100 ? '#00BD26' :
-               d > 50  ? '#1AE31C' :
-               d > 20  ? '#4EFC2A' :
-               d > 10  ? '#8DFD3C' :
-               d > 5   ? '#B2FE4C' :
-               d > 1   ? '#D9FE76' :
-                         '#EDFFA0';
+      function getColor(d, max) {
+        return d > getScale(7, max) ? '#008026' :
+               d > getScale(6, max) ? '#00BD26' :
+               d > getScale(5, max)  ? '#1AE31C' :
+               d > getScale(4, max)  ? '#4EFC2A' :
+               d > getScale(3, max)  ? '#8DFD3C' :
+               d > getScale(2, max)   ? '#B2FE4C' :
+               d > getScale(1, max)   ? '#D9FE76' :
+                                   '#EDFFA0';
+      }
+
+      function getScale(d, max) {
+        if (max <= 1) {
+          console.log("1color:",parseInt(max*(0.75**d)*100))
+          return parseInt(max*(0.75**d)*100)
+        } else {
+          console.log("100color:",parseInt(max*(0.5**d)))
+          return parseInt(max*(0.5**d))
+        }
       }
 
       detail = e.detail;
@@ -144,23 +158,11 @@
       }
 
       //----- add markers to map on click
-      for (let drop of document.getElementsByClassName("covMapButton")) {
+      for (let drop of document.getElementsByClassName("covMapButton-type")) {
         drop.addEventListener("click", function (e) {
           document.getElementById("covStats").innerHTML = ""
-          detail.map.eachLayer(function (layer) {
-            for (let hash in covLayers){
-              for (let district in covLayers[hash]) {
-                detail.map.removeLayer(covLayers[hash][district]["polygon"])
-                detail.map.removeLayer(covLayers[hash][district]["icon"])
-              }
-            }
-            for (let hash of Object.keys(covLayers).filter(x => x.indexOf(e.target.innerHTML) >= 0)) {
-              for (let district in covLayers[hash]) {
-                detail.map.addLayer(covLayers[hash][district]["polygon"])
-                detail.map.addLayer(covLayers[hash][district]["icon"])
-              }
-            }
-          });
+          activeMapType = e.target.innerHTML
+          refreshMapPolygons();
         });
       }
 
@@ -172,11 +174,59 @@
         labels = [];
         // loop through our density intervals and generate a label with a colored square for each interval
         for (var i = 0; i < grades.length; i++) {
-          div.innerHTML += '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' + grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+          div.innerHTML += '<i style="background:' + getColor(grades[i] + 1, 200) + '"></i> ' + grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
         }
         return div;
       };
-      legend.addTo(detail.map);
+
+      //----- change colorscheme on click
+      for (let drop of document.getElementsByClassName("covMapButton-color")) {
+        drop.addEventListener("click", function (e) {
+          document.getElementById("covStats").innerHTML = ""
+          activeMapColor = e.target.innerHTML.split(" ")[e.target.innerHTML.split(" ").length - 1].toLowerCase()
+          console.log(activeMapColor)
+
+          for (let hash in covLayers) {
+            for (let district in covLayers[hash]) {
+              let positive = 0
+              let tested = 0
+              for (let test in azCov[hash][district]["tested"]) {
+                tested += 1
+                if (azCov[hash][district]["tested"][test][3] == "+") {
+                  positive += 1
+                }    
+              }
+              if (activeMapColor == "samples") {
+                covLayers[hash][district]["polygon"]["options"]["fillColor"] = getColor(tested)
+              } else if (activeMapColor == "positive") {
+                covLayers[hash][district]["polygon"]["options"]["fillColor"] = getColor(positive)
+              } else {
+                covLayers[hash][district]["polygon"]["options"]["fillColor"] = getColor(positive/tested)
+              }
+            }
+          }
+          refreshMapPolygons();
+        });
+      }
+
+      //----- show currently selected polygons
+      function refreshMapPolygons() {
+        for (let hash in covLayers) {
+          for (let district in covLayers[hash]) {
+            detail.map.removeLayer(covLayers[hash][district]["polygon"])
+            detail.map.removeLayer(covLayers[hash][district]["icon"])
+          }
+        }
+        for (let hash of Object.keys(covLayers).filter(x => x.indexOf(activeMapType) >= 0)) {
+          for (let district in covLayers[hash]) {
+            detail.map.addLayer(covLayers[hash][district]["polygon"])
+            detail.map.addLayer(covLayers[hash][district]["icon"])
+          }
+        }
+        detail.map.removeControl(legend)
+        detail.map.addControl(legend)
+      }
+      refreshMapPolygons();
 
       //----- add all plotly plots
       let covDate = new Object();
@@ -284,15 +334,15 @@
     <div class="biomod biomod-options">
       <div class="biomod biomod-options-module">
         <h5>Map Type:</h5>
-        <button type="button" class="btn btn-primary covMapButton">region</button>
-        <button type="button" class="btn btn-primary covMapButton">county</button>
-        <button type="button" class="btn btn-primary covMapButton">zip3</button>
+        <button type="button" class="btn btn-primary covMapButton-type">region</button>
+        <button type="button" class="btn btn-primary covMapButton-type">county</button>
+        <button type="button" class="btn btn-primary covMapButton-type">zip3</button>
       </div>
       <div class="biomod biomod-options-module">
         <h5>Color By:</h5>
-        <button type="button" class="btn btn-primary covMapButton"># of Samples</button>
-        <button type="button" class="btn btn-primary covMapButton"># of Positive</button>
-        <button type="button" class="btn btn-primary covMapButton"># Positive / Tested</button>
+        <button type="button" class="btn btn-primary covMapButton-color"># of Samples</button>
+        <button type="button" class="btn btn-primary covMapButton-color"># of Positive</button>
+        <button type="button" class="btn btn-primary covMapButton-color"># Positive / Tested</button>
       </div>
     </div>
 

@@ -66,6 +66,12 @@ class Covid19CoverageView(LoginRequiredMixin, generic.ListView):
   def get_queryset(self):
     return ""
 
+class Covid19TreeView(LoginRequiredMixin, generic.ListView):
+  template_name = 'covid19/covid19Tree.html'
+  context_object_name = 'covid19Tree'
+  def get_queryset(self):
+    return ""
+
 class DemoEmmtypeView(LoginRequiredMixin, generic.ListView):
   template_name = 'demo/demoEmmtype.html'
   context_object_name = 'demoEmmtype'

@@ -1,0 +1,266 @@
+{% extends "newick/samples.html" %}
+
+{% block static %}
+  {{ block.super }}
+  {% load leaflet_tags %}
+  {% leaflet_css %}
+  {% leaflet_js %}
+  {% load static %}
+
+  <script src="{% static '/newick/js/azCov.js'%}"></script>
+  <script src="{% static '/newick/js/covTrees.js'%}"></script>
+  <script src="{% static '/plotly.js/dist/plotly.min.js' %}"></script>
+  <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
+  <style>
+    .leaflet-container {  /* all maps */
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .mapIcon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #000;
+    }
+    .legend {
+      line-height: 18px;
+      background-color: white;
+      padding: 15px;
+      border-radius: 5px;
+      color: #555;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+  </style>
+
+
+  <!--====================================================================================================( SCRIPTS )-->
+  <script>
+    window.addEventListener("resize", function() {
+      setTimeout(function() {
+        sampleFontFunc('name', rangeSelect(document.getElementById("nameFontDrop" + document.getElementById("nameFontBtn").innerHTML)))
+        sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
+        sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
+      }, 0);
+    });
+
+    //=========================( Wait For Page Load )
+    document.onreadystatechange = function () {
+      if (document.readyState === 'complete') {
+        //----- option button
+        document.getElementsByClassName('biomod-options-icon')[0].addEventListener('click', function() {
+          document.getElementsByClassName('biomod-options')[0].classList.toggle('tog');
+          window.dispatchEvent(new Event('resize'));
+        })
+
+        //=========================( Initialize and Update Phylocanvas )
+        //----- load cov tree
+        tree = Phylocanvas.default.createTree('phylocanvas')
+        tree.load = (function() {
+          var cached = tree.load;
+          return function() {
+            var result = cached.apply(this, arguments)
+            tree.baseNodeSize = 2
+            tree.setTreeType('rectangular')
+            tree.showBranchLengthLabels = true
+            tree.setTitle("bestsnp")
+            sampleFontFunc('name', rangeSelect(document.getElementById("nameFontDrop" + document.getElementById("nameFontBtn").innerHTML)))
+            sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
+            sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
+            return result
+          }
+        })()
+        tree.load(covTrees["bestsnp"])
+
+        //----- tree type click events
+        for (let drop of document.getElementsByClassName("covTree-type")) {
+          drop.addEventListener("click", function (e) {
+            tree.load(covTrees[e.target.innerHTML])
+            tree.setTitle(e.target.innerHTML)
+            console.log(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML))
+          });
+        }
+      }
+    }
+  </script>
+
+{% endblock %}
+
+{% block BioMod %}
+
+  <div class="biomod biomod-container">
+    <!--====================================================================================================( OPTIONS MENU )-->
+    <div class="biomod biomod-options">
+      <div class="biomod biomod-options-module">
+        <h5>Tree:</h5>
+        <button type="button" class="btn btn-primary covTree-type">bestsnp</button>
+        <button type="button" class="btn btn-primary covTree-type">bestsnp-fixed</button>
+        <button type="button" class="btn btn-primary covTree-type">missingdata</button>
+        <button type="button" class="btn btn-primary covTree-type">missingdata-fixed</button>
+      </div>
+      <div class="biomod biomod-options-module">
+      <h5>Sample Name Font Size:</h5>
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'left'))">&#8592;</button>
+          <div class="btn-group dropdown btn-block">
+            <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
+            <div class="dropdown-menu btn-block">
+              {% for i in n|rjust:"10" %}
+                <button id="nameFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('name', rangeSelect(this))">{{ forloop.counter }}</button>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'right'))">&#8594;</button>
+        </div>
+      </div>
+      <h5>SNP Font Size:</h5>
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'left'))">&#8592;</button>
+          <div class="btn-group dropdown btn-block">
+            <button id="snpFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
+            <div class="dropdown-menu btn-block">
+              {% for i in n|rjust:"10" %}
+                <button id="snpFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('size', rangeSelect(this))">{{ forloop.counter }}</button>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'right'))">&#8594;</button>
+        </div>
+      </div>
+      <h5>Branch Scale:</h5>
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'left'))">&#8592;</button>
+          <div class="btn-group dropdown btn-block">
+            <button id="branchScaleBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
+            <div class="dropdown-menu btn-block">
+              {% for i in n|rjust:"10" %}
+                <button id="branchScaleDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('branch', rangeSelect(this))">{{ forloop.counter }}</button>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'right'))">&#8594;</button>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <script>
+    function rangeSelect(obj) {
+      let drop = obj.parentNode.parentNode.getElementsByClassName("btn")[0]
+      let index = Object.values(obj.parentNode.getElementsByClassName("dropdown-item")).map(x => x.innerHTML).indexOf(obj.innerHTML)
+      drop.innerHTML = obj.innerHTML
+      return index
+    }   
+    function rangeArrow(obj, str) {
+      let dropList = obj.parentNode.getElementsByClassName("dropdown")[0]
+      let drop = dropList.getElementsByClassName("btn")[0]
+      dropList = Object.values(dropList.getElementsByClassName("dropdown-item"))
+      let index = dropList.map(x => x.innerHTML).indexOf(drop.innerHTML)
+      index = (str === "left" ? index - 1 : index + 1)
+      try {
+        drop.innerHTML = dropList[index].innerHTML
+        return index
+      } catch {}
+    }   
+    function sampleRangeFunc(str) {
+      if (typeof str !== "undefined") {
+        newRange = parseInt(str) + 1 
+        addMarks()
+      }   
+    }   
+    function treeDateFunc(str) {
+      if (typeof str !== "undefined") {
+        tree.draw();
+        treeDate = Object.keys(trees[treeType])[str]
+        resetM(Object.keys(trees[treeType][treeDate])[0])
+      }   
+    }   
+    function clusterSnpsFunc(str) {
+      if (typeof str !== "undefined") {
+        let dropDown = document.getElementById("clusterSnpsDropdown")
+        dropDown.innerHTML = dropDown.parentNode.getElementsByClassName("dropdown-item")[str].innerHTML
+        updateClusterContext()
+      }   
+    }   
+    function clusterSamplesFunc(str) {
+      if (typeof str !== "undefined") {
+        let dropDown = document.getElementById("clusterSamplesDropdown")
+        dropDown.innerHTML = dropDown.parentNode.getElementsByClassName("dropdown-item")[str].innerHTML
+        updateClusterContext()
+      }   
+    }   
+
+    function updateClusterContext() {
+      let clusterSnps = document.getElementById("clusterSnpsDropdown")
+      clusterSnps = clusterSnps.innerHTML.split(" ")[0]
+      let clusterSamples = document.getElementById("clusterSamplesDropdown")
+      clusterSamples = clusterSamples.innerHTML.split(" ")[0]
+      clusters = tree.getClusters(clusterSnps, clusterSamples)
+      document.getElementById("clusterContext").innerHTML = "<div id='newClusters'>Clusters: " + Object.keys(clusters).length + "</div><div></div>"
+      document.getElementById("newClusters").addEventListener('click', function() {
+        getClusters(clusters)
+        tree.draw()
+      })  
+    } 
+    function sampleFontFunc(type, value) {
+      if (typeof value != "undefined") {
+        value += 1;
+        switch(type) {
+          case 'name':
+            value *= 5
+            tree.textSize = value;
+            break;
+          case 'size':
+            value *= 5
+            tree.canvas.font = value + 'px ' + tree.canvas.font.split(' ')[1];
+            break;
+          case 'branch':
+            value *= 2
+            tree.branchScalar = value/tree.maxBranchLength*200
+        }
+        tree.draw()
+      }
+    }
+
+    </script>
+
+    <!--====================================================================================================( MAIN CONTENT )-->
+    <div class="biomod biomod-content">
+      <div class="biomod biomod-row">
+        <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
+        <div class="biomod biomod-module" id="phylocanvas" style="flex-grow: 3;"></div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

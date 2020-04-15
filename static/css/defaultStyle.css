@@ -20,7 +20,6 @@ div {
   margin: 0;
 }
 
-
 /* ===========================================================================( PRIMARY WEBAPP CONTAINER )
   + container prioritizes a content column
     - header forced to top and footer forced to bottom using flexboxes
@@ -71,6 +70,10 @@ div {
 .navbar .nav-item:hover .nav-link {
   color: #19A;
 }                
+
+.nav-link:hover {
+  cursor: pointer;
+}
 
 /* ===========================================================================( v2.0 MODULE MANAGEMENT ) 
   + module rows seperated by "dragbar" to resize height of selected row (NO REDISTRIBUTION!!)
