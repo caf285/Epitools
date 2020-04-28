@@ -78,7 +78,8 @@
               let metaCounty = covMeta["County"][covMeta["RNAcode"].indexOf(TG)]
               let metaDate = covMeta["Datecollected"][covMeta["RNAcode"].indexOf(TG)]
               let metaName = covMeta["Sample.Name"][covMeta["RNAcode"].indexOf(TG)]
-              tree["branches"][branch]["label"] = TG + "::" + metaName + "::" + metaCounty + "::" + metaDate
+              let metaAffiliation = covMeta["TribalAffiliation"][covMeta["RNAcode"].indexOf(TG)]
+              tree["branches"][branch]["label"] = TG + "::" + metaName + "::" + metaCounty + "::" + metaDate + "::" + metaAffiliation
             }
             tree.draw()
 
@@ -120,7 +121,7 @@
         <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
           <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'left'))">&#8592;</button>
           <div class="btn-group dropdown btn-block">
-            <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">3</button>
+            <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
             <div class="dropdown-menu btn-block">
               {% for i in n|rjust:"10" %}
                 <button id="nameFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('name', rangeSelect(this))">{{ forloop.counter }}</button>
