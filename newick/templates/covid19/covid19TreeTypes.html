@@ -1,4 +1,4 @@
-{% extends "demo/demo.html" %}
+{% extends "newick/samples.html" %}
 
 {% block static %}
   {{ block.super }}
@@ -13,7 +13,8 @@
   <link rel="stylesheet" href="{% static '/jQRangeSlider/css/classic.css' %}" type="text/css"></link>
 
   <!-- Javascript -->
-  <script src="{% static '/newick/js/trees.js' %}"></script>
+  <script src="{% static '/newick/js/covMetaTable.js'%}"></script>
+  <script src="{% static '/newick/js/covTrees.js' %}"></script>
   <script src="{% static '/newick/js/gas.js' %}"></script>
   <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
   <script src="{% static '/jquery/jquery-1.10.2.min.js' %}"></script>
@@ -23,72 +24,234 @@
 
   <!--====================================================================================================( SCRIPTS )-->
   <script>
-    var DB
-    var userGroups
-    var groups
-    var treeType
-    var treeDate
-    var tree
+    window.addEventListener("resize", function() {
+      setTimeout(function() {
+        sampleFontFunc('name', rangeSelect(document.getElementById("nameFontDrop" + document.getElementById("nameFontBtn").innerHTML)))
+        sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
+        sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
+      }, 0);
+    });
 
     //=========================( Wait For Page Load )
     document.onreadystatechange = function () {
       if (document.readyState === 'complete') {
-        // load database
-        DB = {{ demoBioMod | safe }}
-        userGroups = "{{ user.groups.all|safe }}"
-        groups = []
-        newRange = 1
-        // prep 'bestsnp' toggle
-        treeType = 'bestsnp'
-        $(function() {
-          $('#bestsnp').change(function() {
-            if ($(this).prop('checked')) {
-              treeType = 'bestsnp'
-            } else {
-              treeType = 'missingdata'
-            }
-            resetM(Object.keys(trees[treeType][treeDate])[0])
-          })
+        //----- option button
+        document.getElementsByClassName('biomod-options-icon')[0].addEventListener('click', function() {
+          document.getElementsByClassName('biomod-options')[0].classList.toggle('tog');
+          window.dispatchEvent(new Event('resize'));
         })
-        let dropDown = document.getElementById("treeDateDropdown")
-        for (let newDate of Object.keys(trees[treeType])) {
-          dropDown.innerHTML += "<button type='button' class='dropdown-item' onclick='treeDateFunc(rangeSelect(this))'>" + newDate + " Months</button>"
-          dropDown.parentNode.getElementsByClassName("btn")[0].innerHTML = newDate + " Months"
-        }
+
+        //=========================( Initialize and Update Phylocanvas )
+        //----- load cov tree
         tree = Phylocanvas.default.createTree('phylocanvas')
         tree.load = (function() {
           var cached = tree.load;
           return function() {
             var result = cached.apply(this, arguments)
-            let emm = Object.keys(trees[treeType][treeDate][document.getElementById("masterButton").innerHTML]).filter(x => trees[treeType][treeDate][document.getElementById("masterButton").innerHTML][x] === arguments[0])[0]
-            document.getElementById("gasMtypeButton").innerHTML = ((emm == 'ALL') ? 'ALL' : 'emm' + emm.split('M')[1].split('::')[0])
-            tree.textSize = Math.min(3 + (800 / tree.leaves.length), 35)
-            tree.canvas.font = tree.textSize + 'px ' + tree.canvas.font.split(' ')[1];
-            tree.branchScalar = 1800/tree.maxBranchLength
-            tree.setTitle(document.getElementById("gasMtypeButton").innerHTML)
-            updateSampleNames()
-            addMarks()
-            updateClusterContext()
+            tree.baseNodeSize = 2
+            tree.setTreeType('rectangular')
+            tree.showBranchLengthLabels = true
+            sampleFontFunc('name', rangeSelect(document.getElementById("nameFontDrop" + document.getElementById("nameFontBtn").innerHTML)))
+            sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
+            sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
             return result
           }
         })()
-        tree.baseNodeSize = 2
-        tree.setTreeType('rectangular')
-        tree.showBranchLengthLabels = true
-        for (var i in trees[treeType][treeDate]) {
-          document.getElementById("masterDropdown").innerHTML += "<a class='dropdown-item' onclick='resetM(\"" + i + "\")'>" + i + "</a>"
-        }
-        treeDateFunc(Object.keys(trees[treeType]).length - 1)
-        clusterSnpsFunc(0)
-        clusterSamplesFunc(0)
-        document.getElementsByClassName('biomod-options-icon')[0].addEventListener('click', function() {
-          document.getElementsByClassName('biomod-options')[0].classList.toggle('tog');
-          window.dispatchEvent(new Event('resize'));
-        })
-        window.dispatchEvent(new Event('resize'));
+
+        //----- 
+        resetLineageDropdown()
+
+
       }
     }
+  </script>
+{% endblock %}
 
+{% block BioMod %}
+  <div class="biomod biomod-container">
+    <!--====================================================================================================( OPTIONS MENU )-->
+    <div class="biomod biomod-options">
+
+      <!--=========================( Emm Type Dropdown )-->
+      <div class="biomod biomod-options-module">
+        <h5>Tree Type:</h5>
+        <div class="dropdown">
+          <button id="treeTypeButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ALL</button>
+          <div class="dropdown-menu btn-block">
+            <button type='button' class='dropdown-item' onclick="document.getElementById('treeTypeButton').innerHTML = 'ALL'; resetLineageDropdown();">ALL</button>
+            <button type='button' class='dropdown-item' onclick="document.getElementById('treeTypeButton').innerHTML = 'TGEN'; resetLineageDropdown();">TGEN</button>
+          </div>
+        </div>
+        <h5>Lineage:</h5>
+        <div class="dropdown">
+          <button id="treeLineageButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+          <div id="treeLineageDropdown" class="dropdown-menu btn-block">
+          </div>
+        </div>
+      </div>
+
+      <!--=========================( New Sample Highlight Range )-->
+      <div class="biomod biomod-options-module">
+      <h5>New Sample Range:</h5>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+            <button type="button" class="btn btn-primary" onclick="sampleRangeFunc(rangeArrow(this, 'left'))">&#8592;</button>
+            <div class="btn-group dropdown btn-block">
+              <button class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1 Month</button>
+              <div class="dropdown-menu btn-block">
+                {% for i in n|rjust:"12" %}
+                <button type="button" class="dropdown-item" onclick="sampleRangeFunc(rangeSelect(this))">{{ forloop.counter }} Month{% if forloop.counter >= 2 %}s{% endif %}</button>
+                {% endfor %}
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="sampleRangeFunc(rangeArrow(this, 'right'))">&#8594;</button>
+          </div>
+        </div>
+      </div>
+
+      <!--=========================( Custer Detection Range Selection )-->
+      <div class="biomod biomod-options-module">
+      <h5>Cluster Detection:</h5>
+        <div style="font-size:14px;">Number of SNPs</div>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+            <button type="button" class="btn btn-primary" onclick="clusterSnpsFunc(rangeArrow(this, 'left'))">&#8592;</button>
+            <div class="btn-group dropdown btn-block">
+              <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+              <div class="dropdown-menu btn-block">
+                {% for i in n|rjust:"11" %}
+                  <button type="button" class="dropdown-item" onclick="clusterSnpsFunc(rangeSelect(this))">{{ forloop.counter|add:-1 }} SNP{% if forloop.counter|add:-1 != 1 %}s{% endif %}</button>
+                {% endfor %}
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="clusterSnpsFunc(rangeArrow(this, 'right'))">&#8594;</button>
+          </div>
+        </div>
+        <div style="font-size:14px;">Number of Samples in Cluster</div>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+            <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'left'))">&#8592;</button>
+            <div class="btn-group dropdown btn-block">
+              <button id="clusterSamplesDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+              <div class="dropdown-menu btn-block">
+                {% for i in n|rjust:"9" %}
+                  <button type="button" class="dropdown-item" onclick="clusterSamplesFunc(rangeSelect(this))">{{ forloop.counter|add:1 }} Sample{% if forloop.counter|add:2 >= 2 %}s{% endif %}</button>
+                {% endfor %}
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'right'))">&#8594;</button>
+          </div>
+        </div>
+      </div>
+
+      <!--=========================( Phylogeny Options Menu )-->
+      <div class="biomod biomod-options-module">
+      <h5>Sample Name Font Size:</h5>
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'left'))">&#8592;</button>
+          <div class="btn-group dropdown btn-block">
+            <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
+            <div class="dropdown-menu btn-block">
+              {% for i in n|rjust:"10" %}
+                <button id="nameFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('name', rangeSelect(this))">{{ forloop.counter }}</button>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'right'))">&#8594;</button>
+        </div>
+      </div>
+      <h5>SNP Font Size:</h5>
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'left'))">&#8592;</button>
+          <div class="btn-group dropdown btn-block">
+            <button id="snpFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
+            <div class="dropdown-menu btn-block">
+              {% for i in n|rjust:"10" %}
+                <button id="snpFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('size', rangeSelect(this))">{{ forloop.counter }}</button>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'right'))">&#8594;</button>
+        </div>
+      </div>
+      <h5>Branch Scale:</h5>
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'left'))">&#8592;</button>
+          <div class="btn-group dropdown btn-block">
+            <button id="branchScaleBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
+            <div class="dropdown-menu btn-block">
+              {% for i in n|rjust:"10" %}
+                <button id="branchScaleDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('branch', rangeSelect(this))">{{ forloop.counter }}</button>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'right'))">&#8594;</button>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <script>
+    function rangeSelect(obj) {
+      let drop = obj.parentNode.parentNode.getElementsByClassName("btn")[0]
+      let index = Object.values(obj.parentNode.getElementsByClassName("dropdown-item")).map(x => x.innerHTML).indexOf(obj.innerHTML)
+      drop.innerHTML = obj.innerHTML
+      return index
+    }   
+    function rangeArrow(obj, str) {
+      let dropList = obj.parentNode.getElementsByClassName("dropdown")[0]
+      let drop = dropList.getElementsByClassName("btn")[0]
+      dropList = Object.values(dropList.getElementsByClassName("dropdown-item"))
+      let index = dropList.map(x => x.innerHTML).indexOf(drop.innerHTML)
+      index = (str === "left" ? index - 1 : index + 1)
+      try {
+        drop.innerHTML = dropList[index].innerHTML
+        return index
+      } catch {}
+    }   
+    function sampleRangeFunc(str) {
+      if (typeof str !== "undefined") {
+        newRange = parseInt(str) + 1 
+        addMarks()
+      }   
+    }   
+    function treeDateFunc(str) {
+      if (typeof str !== "undefined") {
+        tree.draw();
+        treeDate = Object.keys(trees[treeType])[str]
+        resetM(Object.keys(trees[treeType][treeDate])[0])
+      }   
+    }   
+    function clusterSnpsFunc(str) {
+      if (typeof str !== "undefined") {
+        let dropDown = document.getElementById("clusterSnpsDropdown")
+        dropDown.innerHTML = dropDown.parentNode.getElementsByClassName("dropdown-item")[str].innerHTML
+        updateClusterContext()
+      }   
+    }   
+    function clusterSamplesFunc(str) {
+      if (typeof str !== "undefined") {
+        let dropDown = document.getElementById("clusterSamplesDropdown")
+        dropDown.innerHTML = dropDown.parentNode.getElementsByClassName("dropdown-item")[str].innerHTML
+        updateClusterContext()
+      }   
+    }   
+
+    function updateClusterContext() {
+      let clusterSnps = document.getElementById("clusterSnpsDropdown")
+      clusterSnps = clusterSnps.innerHTML.split(" ")[0]
+      let clusterSamples = document.getElementById("clusterSamplesDropdown")
+      clusterSamples = clusterSamples.innerHTML.split(" ")[0]
+      clusters = tree.getClusters(clusterSnps, clusterSamples)
+      document.getElementById("clusterContext").innerHTML = "<div id='newClusters'>Clusters: " + Object.keys(clusters).length + "</div><div></div>"
+      document.getElementById("newClusters").addEventListener('click', function() {
+        getClusters(clusters)
+        tree.draw()
+      })  
+    } 
     function sampleFontFunc(type, value) {
       if (typeof value != "undefined") {
         value += 1;
@@ -108,173 +271,25 @@
         tree.draw()
       }
     }
-  </script>
 
-{% endblock %}
+    function resetLineageDropdown() {
+      document.getElementById("treeLineageDropdown").innerHTML = ""
+      for (let index of Object.keys(trees[document.getElementById("treeTypeButton").innerHTML]).sort()) {
+        document.getElementById("treeLineageDropdown").innerHTML += "<button type='button' class='dropdown-item' onclick='document.getElementById(\"treeLineageButton\").innerHTML = \"" + index + "\"; loadTree();'>" + index + "</button>"
+      }
+      document.getElementById("treeLineageButton").innerHTML = Object.keys(trees[document.getElementById("treeTypeButton").innerHTML]).sort()[0]
+      console.log(document.getElementById("treeTypeButton").innerHTML, document.getElementById("treeLineageButton").innerHTML)
+      loadTree();
+    }
 
-{% block BioMod %}
-  <div class="biomod biomod-container">
-    <!--====================================================================================================( OPTIONS MENU )-->
-    <div class="biomod biomod-options">
+    function loadTree() {
+      tree.load(trees[document.getElementById("treeTypeButton").innerHTML][document.getElementById("treeLineageButton").innerHTML])
+      tree.setTitle(document.getElementById("treeTypeButton").innerHTML + "::" + document.getElementById("treeLineageButton").innerHTML)
+      tree.draw()
+    }
 
-      <!--=========================( Master Reference Dropdown )-->
-      <span style="display: none;">
-        Master Reference:
-        <div class="dropdown">
-          <button id="masterButton" class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-          <div id="masterDropdown" class="dropdown-menu">
-          </div>
-        </div>
-      </span>
 
-      <!--=========================( Emm Type Dropdown )-->
-      emmType:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="dropdown">
-          <button id="gasMtypeButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-          <div id="gasMtypeDropdown" class="dropdown-menu btn-block"></div>
-        </div>
-      </div>
-      </br>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="dropdown" style="margin-top: 7px">
-          <button class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sample Names</button>
-          <div id="samplesDropdown" class="dropdown-menu btn-block">
-            &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="id"> Sample Name&nbsp;<br>
-            &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="tg"> TG Number&nbsp;<br>
-            &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="az" checked> AZ Number&nbsp;<br>
-            &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="mType"> M-Type&nbsp;<br>
-            &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="facilityStr"> Facility Name&nbsp;<br>
-            &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="collectionDate" checked> Collection Date&nbsp;<br>
-            &nbsp;<input oninput="updateSampleNames(); tree.draw();" type="checkbox" class="sampleNamesCheck" name="sequenceDate"> Sequence Date&nbsp;<br>
-          </div>
-        </div>
-      </div>
-      </br>
-
-      <!--=========================( Bestsnp/Missingdata Toggle )-->
-      <span style="display: none;">
-        Tree Type:
-        <input id="bestsnp" type="checkbox" checked data-toggle="toggle" data-on="bestsnp" data-off="missingdata" data-width="100%" data-onstyle="info" data-offstyle="info">
-      </span>
-
-      <!--=========================( New Sample Highlight Range )-->
-      New Sample Range:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleRangeFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1 Month</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"12" %}
-              <button type="button" class="dropdown-item" onclick="sampleRangeFunc(rangeSelect(this))">{{ forloop.counter }} Month{% if forloop.counter >= 2 %}s{% endif %}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="sampleRangeFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-
-      <!--=========================( Tree Date Range Selection )-->
-      Tree Date Range:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="treeDateFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div id="treeDateDropdown" class="dropdown-menu btn-block"></div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="treeDateFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-
-      <!--=========================( Custer Detection Range Selection )-->
-      <div>Cluster Detection:</div>
-      <div style="font-size:14px;">Number of SNPs</div>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="clusterSnpsFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"11" %}
-                <button type="button" class="dropdown-item" onclick="clusterSnpsFunc(rangeSelect(this))">{{ forloop.counter|add:-1 }} SNP{% if forloop.counter|add:-1 != 1 %}s{% endif %}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="clusterSnpsFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      <div style="font-size:14px;">Number of Samples in Cluster</div>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="clusterSamplesDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"9" %}
-                <button type="button" class="dropdown-item" onclick="clusterSamplesFunc(rangeSelect(this))">{{ forloop.counter|add:1 }} Sample{% if forloop.counter|add:2 >= 2 %}s{% endif %}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-
-      <!--=========================( Phylogeny Options Menu )-->
-      Sample Name Font Size:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"10" %}
-                <button type="button" class="dropdown-item" onclick="sampleFontFunc('name', rangeSelect(this))">{{ forloop.counter }}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      SNP Font Size:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"10" %}
-                <button type="button" class="dropdown-item" onclick="sampleFontFunc('size', rangeSelect(this))">{{ forloop.counter }}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      Branch Scale:
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">1</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"10" %}
-                <button type="button" class="dropdown-item" onclick="sampleFontFunc('branch', rangeSelect(this))">{{ forloop.counter }}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      </br>
-      <div id="clusterContext"></div>
-      <div id="treeContext1"></div>
-    </div>
-
+    </script>
 
     <!--====================================================================================================( MAIN CONTENT )-->
     <div class="biomod biomod-content">
