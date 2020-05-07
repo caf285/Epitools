@@ -14,7 +14,7 @@
 
   <!-- Javascript -->
   <script src="{% static '/newick/js/covMetaTable.js'%}"></script>
-  <script src="{% static '/newick/js/covTrees.js' %}"></script>
+  <script src="{% static '/newick/js/gisTrees.js' %}"></script>
   <script src="{% static '/newick/js/gas.js' %}"></script>
   <script src="{% static '/phylocanvas/phylocanvas.js' %}"></script>
   <script src="{% static '/jquery/jquery-1.10.2.min.js' %}"></script>
@@ -54,6 +54,13 @@
             sampleFontFunc('name', rangeSelect(document.getElementById("nameFontDrop" + document.getElementById("nameFontBtn").innerHTML)))
             sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
             sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
+            for (let leaf of this.leaves.filter(x => x.id.indexOf("TG") >= 0)) {
+              for (let tg of covMeta["RNAcode"].filter(x => x !== "None")) {
+                if (leaf.id.indexOf(tg) >= 0) {
+                  leaf.id = tg
+                }
+              }
+            }
             return result
           }
         })()
@@ -85,14 +92,14 @@
         <h5>Lineage:</h5>
         <div class="dropdown">
           <button id="treeLineageButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-          <div id="treeLineageDropdown" class="dropdown-menu btn-block">
+          <div id="treeLineageDropdown" class="dropdown-menu btn-block" style="max-height: 250px; overflow-y: scroll">
           </div>
         </div>
       </div>
 
       <!--=========================( New Sample Highlight Range )-->
-      <div class="biomod biomod-options-module">
-      <h5>New Sample Range:</h5>
+      <div style="display: none;" class="biomod biomod-options-module">
+        <h5>New Sample Range:</h5>
         <div style="display: flex; justify-content: flex-end; width: 100%;">
           <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
             <button type="button" class="btn btn-primary" onclick="sampleRangeFunc(rangeArrow(this, 'left'))">&#8592;</button>
@@ -111,13 +118,13 @@
 
       <!--=========================( Custer Detection Range Selection )-->
       <div class="biomod biomod-options-module">
-      <h5>Cluster Detection:</h5>
+        <h5>Cluster Detection:</h5>
         <div style="font-size:14px;">Number of SNPs</div>
         <div style="display: flex; justify-content: flex-end; width: 100%;">
           <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
             <button type="button" class="btn btn-primary" onclick="clusterSnpsFunc(rangeArrow(this, 'left'))">&#8592;</button>
             <div class="btn-group dropdown btn-block">
-              <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+              <button id="clusterSnpsDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">0 SNPs</button>
               <div class="dropdown-menu btn-block">
                 {% for i in n|rjust:"11" %}
                   <button type="button" class="dropdown-item" onclick="clusterSnpsFunc(rangeSelect(this))">{{ forloop.counter|add:-1 }} SNP{% if forloop.counter|add:-1 != 1 %}s{% endif %}</button>
@@ -132,7 +139,7 @@
           <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
             <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'left'))">&#8592;</button>
             <div class="btn-group dropdown btn-block">
-              <button id="clusterSamplesDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+              <button id="clusterSamplesDropdown" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">2 Samples</button>
               <div class="dropdown-menu btn-block">
                 {% for i in n|rjust:"9" %}
                   <button type="button" class="dropdown-item" onclick="clusterSamplesFunc(rangeSelect(this))">{{ forloop.counter|add:1 }} Sample{% if forloop.counter|add:2 >= 2 %}s{% endif %}</button>
@@ -142,56 +149,57 @@
             <button type="button" class="btn btn-primary" onclick="clusterSamplesFunc(rangeArrow(this, 'right'))">&#8594;</button>
           </div>
         </div>
+        <div id="clusterContext"></div>
       </div>
 
       <!--=========================( Phylogeny Options Menu )-->
       <div class="biomod biomod-options-module">
-      <h5>Sample Name Font Size:</h5>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"10" %}
-                <button id="nameFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('name', rangeSelect(this))">{{ forloop.counter }}</button>
-              {% endfor %}
+        <h5>Sample Name Font Size:</h5>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+            <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'left'))">&#8592;</button>
+            <div class="btn-group dropdown btn-block">
+              <button id="nameFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
+              <div class="dropdown-menu btn-block">
+                {% for i in n|rjust:"10" %}
+                  <button id="nameFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('name', rangeSelect(this))">{{ forloop.counter }}</button>
+                {% endfor %}
+              </div>
             </div>
+            <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'right'))">&#8594;</button>
           </div>
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('name', rangeArrow(this, 'right'))">&#8594;</button>
+        </div>
+        <h5>SNP Font Size:</h5>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+            <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'left'))">&#8592;</button>
+            <div class="btn-group dropdown btn-block">
+              <button id="snpFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
+              <div class="dropdown-menu btn-block">
+                {% for i in n|rjust:"10" %}
+                  <button id="snpFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('size', rangeSelect(this))">{{ forloop.counter }}</button>
+                {% endfor %}
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'right'))">&#8594;</button>
+          </div>
+        </div>
+        <h5>Branch Scale:</h5>
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+          <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
+            <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'left'))">&#8592;</button>
+            <div class="btn-group dropdown btn-block">
+              <button id="branchScaleBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
+              <div class="dropdown-menu btn-block">
+                {% for i in n|rjust:"10" %}
+                  <button id="branchScaleDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('branch', rangeSelect(this))">{{ forloop.counter }}</button>
+                {% endfor %}
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'right'))">&#8594;</button>
+          </div>
         </div>
       </div>
-      <h5>SNP Font Size:</h5>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="snpFontBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"10" %}
-                <button id="snpFontDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('size', rangeSelect(this))">{{ forloop.counter }}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('size', rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-      <h5>Branch Scale:</h5>
-      <div style="display: flex; justify-content: flex-end; width: 100%;">
-        <div style="width: 90%;" class="btn-group btn-group-lg" role="group">
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'left'))">&#8592;</button>
-          <div class="btn-group dropdown btn-block">
-            <button id="branchScaleBtn" class="btn btn-lg btn-block btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">4</button>
-            <div class="dropdown-menu btn-block">
-              {% for i in n|rjust:"10" %}
-                <button id="branchScaleDrop{{ forloop.counter }}" type="button" class="dropdown-item" onclick="sampleFontFunc('branch', rangeSelect(this))">{{ forloop.counter }}</button>
-              {% endfor %}
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="sampleFontFunc('branch', rangeArrow(this, 'right'))">&#8594;</button>
-        </div>
-      </div>
-    </div>
     </div>
 
     <script>
@@ -285,9 +293,56 @@
     function loadTree() {
       tree.load(trees[document.getElementById("treeTypeButton").innerHTML][document.getElementById("treeLineageButton").innerHTML])
       tree.setTitle(document.getElementById("treeTypeButton").innerHTML + "::" + document.getElementById("treeLineageButton").innerHTML)
+      updateClusterContext()
       tree.draw()
     }
 
+    function getAZ() {
+      // remove all "info" highlights
+      for (let leaf of tree.leaves.filter(x => x.markStyle["info"] === true)) {
+        leaf.markStyle["info"] = false
+      }
+
+      let azResults = document.getElementById("azResults")
+      azResults.innerHTML = ""
+
+      for (let leaf of tree.leaves.filter(x => document.getElementById("azNumber").value && covMeta["RNAcode"].filter(y => y.indexOf(document.getElementById("azNumber").value) >= 0).indexOf(x.id) >= 0)) {
+        leaf.markStyle["info"] = true
+      }
+
+      for (let az of covMeta["RNAcode"].filter(x => x !== "None" && document.getElementById("azNumber").value && x.indexOf(document.getElementById("azNumber").value) >= 0)) {
+        azResults.innerHTML += "<div class='azResults'>" + az + "</div>"
+      }
+      tree.draw()
+
+
+/*
+      for (let leaf of tree.leaves.filter(x => x.markStyle["info"] === true)) {
+        leaf.markStyle["info"] = false
+      }   
+
+      let azResults = document.getElementById("azResults")
+      azResults.innerHTML = ""
+
+      for (let leaf of tree.leaves.filter(x => document.getElementById("azNumber").value && covMeta["RNAcode"].filter(y => covMeta["RNAcode"][y].indexOf(x.id) >= 0).indexOf(document.getElementById("azNumber").value) >= 0)) {
+        leaf.markStyle["info"] = true
+      }   
+
+      for (let az of covMeta["RNAcode"].filter(x => document.getElementById("azNumber").value && x.indexOf(document.getElementById("azNumber").value) >= 0).sort(function(a, b) {if (a[0] - b[0]) {return 1} else if (a[0] <= b[0]) {return -1}}          )) {    
+        m = Object.entries(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]]).filter(x => x[0] !== "ALL" && x[1].indexOf(az.pk) >= 0)[0]
+        if (m) {
+          let emm = m[0].split("M")[1].split("::")[0]
+          azResults.innerHTML += "<div class='azResults' onclick='loadAzTree(\"" + m[0] + "\"); tree.draw()'>" + az.fields["az"] + " --> emm" + emm + "</div>"
+        }
+      }     
+
+      tree.draw()
+    }     
+
+    function loadAzTree(m) {
+      tree.load(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]][m])
+*/
+    }
 
     </script>
 
@@ -300,7 +355,7 @@
       <div class="biomod biomod-row">
 
         <!--=========================( Tree Context Menu )-->
-        <div class="biomod biomod-module">
+        <div style="display: none;" class="biomod biomod-module">
           <div class="biomod biomod-module">
             Tree Context
           </div>
@@ -311,7 +366,7 @@
           <div style="display: flex; flex-flow: column; height: 100%;">
             <form onsubmit="loadAzTree(); return false;" style="margin: 5px;">
               <div class="form-group">
-                <label style="color:#0D0; font-size:18px;">AZ Number Search:</label>
+                <label style="color:#0D0; font-size:18px;">TG Number Search:</label>
                 <input type="text" class="form-control" id="azNumber" placeholder="Enter AZ Number" oninput="getAZ();">
               </div>
             </form>
