@@ -54,13 +54,6 @@
             sampleFontFunc('name', rangeSelect(document.getElementById("nameFontDrop" + document.getElementById("nameFontBtn").innerHTML)))
             sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
             sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
-            for (let leaf of this.leaves.filter(x => x.id.indexOf("TG") >= 0)) {
-              for (let tg of covMeta["RNAcode"].filter(x => x !== "None")) {
-                if (leaf.id.indexOf(tg) >= 0) {
-                  leaf.id = tg
-                }
-              }
-            }
             return result
           }
         })()
@@ -83,7 +76,7 @@
       <div class="biomod biomod-options-module">
         <h5>Tree Type:</h5>
         <div class="dropdown">
-          <button id="treeTypeButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ALL</button>
+          <button id="treeTypeButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">TGEN</button>
           <div class="dropdown-menu btn-block">
             <button type='button' class='dropdown-item' onclick="document.getElementById('treeTypeButton').innerHTML = 'ALL'; resetLineageDropdown();">ALL</button>
             <button type='button' class='dropdown-item' onclick="document.getElementById('treeTypeButton').innerHTML = 'TGEN'; resetLineageDropdown();">TGEN</button>
@@ -298,22 +291,6 @@
     }
 
     function getAZ() {
-      // remove all "info" highlights
-      for (let leaf of tree.leaves.filter(x => x.markStyle["info"] === true)) {
-        leaf.markStyle["info"] = false
-      }
-
-      let azResults = document.getElementById("azResults")
-      azResults.innerHTML = ""
-
-      for (let leaf of tree.leaves.filter(x => document.getElementById("azNumber").value && covMeta["RNAcode"].filter(y => y.indexOf(document.getElementById("azNumber").value) >= 0).indexOf(x.id) >= 0)) {
-        leaf.markStyle["info"] = true
-      }
-
-      for (let az of covMeta["RNAcode"].filter(x => x !== "None" && document.getElementById("azNumber").value && x.indexOf(document.getElementById("azNumber").value) >= 0)) {
-        azResults.innerHTML += "<div class='azResults'>" + az + "</div>"
-      }
-      tree.draw()
 
 
 /*
