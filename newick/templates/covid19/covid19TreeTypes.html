@@ -77,10 +77,7 @@
         <h5>Tree Type:</h5>
         <div class="dropdown">
           <button id="treeTypeButton" class="btn btn-lg btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">TGEN</button>
-          <div class="dropdown-menu btn-block">
-            <button type='button' class='dropdown-item' onclick="document.getElementById('treeTypeButton').innerHTML = 'ALL'; resetLineageDropdown();">ALL</button>
-            <button type='button' class='dropdown-item' onclick="document.getElementById('treeTypeButton').innerHTML = 'TGEN'; resetLineageDropdown();">TGEN</button>
-          </div>
+          <div id="treeTypeDropdown" class="dropdown-menu btn-block"></div>
         </div>
         <h5>Lineage:</h5>
         <div class="dropdown">
@@ -89,6 +86,24 @@
           </div>
         </div>
       </div>
+      <script>
+        for (let type of Object.keys(trees)) {
+          document.getElementById("treeTypeDropdown").innerHTML += "<button type='button' class='dropdown-item' onclick=\"document.getElementById('treeTypeButton').innerHTML = '" + type + "'; resetLineageDropdown();\">" + type + "</button>"
+        }
+      </script>
+
+      <!--=========================( Metadata Toggle )-->
+      <div class="biomod biomod-options-module">
+        <h5>Metadata:</h5>
+        <div style="display: flex; justify-content: flex-end; width: 100%; max-height: 100px;">
+          <div id="metadataList" style="display: flex; flex-flow: column; width: 90%; overflow-y: scroll"></div>
+        </div>
+      </div>
+      <script>
+        for (let meta of Object.keys(metadata[Object.keys(metadata)[0]])) {
+          document.getElementById("metadataList").innerHTML += "<div><input id='meta_" + meta + "' type='checkbox' oninput='updateSampleNames()'> " + meta + "</input></div>"
+        }
+      </script>
 
       <!--=========================( New Sample Highlight Range )-->
       <div style="display: none;" class="biomod biomod-options-module">
@@ -319,6 +334,21 @@
     function loadAzTree(m) {
       tree.load(trees[treeType][treeDate][Object.keys(trees[treeType][treeDate])[0]][m])
 */
+    }
+
+    function updateSampleNames() {
+      for (let leaf of tree.leaves) {
+        if (Object.keys(metadata).indexOf(leaf.id) >= 0) {
+          let newLabel = [leaf.id]
+          for (let meta in metadata[leaf.id]) {
+            if (document.getElementById("meta_" + meta).checked) {
+              newLabel.push(metadata[leaf.id][meta])
+            }
+          }
+          leaf.label = newLabel.join("_")
+          tree.draw()
+        }
+      }
     }
 
     </script>
