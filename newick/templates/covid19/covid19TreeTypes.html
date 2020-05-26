@@ -55,6 +55,7 @@
             sampleFontFunc('size', rangeSelect(document.getElementById("snpFontDrop" + document.getElementById("snpFontBtn").innerHTML)))
             sampleFontFunc('branch', rangeSelect(document.getElementById("branchScaleDrop" + document.getElementById("branchScaleBtn").innerHTML)))
             updateSampleNames()
+            highlightSamples()
             return result
           }
         })()
@@ -105,6 +106,33 @@
           document.getElementById("metadataList").innerHTML += "<div><input id='meta_" + meta + "' type='checkbox' oninput='updateSampleNames()'> " + meta + "</input></div>"
         }
       </script>
+
+      <!--=========================( Highlight )-->
+      <div class="biomod biomod-options-module">
+        <h5 style="color:#F66;">Highlight:</h5>
+        <form onsubmit="return false;" style="margin: 5px;">
+          <div class="form-group">
+            <input type="text" class="form-control" id="highlightCounty" placeholder="" oninput="highlightSamples()">
+          </div>
+        </form>
+      </div>
+      <script>
+        function highlightSamples() {
+          let value = document.getElementById("highlightCounty").value
+          for (let leaf of tree.leaves.filter(x => x.markStyle["primary"] === true)) {
+            leaf.markStyle["primary"] = false
+          }   
+          for (let leaf of tree.leaves.filter(x => Object.keys(metadata).indexOf(x.id) >= 0 && metadata[x.id]["location"].toLowerCase().indexOf(value.toLowerCase()) >= 0)) {
+            if (value) {
+              leaf.markStyle["primary"] = true
+              console.log(leaf.id)
+            }
+          }
+          tree.draw()
+          console.log(value)
+        }
+      </script>
+
 
       <!--=========================( New Sample Highlight Range )-->
       <div style="display: none;" class="biomod biomod-options-module">
@@ -310,10 +338,10 @@
 
 
 /*
+
       for (let leaf of tree.leaves.filter(x => x.markStyle["info"] === true)) {
         leaf.markStyle["info"] = false
       }   
-
       let azResults = document.getElementById("azResults")
       azResults.innerHTML = ""
 
@@ -356,33 +384,9 @@
 
     <!--====================================================================================================( MAIN CONTENT )-->
     <div class="biomod biomod-content">
-      <div class="biomod biomod-row" style="flex-grow: 5">
+      <div class="biomod biomod-row" style="flex-grow: 7">
         <div class="biomod biomod-options-icon"><img src="{% static '/newick/images/options.png' %}"></div>
         <div class="biomod biomod-module" id="phylocanvas"></div>
-      </div>
-      <div class="biomod biomod-row">
-
-        <!--=========================( Tree Context Menu )-->
-        <div style="display: none;" class="biomod biomod-module">
-          <div class="biomod biomod-module">
-            Tree Context
-          </div>
-        </div>
-
-        <!--=========================( AZ Search Window )-->
-        <div class="biomod biomod-module" style="display: block; overflow: hidden;">
-          <div style="display: flex; flex-flow: column; height: 100%;">
-            <form onsubmit="loadAzTree(); return false;" style="margin: 5px;">
-              <div class="form-group">
-                <label style="color:#0D0; font-size:18px;">TG Number Search:</label>
-                <input type="text" class="form-control" id="azNumber" placeholder="Enter AZ Number" oninput="getAZ();">
-              </div>
-            </form>
-            <div style="margin: 5px; position: relative; overflow: scroll; flex-grow: 1;">
-              <div id="azResults" style="position: absolute;"></div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
