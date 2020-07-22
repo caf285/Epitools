@@ -371,7 +371,9 @@
           let newLabel = [leaf.id]
           for (let meta in metadata[leaf.id]) {
             if (document.getElementById("meta_" + meta).checked) {
-              newLabel.push(metadata[leaf.id][meta])
+              if (metadata[leaf.id][meta]) {
+                newLabel.push(metadata[leaf.id][meta])
+              }
             }
           }
           leaf.label = newLabel.join("_")

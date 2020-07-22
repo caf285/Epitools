@@ -3320,6 +3320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.save();
 
 	      this.canvas.strokeStyle = this.tree.highlightColour;
+	      this.canvas.fillStyle = this.tree.highlightColour;
 	      this.canvas.lineWidth = this.getHighlightLineWidth();
 	      var radius = this.getHighlightRadius();
 
@@ -3363,11 +3364,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
   	      this.canvas.beginPath();
           if (this.leaf) {
-  	        this.canvas.arc(centerX, centerY, this.tree.baseNodeSize, 0, Angles.FULL, false);
+  	        this.canvas.arc(centerX - this.tree.baseNodeSize, centerY, this.tree.baseNodeSize, 0, Angles.FULL, false);
           } else {
   	        this.canvas.arc(centerX, centerY, this.tree.baseNodeSize * 2 / 3, 0, Angles.FULL, false);
           }
-  	      this.canvas.stroke();
+  	      this.canvas.fill();
   	      this.canvas.closePath();
         }
 	      //this.canvas.arc(centerX, centerY, radius, 0, Angles.FULL, false);
@@ -3396,7 +3397,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
         // 7BDP - branch decimal places (set to whole number)
 	      if (this.tree.showBranchLengthLabels && this.tree.branchLengthLabelPredicate(this)) {
-	        this.canvas.fillText(this.branchLength.toFixed(0), x, y + em);
+          let branchLength = this.branchLength.toFixed(0);
+          //if (this.tree.leaves.length >= 20 && branchLength > 0 || this.tree.leaves.length < 20) {
+          if (branchLength > 0) {
+  	        this.canvas.fillText(branchLength, x, y + em);
+          }
 	      }
 	      //if (this.tree.showBranchLengthLabels && this.tree.branchLengthLabelPredicate(this)) {
 	      //  this.canvas.fillText(this.branchLength.toFixed(2), x, y + em);
@@ -5063,7 +5068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  circle: function circle(canvas, radius, style) {
 	    drawConnector(canvas, radius);
 	    canvas.beginPath();
-	    canvas.arc(radius, 0, radius, 0, Angles.FULL, false);
+	    canvas.arc(0, 0, radius, 0, Angles.FULL, false);
 	    canvas.closePath();
 	    commitPath(canvas, style);
 	  },
