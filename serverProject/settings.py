@@ -24,7 +24,7 @@ SECRET_KEY = 'ml)j)2fmq7!l+9or(4jvcd2h2!18r72%g5!5yo7^9_b(j(=cjv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['jackie.tgen.org', '10.56.0.21']
+ALLOWED_HOSTS = ['north-juniper-2.tgen.org', '10.56.0.116']
 
 # Application definition
 
