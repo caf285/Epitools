@@ -1,4 +1,4 @@
-#!/home/cfrench/env/TacoTime/bin/python
+#!/usr/bin/env python3
 #============================================================( import )
 import sys
 import os
@@ -34,7 +34,7 @@ def write(fileName, output):
 def main():
 
     # load workbook
-    allGasBook = openpyxl.load_workbook(filename="/home/cfrench/GAS/dev/CSV/All GAS.xlsx", data_only=True)
+    allGasBook = openpyxl.load_workbook(filename="All GAS.xlsx", data_only=True)
     tgGas = {}
     azGas = {}
 
@@ -78,12 +78,15 @@ def main():
     tgList = list(map(lambda x: x.split("TG")[-1], tgList))
 
     # read GAS.tsv
-    gasTsv = list(map(lambda x: x.split("\t"), read("/home/cfrench/GAS/dev/CSV/GAS.tsv").split("\n")[1:]))
+    gasTsv = list(map(lambda x: x.split("\t"), read("All GAS.tsv").split("\n")[1:]))
     gas = []
     for row in gasTsv:
       tg = re.findall(r"TG\d+", row[0])
+      az = re.findall(r"AZ\d+", row[0])
       if tg and tg[0] in tgGas:
         gas.append([row[0]] + tgGas[tg[0]] + row[1:])
+      elif az and az[0] in azGas:
+        gas.append([row[0]] + azGas[az[0]] + row[1:])
       elif row[0] in azGas:
         gas.append([row[0]] + azGas[row[0]] + row[1:])
       else:

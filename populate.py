@@ -1,10 +1,10 @@
-#!/home/cfrench/env/TacoTime/bin/python
+#!/home/cfrench/miniconda3/envs/django/bin/python
 
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "serverProject.settings")
 
 import sys
-sys.path.append('~/env/TacoTime/lib/python3.4/site-packages/')
+sys.path.append('~/miniconda3/envs/django/lib/python3.6/site-packages')
 
 import django
 django.setup()
