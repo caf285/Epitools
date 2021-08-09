@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar, Nav } from "react-bootstrap";
+import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import logo from "../tgen-coh.png";
 
 function Header() {
@@ -19,6 +19,11 @@ function Header() {
           <Nav.Link href="home">Home</Nav.Link>
           <Nav.Link href="project1">Project 1</Nav.Link>
           <Nav.Link href="project2">Project 2</Nav.Link>
+          <NavDropdown title="Component Demo">
+            <NavDropdown.Item href="demo-phylocanvas">Phylocanvas</NavDropdown.Item>
+            <NavDropdown.Item href="demo-leaflet">Leaflet</NavDropdown.Item>
+            <NavDropdown.Item href="demo-plotly">Plotly</NavDropdown.Item>
+          </NavDropdown>
         </Nav>
       </Navbar>
     </div>
