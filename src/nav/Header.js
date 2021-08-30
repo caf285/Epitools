@@ -17,8 +17,6 @@ function Header() {
         </Navbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="home">Home</Nav.Link>
-          <Nav.Link href="project1">Project 1</Nav.Link>
-          <Nav.Link href="project2">Project 2</Nav.Link>
           <NavDropdown title="Component Demo">
             <NavDropdown.Item href="demo-phylocanvas">Phylocanvas</NavDropdown.Item>
             <NavDropdown.Item href="demo-leaflet">Leaflet</NavDropdown.Item>

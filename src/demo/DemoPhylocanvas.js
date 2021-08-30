@@ -6,9 +6,9 @@ function PhylocanvasView() {
   const [type, setType] = useState("radial");
   const [labels, setLabels] = useState(true);
   const [align, setAlign] = useState(false);
-  const [nodeSize, setNodeSize] = useState(30);
-  const [textSize, setTextSize] = useState(30);
-  const [lineWidth, setLineWidth] = useState(3);
+  const [nodeSize, setNodeSize] = useState(10);
+  const [textSize, setTextSize] = useState(20);
+  const [lineWidth, setLineWidth] = useState(2);
 
   useEffect(() => {
     setTree("(A:2.5,B:0.2,(C:0.3,D:0.4)E:0.9)F;");
@@ -17,7 +17,7 @@ function PhylocanvasView() {
 
   return (
     <div>
-      <h1>Phylocanvas Quickstart</h1>
+      <h1>Phylocanvas Demo</h1>
       <Phylocanvas
         tree = {tree}
         type = {type}

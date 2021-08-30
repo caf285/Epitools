@@ -1,27 +1,14 @@
 import React, {useEffect} from "react";
 import Plotly from "plotly.js-dist";
 
-function PlotlyView() {
+function PlotlyView(props) {
 
   useEffect(() => {
-    var data = [
-      {
-        x: ['data1', 'data2', 'data3'],
-        y: [20, 14, 23],
-        type: 'bar'
-      }
-    ];
-    Plotly.newPlot('plotly', data);
-
-    return () => {
-    }
-  }, [])
+    Plotly.react('plotly', props.data)
+  }, [props.data])
 
   return (
-    <div>
-      <h1>Plotly Quickstart</h1>
-      <div id="plotly"></div>
-    </div>
+    <div id="plotly"></div>
   )
 }
 

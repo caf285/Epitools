@@ -1,5 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import Phylocanvas from "phylocanvas";
+import scalebar from "phylocanvas-plugin-scalebar";
+import branchLength from "phylocanvas-plugin-branch-length";
+Phylocanvas.plugin(scalebar)
+Phylocanvas.plugin(branchLength)
 
 function PhylocanvasView(props) {
   let phylocanvas = useRef();

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect, useRef } from "react";
 import Leaflet from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -6,7 +6,15 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 
-function LeafletView() {
+/*function SetView() {
+  const map = useMapEvent('click', () => {
+    map.setCenter([0,0])
+  })
+  return null  
+}*/
+
+function LeafletView(props) {
+
   delete Leaflet.Icon.Default.prototype._getIconUrl;
   Leaflet.Icon.Default.mergeOptions({
     iconRetinaUrl: iconRetina,
@@ -15,27 +23,17 @@ function LeafletView() {
   });
 
   useEffect(() => {
-
-    return () => {
-    }   
-  }, [])  
-
-  const position = [34.0489, -111.0937]
+  }, [props.center])
 
   return (
-    <div>
-      <h1>Leaflet Quickstart</h1>
-      <MapContainer style={{ height: '400px' }} center={position} zoom={6} scrollWheelZoom={false}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={position}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
-      </MapContainer>
-    </div>
+    <MapContainer style={{ height: '400px' }} center={props.center} zoom={props.zoom} scrollWheelZoom={false}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <Marker position={props.center}>
+        <Popup>
+          A pretty CSS3 popup. <br /> Easily customizable.
+        </Popup>
+      </Marker>
+    </MapContainer>
   )
 }
 

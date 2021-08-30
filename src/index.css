@@ -6,6 +6,7 @@ html, body, #root {
 }
 
 #root {
+  background-color: #aaa;
   display: flex;
   flex-flow: row;
   align-items: stretch;
