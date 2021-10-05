@@ -9,7 +9,7 @@ function Header() {
         <Navbar.Brand href="home">
           <img
             src={logo}
-            height="40"
+            height="60"
             className="d-inline-block align-center mr-3"
             alt="Epitools Logo"
           />{" "}
@@ -17,6 +17,7 @@ function Header() {
         </Navbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="home">Home</Nav.Link>
+          <Nav.Link href="gas">GAS</Nav.Link>
           <NavDropdown title="Component Demo">
             <NavDropdown.Item href="demo-phylocanvas">Phylocanvas</NavDropdown.Item>
             <NavDropdown.Item href="demo-leaflet">Leaflet</NavDropdown.Item>

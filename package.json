@@ -13,7 +13,11 @@
     "create-react-app": "^4.0.3",
     "leaflet": "^1.7.1",
     "package.json": "^2.0.1",
+    "phylocanvas": "^2.8.1",
     "phylocanvas-plugin-branch-length": "file:my_modules/phylocanvas-plugin-branch-length",
+    "phylocanvas-plugin-pairwise-ops": "file:my_modules/phylocanvas-plugin-pairwise-ops",
+    "phylocanvas-plugin-root": "file:my_modules/phylocanvas-plugin-root",
+    "phylocanvas-plugin-scalebar": "file:my_modules/phylocanvas-plugin-scalebar",
     "plotly.js-dist": "^2.3.1",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.1",
@@ -49,7 +53,6 @@
     ]
   },
   "devDependencies": {
-    "@types/leaflet": "^1.7.4",
-    "phylocanvas": "^2.8.1"
+    "@types/leaflet": "^1.7.4"
   }
 }

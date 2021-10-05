@@ -2,8 +2,12 @@ import React, { useEffect, useRef } from "react";
 import Phylocanvas from "phylocanvas";
 import scalebar from "phylocanvas-plugin-scalebar";
 import branchLength from "phylocanvas-plugin-branch-length";
+import root from "phylocanvas-plugin-root";
+import pairwiseOps from "phylocanvas-plugin-pairwise-ops";
 Phylocanvas.plugin(scalebar)
 Phylocanvas.plugin(branchLength)
+Phylocanvas.plugin(root)
+Phylocanvas.plugin(pairwiseOps)
 
 function PhylocanvasView(props) {
   let phylocanvas = useRef();
@@ -11,6 +15,7 @@ function PhylocanvasView(props) {
 
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
+    console.log(phylocanvas.current)
   }, [])
 
   useEffect(() => {
@@ -26,13 +31,27 @@ function PhylocanvasView(props) {
   }, [props.type])
 
   useEffect(() => {
+    phylocanvas.current.setNodeSize(props.nodeSize)
+  }, [props.nodeSize])
+
+  useEffect(() => {
+    phylocanvas.current.setTextSize(props.textSize)
+  }, [props.textSize])
+
+  useEffect(() => {
     phylocanvas.current.showLabels = props.labels
     phylocanvas.current.alignLabels = props.align
-    phylocanvas.current.setNodeSize(props.nodeSize)
-    phylocanvas.current.setTextSize(props.textSize)
     phylocanvas.current.lineWidth = props.lineWidth
     phylocanvas.current.draw()
-  }, [props.type, props.labels, props.align, props.nodeSize, props.textSize, props.lineWidth])
+  }, [props.labels, props.align, props.lineWidth])
+
+  useEffect(() => {
+    phylocanvas.current.pairwiseOps.clusterDistance = props.clusterDistance
+    phylocanvas.current.pairwiseOps.clusterSamples = props.clusterSamples
+    console.log(phylocanvas.current)
+    phylocanvas.current.pairwiseOps.clusterDraw = true
+    phylocanvas.current.draw()
+  }, [props.clusterDistance, props.clusterSamples])
 
   return (
     <div id="phylocanvas"></div>
