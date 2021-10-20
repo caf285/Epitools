@@ -9,36 +9,53 @@ const DEFAULTS = {
 function drawBranchLength() {
 
   const { branchLength } = this;
-  const cxt = this.canvas;
-  const canvas = cxt.canvas;
-  const pixelRatio = getPixelRatio(cxt);
-  const pi = 3.141592653589793
-  const textSize = this.textSize * this.zoom / 2
+  const ctx = this.canvas;
+  const canvas = ctx.canvas;
+  const pixelRatio = getPixelRatio(ctx);
+  const textSize = this.textSize * this.zoom
 
-  cxt.save();
+  ctx.save();
 
-  cxt.font = `${textSize * pixelRatio}px ${this.font}`;
-  cxt.fillStyle = this.branchColour;
-  cxt.textBaseline = "bottom";
-  cxt.textAlign = "center";
+  ctx.font = `${textSize}px ${this.font}`;
+  ctx.fillStyle = this.branchColour;
+  ctx.textBaseline = "bottom";
+  ctx.textAlign = "left";
 
   for (let branch in this.branches) {
     if (this.branches[branch].branchLength == 0) {
       continue
     }
     branch = this.branches[branch]
-    let x = (this.offsetx + (branch.startx + (branch.centerx - branch.startx) / 2) * this.zoom / 2) * pixelRatio
-    let y = (this.offsety + (branch.starty + (branch.centery - branch.starty) / 2) * this.zoom / 2) * pixelRatio
+    let centerX = (this.offsetx + (branch.startx + branch.centerx) / 2 * this.zoom / pixelRatio) * pixelRatio
+    let centerY = (this.offsety + (branch.starty + branch.centery) / 2 * this.zoom / pixelRatio) * pixelRatio
+    let x = (this.offsetx + branch.centerx * this.zoom / pixelRatio) * pixelRatio
+    let y = (this.offsety + branch.centery * this.zoom / pixelRatio) * pixelRatio
     if (this.treeType == "rectangular") {
-      y = (this.offsety + branch.centery * this.zoom / 2) * pixelRatio
-    } else if (pi * 1 / 4 < branch.angle && branch.angle < pi * 3 / 4 || pi + pi * 1 / 4 < branch.angle && branch.angle < pi + pi * 3 / 4) {
-      x = (this.offsetx + textSize + branch.centerx * this.zoom / 2) * pixelRatio
-      y += textSize * pixelRatio
+      ctx.textAlign = "center"
+      ctx.fillText(branch.branchLength, centerX, y)
+    } else if (this.treeType == "hierarchical") {
+      ctx.textBaseline = "middle"
+      ctx.fillText(branch.branchLength, x, centerY)
+    } else {
+      if (centerY > y) {
+        ctx.textAlign = "right"
+        centerX = centerX - pixelRatio * this.zoom
+      } else {
+        ctx.textAlign = "left"
+        centerX = centerX + pixelRatio * this.zoom
+      }
+      if (centerX > x) {
+        ctx.textBaseline = "top"
+        centerY = centerY + pixelRatio * this.zoom
+      } else {
+        ctx.textBaseline = "bottom"
+        centerY = centerY - pixelRatio * this.zoom
+      }
+      ctx.fillText(branch.branchLength, centerX, centerY)
     }
-    cxt.fillText(branch.branchLength, x, y)
   }
 
-  cxt.restore();
+  ctx.restore();
 }
 
 export default function plugin(decorate) {

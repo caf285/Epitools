@@ -16,15 +16,15 @@ function drawRoot() {
   cxt.strokeStyle = this.branchColour;
   cxt.lineWidth = this.lineWidth;
 
-  let x = (this.offsetx + (this.root.centerx) * this.zoom / 2) * pixelRatio
-  let y = (this.offsety + (this.root.centery) * this.zoom / 2) * pixelRatio
+  let x = (this.offsetx + this.root.centerx * this.zoom / pixelRatio) * pixelRatio
+  let y = (this.offsety + this.root.centery * this.zoom / pixelRatio) * pixelRatio
 
   cxt.beginPath();
   cxt.moveTo(x, y);
   if (this.treeType == "rectangular" || this.treeType == "diagonal") {
-    cxt.lineTo(x-50, y);
+    cxt.lineTo(x - 100 * this.zoom, y);
   } else if (this.treeType == "hierarchical") {
-    cxt.lineTo(x, y-50);
+    cxt.lineTo(x, y - 100 * this.zoom);
   }
   cxt.stroke();
   cxt.closePath();

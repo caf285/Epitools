@@ -65,7 +65,7 @@ function drawScalebar() {
   cxt.font = `${fontSize}px ${scalebar.fontFamily}`;
   cxt.fillStyle = scalebar.fillStyle;
   cxt.strokeStyle = scalebar.strokeStyle;
-  cxt.lineWidth = lineWidth;
+  cxt.lineWidth = lineWidth * pixelRatio / 2;
   cxt.textBaseline = scalebar.textBaseline;
   cxt.textAlign = scalebar.textAlign;
 

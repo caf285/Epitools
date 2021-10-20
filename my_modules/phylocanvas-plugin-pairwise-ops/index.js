@@ -150,8 +150,12 @@ function colorNode() {
 function drawClusterInfo() {
   let label = "Cluster Size: " + String(this.pairwiseOps.clusterSamples) + "; Cluster Distance: " + String(this.pairwiseOps.clusterDistance)
   let ctx = this.canvas
-  ctx.font = "30px Arial";
+  let pixelRatio = getPixelRatio(ctx)
+  ctx.save()
+  ctx.font = `${30 * pixelRatio / 2}px Arial`;
+  console.log(ctx.font)
   ctx.fillText(label, ctx.canvas.width - ctx.measureText(label).width - 10, ctx.canvas.height - 10)
+  ctx.restore()
 }
 
 export default function plugin(decorate) {
