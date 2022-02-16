@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Phylocanvas, { utils } from "phylocanvas";
 import scalebar from "phylocanvas-plugin-scalebar";
 import branchLength from "phylocanvas-plugin-branch-length";
@@ -15,11 +15,67 @@ const { getPixelRatio } = utils.canvas;
 
 function PhylocanvasView(props) {
   let phylocanvas = useRef();
-  let typeList = useRef(["radial", "rectangular", "circular", "diagonal", "hierarchical"])
+  let minHeight = 100
+  let minWidth = 100
+
+  // [height, width]
+  let [hw, _setHW] = useState([minHeight, minWidth])
+  let heightRef = useRef(hw[0])
+  let widthRef = useRef(hw[1])
+  let setHW = data => {
+    heightRef.current = data[0]
+    widthRef.current = data[1]
+    _setHW(data)
+  }
+
+  // [nodeSize, textSize, lineWidth]
+  let [textSize, _setTextSize] = useState(1);
+  let textSizeRef = useRef(textSize);
+  let setTextSize = data => {
+    textSizeRef.current = data;
+    _setTextSize(data);
+  }
+  let [nodeSize, _setNodeSize] = useState(1);
+  let nodeSizeRef = useRef(nodeSize);
+  let setNodeSize = data => {
+    nodeSizeRef.current = data;
+    _setNodeSize(data);
+  }
+
+  let typeList = useRef(["radial", "rectangular", "circular", "diagonal", "hierarchical"]);
+
+  //TODO: Fix height inheritance problem (relative height to window size without adding to window size for positive feedback loop)
+
+  useEffect(() => {
+    function handleResize() {
+      //setHeight(document.getElementsByClassName("Nav-body")[0].clientHeight)
+      let newHeight = Math.max( Math.max( document.documentElement.clientHeight || 0, window.innerHeight || 0) - document.getElementsByClassName("Nav-header")[0].clientHeight * 2, minHeight )
+      let newWidth = Math.max( document.documentElement.clientWidth || minWidth, window.innerWidth || minWidth, minWidth)
+      let heightDelta = heightRef.current / newHeight
+      let widthDelta = widthRef.current / newWidth
+      setHW([newHeight, newWidth])
+      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
+      phylocanvas.current.setNodeSize(nodeSizeRef.current);
+      phylocanvas.current.setTextSize(textSizeRef.current);
+      if (phylocanvas.current.treeType == "circular") {
+      }
+      if (phylocanvas.current.treeType == "rectangular") {
+      }
+    }
+    function initialSize() {
+      window.dispatchEvent(new Event('resize')) 
+      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
+    } 
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("load", initialSize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("load", initialSize);
+    };
+  }, [])
 
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
-    console.log(phylocanvas.current)
   }, [])
 
   useEffect(() => {
@@ -32,17 +88,20 @@ function PhylocanvasView(props) {
     } else {
       phylocanvas.current.setTreeType("rectangular")
     }
-    phylocanvas.current.setNodeSize(props.nodeSize * getPixelRatio(phylocanvas.current.canvas) / 2)
-    phylocanvas.current.setTextSize(props.textSize * getPixelRatio(phylocanvas.current.canvas) / 2)
+    //setTextSize(props.textSize * getPixelRatio(phylocanvas.current.canvas) / 2);
+    phylocanvas.current.setNodeSize(nodeSizeRef.current)
+    phylocanvas.current.setTextSize(textSizeRef.current)
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
-  }, [props.type])
+ }, [props.type])
 
   useEffect(() => {
-    phylocanvas.current.setNodeSize(props.nodeSize * getPixelRatio(phylocanvas.current.canvas) / 2)
+    setNodeSize(props.nodeSize * getPixelRatio(phylocanvas.current.canvas) / 2)
+    phylocanvas.current.setNodeSize(nodeSizeRef.current)
   }, [props.nodeSize])
 
   useEffect(() => {
-    phylocanvas.current.setTextSize(props.textSize * getPixelRatio(phylocanvas.current.canvas) / 2)
+    setTextSize(props.textSize * getPixelRatio(phylocanvas.current.canvas) / 2);
+    phylocanvas.current.setTextSize(textSizeRef.current)
   }, [props.textSize])
 
   useEffect(() => {
@@ -61,7 +120,7 @@ function PhylocanvasView(props) {
   }, [props.clusterDistance, props.clusterSamples])
 
   return (
-    <div id="phylocanvas"></div>
+    <div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>
   )
 }
 

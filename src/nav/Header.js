@@ -4,7 +4,7 @@ import logo from "../tgen-coh.png";
 
 function Header() {
   return (
-    <div>
+    <div className="Nav-header">
       <Navbar sticky="top" bg="light" variant="light">
         <Navbar.Brand href="home">
           <img

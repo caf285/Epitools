@@ -5,27 +5,27 @@
   align-items: stretch;
 }
 
-.Body {
-  background-color: #ddd;
+.Nav-body {
+  background-color: #f8f9fa;
   margin: 5px;
   padding: 5px;
   box-shadow: 0px 0px 3px 3px rgba(0,0,0,0.25);
   flex-grow: 1;
 }
 
-.Header {
+.Nav-header {
   line-height: 60px;
   font-size: 20px;
-  background-color: #eee;
+  background-color: #f8f9fa;
   padding-left: 15px;
   padding-right: 15px;
   z-index: 1000;
 }
 
-.Footer {
+.Nav-footer {
   line-height: 35px;
   font-size: 12px;
-  background-color: #eee;
+  background-color: #f8f9fa;
   padding-left: 10px;
   padding-right: 10px;
   z-index: 1000;
