@@ -54,7 +54,7 @@ function SvgButton(props) {
   if (svg && !label && !drop) {
     return (
       <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
-        <SvgIcon sx={{height: 16, width:16}}>
+        <SvgIcon sx={{height: 16, width: 16}}>
           <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
         </SvgIcon>
       </IconButton>
