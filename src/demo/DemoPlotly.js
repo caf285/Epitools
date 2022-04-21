@@ -11,7 +11,7 @@ function PlotlyView() {
     document.getElementById("demoPlotlyYLabel").value = x[1]
     document.getElementById("demoPlotlyXValue").value = y[0]
     document.getElementById("demoPlotlyYValue").value = y[1]
-  }, [])
+  }, [x, y])
 
   return (
     <div>

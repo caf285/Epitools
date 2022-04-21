@@ -1,0 +1,4 @@
+# derived assets
+/build/*
+/node_modules/
+

@@ -3,12 +3,12 @@ import Leaflet from "../leaflet/Leaflet.js";
 
 function LeafletView() {
   const [center, setCenter] = useState([35.2, -111.65]);
-  const [zoom, setZoom] = useState(6)
+  const [zoom] = useState(6)
 
   useEffect(() => {
     document.getElementById("demoLeafletXCenter").value = center[0]
     document.getElementById("demoLeafletYCenter").value = center[1]
-  }, [])  
+  }, [center])  
 
   return (
     <div>

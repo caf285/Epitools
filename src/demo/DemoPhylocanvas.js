@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 
-import Phylocanvas from "../phylocanvas/PhylocanvasOverlay.js";
+import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 
 function PhylocanvasView() {
   return (

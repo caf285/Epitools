@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import Leaflet from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -21,9 +21,6 @@ function LeafletView(props) {
     iconUrl: icon,
     shadowUrl: iconShadow
   });
-
-  useEffect(() => {
-  }, [props.center])
 
   return (
     <MapContainer style={{ height: '400px' }} center={props.center} zoom={props.zoom} scrollWheelZoom={false}>

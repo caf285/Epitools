@@ -1,9 +1,12 @@
-import React, {useEffect, useState, useRef} from "react";
-import {BrowserRouter, Switch, Route} from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+
 import DemoPhylocanvas from "../demo/DemoPhylocanvas.js";
 import DemoLeaflet from "../demo/DemoLeaflet.js";
 import DemoPlotly from "../demo/DemoPlotly.js";
 import GAS from "../gas/GAS.js";
+import DemoFetch from "../demo/DemoFetch.js";
 
 function Body() {
   let [height, setHeight] = useState(0);
@@ -13,7 +16,7 @@ function Body() {
     setHeight(ref.current.clientHeight)
     function handleResize() {
       setHeight(ref.current.clientHeight)
-      console.log(ref.current.clientHeight)
+      //console.log(ref.current.clientHeight)
     }
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -21,7 +24,7 @@ function Body() {
 
   return (
     <div ref={ref} className="Nav-body">
-      {height}
+      {/*height*/}
       <BrowserRouter basename="/epitools">
         <Switch>
           <Route exact path="/">
@@ -35,6 +38,9 @@ function Body() {
           </Route>
           <Route exact path="/demo-plotly">
             <DemoPlotly />
+          </Route>
+          <Route exact path="/demo-fetch">
+            <DemoFetch />
           </Route>
           <Route exact path="/gas">
             <GAS />

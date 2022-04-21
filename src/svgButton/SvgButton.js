@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import SvgIcon from '@mui/material/SvgIcon';
 import Chip from '@mui/material/Chip';
@@ -28,8 +27,10 @@ function SvgButton(props) {
   useEffect(() => {
     setSvg(svgList.current[props.svg])
     setLabel(props.label)
-    setDrop(props.drop)
-  }, [])
+    if (props.drop) {
+      setDrop(props.drop)
+    }
+  }, [props.svg, props.label, props.drop])
 
   function getDrop() {
     if (drop) {

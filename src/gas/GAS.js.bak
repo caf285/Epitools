@@ -1,0 +1,152 @@
+import React, { useState, useRef } from "react";
+
+import SvgButton from "../svgButton/SvgButton.js";
+
+import Phylocanvas from "../phylocanvas/Phylocanvas.js";
+
+function PhylocanvasView() {
+  const [tree, setTree] = useState("(A:1)B;")
+
+  const fileInput = useRef(null)
+  const reader = useRef(new FileReader())
+
+  const handleFileInput = (e) => {
+    let file = e.target.files[0]
+    reader.current.readAsText(file)
+    reader.current.onloadend = () => {
+      // if NWK
+      if (file.name.endsWith(".nwk")) {
+        setTree(reader.current.result)
+
+      // if TSV
+      } else if (file.name.endsWith(".tsv")) {
+        // split out fasta and positions
+        let tsv = reader.current.result.split("\n")
+        let header = tsv.shift().split("\t#SNPcall")[0].split("\t").map((x) => {return x.split("::")[0]})
+        let fasta = {}
+        header.forEach((key) => {fasta[key] = []})
+        for (let i = 0; i < tsv.length; i++) {
+          tsv[i] = tsv[i].split("\t")
+          for (let j = 0; j < header.length; j++) {
+            fasta[header[j]].push(tsv[i][j])
+          }
+        }
+
+        // build D matrix and get longest distance for center root
+        console.log("building distance matrix ...")
+        let dist = {}
+        let longest = [0]
+        for (let i = 2; i < header.length; i++) {
+          dist[header[i]] = {}
+        }
+        for (let i = 2; i < header.length; i++) {
+          for (let j = i + 1; j < header.length; j++) {
+            let diff = 0;
+            fasta[header[i]].forEach((val, k) => {if (val !== fasta[header[j]][k]) {diff += 1}})
+            dist[header[i]][header[j]] = diff
+            dist[header[j]][header[i]] = diff
+            if (diff > longest[0]) {
+              longest = [diff, header[i], header[j]]
+            }
+          }
+          console.log(header[i], fasta[header[i]])
+        }
+        console.log("done ....")
+
+        // reduce D matrix and build tree
+        let tree = {}
+        let longestPath = [[], []]
+        while (Object.keys(dist).length > 2) {
+          console.log(Object.keys(dist).length, " to 2 ...")
+
+          // RECURSIVE BEGIN
+          // build D'
+          let prime = {}
+          for (let i = 0; i < Object.keys(dist).length; i++) {
+            prime[Object.keys(dist)[i]] = Object.values(dist[Object.keys(dist)[i]]).reduce((x, y) => x + y, 0)
+          }
+
+          // get best
+          var best = [dist[Object.keys(dist)[0]][Object.keys(dist)[1]], Object.keys(dist)[0], Object.keys(dist)[1]]
+          for (let i = 0; i < Object.keys(dist).length; i++) {
+            for (let j = i + 1; j < Object.keys(dist).length; j++) {
+              if ((Object.keys(dist).length - 2) * dist[Object.keys(dist)[i]][Object.keys(dist)[j]] - prime[Object.keys(dist)[i]] - prime[Object.keys(dist)[j]] < best[0]) {
+                best = [(Object.keys(dist).length - 2) * dist[Object.keys(dist)[i]][Object.keys(dist)[j]] - prime[Object.keys(dist)[i]] - prime[Object.keys(dist)[j]]]
+                best.push(Object.keys(dist)[i])
+                best.push(Object.keys(dist)[j])
+              }
+            }
+          }
+
+          // get branch lengths for best
+          best[0] = String(Object.keys(dist).length)
+          let branches = [(dist[best[1]][best[2]]/2) + ((prime[best[1]] - prime[best[2]])/(2*(Object.keys(dist).length-2)))]
+          for (let i = 2; i < best.length; i++) {
+            branches.push((dist[best[i]][best[1]]/2) + ((prime[best[i]] - prime[best[1]])/(2*(Object.keys(dist).length-2))))
+          }
+
+          for (let i = 1; i < best.length; i++) {
+            if (best[i] === longest[1]) {
+              longestPath[0].push([longest[1], branches[i - 1]])
+              longest[1] = best[0]
+            }
+            if (best[i] === longest[2]) {
+              longestPath[1].unshift([longest[2], branches[i - 1]])
+              longest[2] = best[0]
+            }
+          }
+
+          // push best nodes to tree
+          tree[best[0]] = []
+          for (let i = 1; i < best.length; i++) {
+            tree[best[0]].push([best[i], branches[i-1]])
+          }
+
+          // rebuild D matrix with new node; delete best leaves from D
+          dist[best[0]] = {}
+          for (let i = 0; i < Object.keys(dist).length; i++) {
+            if (! best.includes(Object.keys(dist)[i])) {
+              // distance math checked in Mega 11 and matches down to the first decimal
+              dist[best[0]][Object.keys(dist)[i]] = ((dist[Object.keys(dist)[i]][best[1]] + dist[Object.keys(dist)[i]][best[2]] - dist[best[1]][best[2]])/2)
+              dist[Object.keys(dist)[i]][best[0]] = dist[best[0]][Object.keys(dist)[i]]
+              for (let j = 1; j < best.length; j++) {
+                delete dist[Object.keys(dist)[i]][best[j]]
+              }
+            }
+          }
+          for (let i = 1; i < best.length; i++) {
+            delete dist[best[i]]
+          }
+          // RECURSIVE END
+        }
+
+        // compile path
+        longestPath[0].push([best[0], longestPath[1][0][1]])
+        for (let i = 1; i < longestPath[1].length; i ++) {
+          longestPath[0].push([longestPath[1][i - 1][0], longestPath[1][i][1]])
+        }
+        longestPath[0].push([longestPath[1][longestPath[1].length - 1][0], 0])
+        longestPath = longestPath[0]
+        console.log("best:", best)
+        console.log("longestPath:", longestPath)
+        console.log(tree)
+
+
+      }
+    }
+  }
+
+  return (
+    <div>
+      
+      <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
+      <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
+
+      <Phylocanvas 
+        tree = {tree}
+      />
+    </div>
+  )
+}
+
+export default PhylocanvasView;
