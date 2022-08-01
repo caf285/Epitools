@@ -1,28 +1,124 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import SvgButton from "../svgButton/SvgButton.js";
-
 import Phylocanvas from "../phylocanvas/Phylocanvas.js";
+import Handsontable from "../handsontable/Handsontable.js";
 
 function PhylocanvasView() {
   const [tree, setTree] = useState("(A:1)B;")
+  const [branches, setBranches] = useState([])
+  const [branchesData, setBranchesData] = useState([])
+  const branchesRef = useRef([])
+  const branchesDataRef = useRef([])
 
+  const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
+  useEffect(() => {
+    if (window.location.hostname === "localhost" || window.location.hostname === "10.55.16.53") {
+      host.current = "http://10.55.16.53:8888/"
+    }
+    console.log("host:", host.current + "mysql")
+  }, [])
+
+  useEffect(() => {
+    branchesRef.current = branches
+    console.log(branchesRef.current)
+    mysqlRequest(branchesRef.current)
+  }, [branches])
+
+  useEffect(() => {
+    branchesDataRef.current = branchesData
+    console.log("branchesData:", branchesData)
+  }, [branchesData])
+
+  // TODO: cleanup
   const fileInput = useRef(null)
   const reader = useRef(new FileReader())
 
-  async function postData(url = '', data = {}) {
-    console.log(url)
-    const response = await fetch(url, {
+  // get branch names callback
+  const branchNameCallback = (e) => {
+    setBranches(e)
+  }
+
+  // database query post request
+  async function mysqlRequest(data = "") {
+    console.log("requestData:", data)
+    //const response = await fetch("/go-epitools/mysql", {
+    const response = await fetch(host.current + "mysql", {
+    //console.log("hello new build")
+    //const response = await fetch("https://pathogen-intelligence.org/go-epitools/mysql", {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      crossDomain: true,
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        fasta: data,
-      })  
-    })  
-    .then(response => response.text())
-    .then(data => setTree(data))
+        query: data,
+      })
+    })
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status + " " + response.statusText);
+      }
+      return response.json()
+    })
+    .then(data => setBranchesData(data))
+    .catch(ERR => window.alert(ERR))
   }   
 
+  // neighborjoin post request
+  async function neighborJoinRequest(data = "") {
+    //const response = await fetch("/go-epitools/neighborjoin", {
+    const response = await fetch(host.current + "neighborjoin", {
+    //const response = await fetch("https://pathogen-intelligence.org/go-epitools/neighborjoin", {
+      method: 'POST',
+      crossDomain: true,
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        fasta: data,
+      })
+    })
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status + " " + response.statusText);
+      }
+      return response.text()
+    })
+    .then(data => setTree(data))
+    .catch(ERR => window.alert(ERR))
+  }   
+
+  // lineage
+  async function lineageRequest(data = "") {
+    //const response = await fetch("/go-epitools/neighborjoin", {
+    const response = await fetch(host.current + "lineage", {
+      method: 'POST',
+      crossDomain: true,
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        lineage: data,
+      })
+    })
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status + " " + response.statusText);
+      }
+      return response.text()
+    })
+    .then(data => {
+      if (data) {
+        setTree(data)
+      } else {
+        console.log("no data")
+      }
+    })
+    .catch(ERR => window.alert(ERR))
+  }   
+
+  // file i/o
   const handleFileInput = (e) => {
     let file = e.target.files[0]
     reader.current.readAsText(file)
@@ -33,19 +129,12 @@ function PhylocanvasView() {
       }
       // if FASTA
       else if (file.name.toLowerCase().endsWith(".fasta")) {
-        console.log("fasta start")
-        console.log("fasta received")
         let fasta = reader.current.result
-        console.log(fasta.substring(0, 20))
-        console.log("fasta stop")
-        postData("http://10.55.16.53:8888/neighborjoin", fasta);
-
+        neighborJoinRequest(fasta);
       }
 
       // if TSV
       else if (file.name.endsWith(".tsv")) {
-
-        console.log("tsv start")
         // split out fasta and positions
         let tsv = reader.current.result.split("\n")
         let header = tsv.shift().split("\t#SNPcall")[0].split("\t").map((x) => {return x.split("::")[0]})
@@ -57,31 +146,48 @@ function PhylocanvasView() {
             fastaObj[header[j]].push(tsv[i][j])
           }
         }
-
         let fasta = []
         for (let i = 1; i < header.length; i++) {
           fasta.push(">" + header[i])
           fasta.push(fastaObj[header[i]].join(""))
         }
         fasta = fasta.join("\n")
-
-        console.log(fasta.substring(0, 20))
-        console.log("tsv stop")
-        postData("http://10.55.16.53:8888/neighborjoin", fasta);
-
+        neighborJoinRequest(fasta);
       }
     }
   }
 
   return (
-    <div>
-      
+    <div style={{height: "100%"}}>
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
-      <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
-
-      <Phylocanvas 
-        tree = {tree}
-      />
+      <div style={{position: "absolute", zIndex: "100"}}>
+        <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
+        <SvgButton onClick={e => lineageRequest("BA.2")} label="BA.2" />
+        <SvgButton onClick={e => lineageRequest("BA.2.18")} label="BA.2.18" />
+        <SvgButton onClick={e => lineageRequest("BA.2.12.1")} label="BA.2.12.1" />
+        <SvgButton onClick={e => lineageRequest("BA.2.3")} label="BA.2.3" />
+        <SvgButton onClick={e => lineageRequest("BA.2.9")} label="BA.2.9" />
+        <SvgButton onClick={e => lineageRequest("BA.4")} label="BA.4" />
+        <SvgButton onClick={e => lineageRequest("BA.4.1")} label="BA.4.1" />
+        <SvgButton onClick={e => lineageRequest("BA.5")} label="BA.5" />
+        <SvgButton onClick={e => lineageRequest("BA.5.1")} label="BA.5.1" />
+        <SvgButton onClick={e => lineageRequest("BA.5.2.1")} label="BA.5.2.1" />
+        <SvgButton onClick={e => lineageRequest("BA.5.5")} label="BA.5.5" />
+        <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
+      </div>
+      <div style={{height: "50%"}}>
+        <Phylocanvas 
+          tree = {tree}
+          branchNameCallback = {branchNameCallback}
+        />
+      </div>
+      <div style={{height: "50%"}}>
+        <Handsontable
+          label = "Metadata:"
+          data = {branchesData}
+          view = "readonly"
+        />
+      </div>
     </div>
   )
 }

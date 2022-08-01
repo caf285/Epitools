@@ -84,6 +84,9 @@ function PhylocanvasView(props) {
     } catch (error) {
       phylocanvas.current.load(oldTree)
     }
+    if (props.branchNameCallback) {
+      props.branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
+    }
   }, [props.tree])
 
   useEffect(() => {
@@ -124,7 +127,10 @@ function PhylocanvasView(props) {
   }, [props.clusterDistance, props.clusterSamples])
 
   return (
-    <div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>
+    <div style={{height: "100%"}}>
+      {/*<div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>*/}
+      <div id="phylocanvas" style={{height: "100%", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>
+    </div>
   )
 }
 

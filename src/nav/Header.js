@@ -24,7 +24,8 @@ function Header() {
             <NavDropdown.Item href="demo-phylocanvas">Phylocanvas</NavDropdown.Item>
             <NavDropdown.Item href="demo-leaflet">Leaflet</NavDropdown.Item>
             <NavDropdown.Item href="demo-plotly">Plotly</NavDropdown.Item>
-            <NavDropdown.Item href="demo-fetch">React Fetch</NavDropdown.Item>
+            <NavDropdown.Item href="demo-mysql">React MySQL</NavDropdown.Item>
+            <NavDropdown.Item href="demo-handsontable">React HandsOnTable</NavDropdown.Item>
           </NavDropdown>
         </Nav>
       </Navbar>

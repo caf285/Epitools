@@ -1,0 +1,10 @@
+.DropZ {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 1;
+}
+
+.DropZ > * {
+  margin-right: 5px !important;
+}

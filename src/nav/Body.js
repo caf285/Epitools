@@ -5,8 +5,9 @@ import { BrowserRouter, Switch, Route } from "react-router-dom";
 import DemoPhylocanvas from "../demo/DemoPhylocanvas.js";
 import DemoLeaflet from "../demo/DemoLeaflet.js";
 import DemoPlotly from "../demo/DemoPlotly.js";
+import DemoMySQL from "../demo/DemoMySQL.js";
+import DemoHandsOnTable from "../demo/DemoHandsOnTable.js"
 import GAS from "../gas/GAS.js";
-import DemoFetch from "../demo/DemoFetch.js";
 
 function Body() {
   let [height, setHeight] = useState(0);
@@ -23,7 +24,7 @@ function Body() {
   }, [])
 
   return (
-    <div ref={ref} className="Nav-body">
+    <div style={{height: "100%", overflow: "hidden"}} ref={ref} className="Nav-body">
       {/*height*/}
       <BrowserRouter basename="/epitools">
         <Switch>
@@ -39,8 +40,11 @@ function Body() {
           <Route exact path="/demo-plotly">
             <DemoPlotly />
           </Route>
-          <Route exact path="/demo-fetch">
-            <DemoFetch />
+          <Route exact path="/demo-mysql">
+            <DemoMySQL />
+          </Route>
+          <Route exact path="/demo-handsontable">
+            <DemoHandsOnTable />
           </Route>
           <Route exact path="/gas">
             <GAS />

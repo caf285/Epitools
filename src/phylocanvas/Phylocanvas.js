@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
+import "./Phylocanvas.css";
 
 import SvgButton from "../svgButton/SvgButton.js";
+import DropZ from "../svgButton/dropZ/DropZ.js";
 
 import Phylocanvas from "./PhylocanvasLogic.js";
 
@@ -24,7 +26,7 @@ function PhylocanvasView(props) {
   }, [props.tree])
 
   return (
-    <div>
+    <div className="Phylocanvas" style={{height: "100%"}}>
       <Phylocanvas
         tree = {tree}
         type = {type}
@@ -35,7 +37,21 @@ function PhylocanvasView(props) {
         lineWidth = {lineWidth}
         clusterDistance = {clusterDistance}
         clusterSamples = {clusterSamples}
+        branchNameCallback = {props.branchNameCallback}
       />
+      <DropZ
+        buttonObj = {
+          [
+            <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial"/>,
+            <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular"/>,
+            <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular"/>,
+            <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal"/>,
+            <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical"/>
+          ]
+        }
+      />
+
+
       <h5>SVG:</h5>
         <SvgButton onClick={() => setType("radial")} svg="treeRadial" />
         <SvgButton onClick={() => setType("rectangular")} svg="treeRectangular" />
@@ -91,6 +107,7 @@ function PhylocanvasView(props) {
         <button onClick={() => setTextSize(Math.max(textSize - 1, 1))}>Text Size - 1</button>
         <button onClick={() => setLineWidth(lineWidth + 1)}>Line Width + 1</button>
         <button onClick={() => setLineWidth(Math.max(lineWidth - 1, 1))}>Line Width - 1</button>
+      
     </div>
   )
 }
