@@ -27,16 +27,25 @@ function addListeners() {
       for (let leaf of this.leaves) {
 
         //==================================================( DEMO: replace this code with getting per node treeStats )
-        let windowText = [leaf.id]
-        for (let i = 0; i < Math.max(Math.ceil(Math.random() * 3), 1); i++) {
-          let rand = Math.random()
-          rand = rand.toFixed(Math.ceil(Math.random() * String(rand).length))
-          windowText.push(String(rand))
-        }
+        leaf.metadata = []
+        leaf.getMetadata = () => {return leaf.metadata}
+        leaf.clearMetadata = () => {leaf.metadata = []}
+        leaf.appendMetadata = (e) => {leaf.metadata.push(e)}
+        let windowText = []
+        //for (let i = 0; i < Math.max(Math.ceil(Math.random() * 3), 1); i++) {
+        //  let rand = Math.random()
+        //  rand = rand.toFixed(Math.ceil(Math.random() * String(rand).length))
+        //  leaf.metadata.push(String(rand))
+        //}
         //==================================================( END DEMO )
 
         this.addListener('mousemove', treeStatsListener, canvas)
         function treeStatsListener(e) {
+          windowText = [leaf.id]
+          for (let data of leaf.getMetadata()) {
+            windowText.push(data)
+          }
+          
           let path = new Path2D()
           ctx.save()
           ctx.font = `${tree.textSize * 4}px ${tree.font}`;

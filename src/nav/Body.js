@@ -1,3 +1,5 @@
+/* eslint-disable react/no-direct-mutation-state */
+
 import React, { useEffect, useState, useRef } from "react";
 
 import { BrowserRouter, Switch, Route } from "react-router-dom";
@@ -24,7 +26,7 @@ function Body() {
   }, [])
 
   return (
-    <div style={{height: "100%", overflow: "hidden"}} ref={ref} className="Nav-body">
+    <div style={{ height: "100%", overflow: "hidden" }} ref={ref} className="Nav-body">
       {/*height*/}
       <BrowserRouter basename="/epitools">
         <Switch>

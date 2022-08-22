@@ -74,7 +74,24 @@ function PhylocanvasView(props) {
 
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
+    phylocanvas.current.addListener("click", () => {
+      props.exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
+    })
   }, [])
+
+  useEffect(() => {
+    console.log("phylocanvas import:", props.importSelection)
+    for (let branch in phylocanvas.current.branches) {
+      console.log("checking for", branch, "in", props.importSelection)
+      if (props.importSelection.includes(branch)) {
+        phylocanvas.current.branches[branch].selected = true
+      } else {
+        phylocanvas.current.branches[branch].selected = false
+      }
+      phylocanvas.current.draw()
+    }
+    //phylocanvas.current.clearSelect()
+  }, [props.importSelection])
 
   useEffect(() => {
     let oldTree = phylocanvas.current.stringRepresentation
@@ -88,6 +105,19 @@ function PhylocanvasView(props) {
       props.branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
   }, [props.tree])
+
+  useEffect(() => {
+    if (props.branchesData) {
+    for (let meta of props.branchesData) {
+      console.log("---------meta:", meta)
+      console.log(phylocanvas.current.branches[meta.Name])
+      phylocanvas.current.branches[meta.Name].clearMetadata()
+      phylocanvas.current.branches[meta.Name].appendMetadata(["  Pathogen:", meta.Pathogen].join(' '))
+      phylocanvas.current.branches[meta.Name].appendMetadata(["  Facility:", meta.Facility].join(' '))
+      phylocanvas.current.branches[meta.Name].appendMetadata(["  Collection:", meta.Collection_date].join(' '))
+    }
+    }
+  }, [props.branchesData])
 
   useEffect(() => {
     if (typeList.current.includes(props.type)) {

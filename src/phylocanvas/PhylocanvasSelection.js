@@ -39,10 +39,7 @@ function PhylocanvasView(props) {
         lineWidth={lineWidth}
         clusterDistance={clusterDistance}
         clusterSamples={clusterSamples}
-        branchesData={props.branchesData}
         branchNameCallback={props.branchNameCallback}
-        importSelection={props.importSelection}
-        exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
       />
       <DropZ
         buttonObj={
