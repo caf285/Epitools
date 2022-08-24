@@ -43,7 +43,7 @@ function buildPairwiseMatrix() {
     this.pairwiseOps.pairwiseMatrix[leaf.id] = []
     walkMatrix(this, leaf, leaf, [], 0, this.pairwiseOps.clusterMaxDistance)
   }
-  console.log(this.pairwiseOps.pairwiseMatrix)
+  //console.log(this.pairwiseOps.pairwiseMatrix)
 }
 */
 
@@ -103,7 +103,7 @@ function buildPairwiseMatrix() {
       this.pairwiseOps.pairwiseMatrix.leaves[leaf][node] = this.pairwiseOps.pairwiseMatrix.leaves[node][leaf]
     }
   }
-  console.log(this.pairwiseOps.pairwiseMatrix.leaves)
+  //console.log(this.pairwiseOps.pairwiseMatrix.leaves)
 }
 
 function buildClusterMatrix() {

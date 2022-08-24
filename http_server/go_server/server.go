@@ -149,8 +149,10 @@ func lineageHandler(w http.ResponseWriter, r *http.Request) {
 
   // db results
   log.Printf("results")
-  log.Printf("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND (collection_date > date_sub(now(), interval 2 month) OR sequence_date > date_sub(now(), interval 1 month))")
-  results, err := db.Query("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND (collection_date > date_sub(now(), interval 2 month) OR sequence_date > date_sub(now(), interval 1 month))")
+  //log.Printf("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND (collection_date > date_sub(now(), interval 2 month) OR sequence_date > date_sub(now(), interval 1 month))")
+  //results, err := db.Query("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND (collection_date > date_sub(now(), interval 2 month) OR sequence_date > date_sub(now(), interval 1 month))")
+  log.Printf("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
+  results, err := db.Query("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
   if err != nil {
     panic(err.Error()) // proper error handling instead of panic in your app
   }

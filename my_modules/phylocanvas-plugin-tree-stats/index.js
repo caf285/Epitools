@@ -23,7 +23,7 @@ function addListeners() {
       for (let eventListener of this.eventListeners.mousemove.filter(eventListener => eventListener.listener.name == "treeStatsListener")) {
         this.removeListener('mousemove', eventListener.listener, canvas)
       }
-      console.log(this)
+      //console.log(this)
       for (let leaf of this.leaves) {
 
         //==================================================( DEMO: replace this code with getting per node treeStats )

@@ -19,18 +19,18 @@ function PhylocanvasView() {
     if (window.location.hostname === "localhost" || window.location.hostname === "10.55.16.53") {
       host.current = "http://10.55.16.53:8888/"
     }
-    console.log("host:", host.current + "mysql")
+    //console.log("host:", host.current + "mysql")
   }, [])
 
   useEffect(() => {
     branchesRef.current = branches
-    console.log(branchesRef.current)
+    //console.log(branchesRef.current)
     mysqlRequest(branchesRef.current)
   }, [branches])
 
   useEffect(() => {
     branchesDataRef.current = branchesData
-    console.log("branchesData:", branchesData)
+    //console.log("branchesData:", branchesData)
   }, [branchesData])
 
   // TODO: cleanup
@@ -44,19 +44,19 @@ function PhylocanvasView() {
 
   // get selection list
   const exportPhylocanvasSelectionCallback = (e) => {
-    console.log("phylocanvas selection:", e)
+    //console.log("phylocanvas selection:", e)
     setImportTableSelection(e)
   }
   const exportTableSelectionCallback = (e) => {
-    console.log("table selection:", e)
+    //console.log("table selection:", e)
     setImportPhylocanvasSelection(e)
   }
 
   // database query post request
   async function mysqlRequest(data = "") {
-    console.log("requestData:", data)
+    //console.log("requestData:", data)
     //const response = await fetch("/go-epitools/mysql", {
-    const response = await fetch(host.current + "mysql", {
+    await fetch(host.current + "mysql", {
       //console.log("hello new build")
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/mysql", {
       method: 'POST',
@@ -81,7 +81,7 @@ function PhylocanvasView() {
   // neighborjoin post request
   async function neighborJoinRequest(data = "") {
     //const response = await fetch("/go-epitools/neighborjoin", {
-    const response = await fetch(host.current + "neighborjoin", {
+    await fetch(host.current + "neighborjoin", {
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/neighborjoin", {
       method: 'POST',
       crossDomain: true,
@@ -105,7 +105,7 @@ function PhylocanvasView() {
   // lineage
   async function lineageRequest(data = "") {
     //const response = await fetch("/go-epitools/neighborjoin", {
-    const response = await fetch(host.current + "lineage", {
+    await fetch(host.current + "lineage", {
       method: 'POST',
       crossDomain: true,
       mode: 'cors',

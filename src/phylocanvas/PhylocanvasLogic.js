@@ -80,9 +80,9 @@ function PhylocanvasView(props) {
   }, [])
 
   useEffect(() => {
-    console.log("phylocanvas import:", props.importSelection)
+    //console.log("phylocanvas import:", props.importSelection)
     for (let branch in phylocanvas.current.branches) {
-      console.log("checking for", branch, "in", props.importSelection)
+      //console.log("checking for", branch, "in", props.importSelection)
       if (props.importSelection.includes(branch)) {
         phylocanvas.current.branches[branch].selected = true
       } else {
@@ -109,8 +109,8 @@ function PhylocanvasView(props) {
   useEffect(() => {
     if (props.branchesData) {
     for (let meta of props.branchesData) {
-      console.log("---------meta:", meta)
-      console.log(phylocanvas.current.branches[meta.Name])
+      //console.log("---------meta:", meta)
+      //console.log(phylocanvas.current.branches[meta.Name])
       phylocanvas.current.branches[meta.Name].clearMetadata()
       phylocanvas.current.branches[meta.Name].appendMetadata(["  Pathogen:", meta.Pathogen].join(' '))
       phylocanvas.current.branches[meta.Name].appendMetadata(["  Facility:", meta.Facility].join(' '))
