@@ -1,9 +1,21 @@
 /* eslint-disable react/no-direct-mutation-state */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.css';
 import './style.css'
 import DropZ from "../svgButton/dropZ/DropZ.js";
+
+// Check if value is in sData
+const checkSdata = (value, sdata) => {
+    //console.log("Checking for:", value)
+    //console.log("in:", sdata)
+    for (let i = 0; i < sdata?.length; i++) {
+        if (sdata[i] === value) {
+            return true
+        }
+    }
+    return false
+}
 
 function SelectionHOT(props) {
     const hot = useRef();
@@ -16,13 +28,14 @@ function SelectionHOT(props) {
     const views = useRef(["readonly"]);
     var NameColumn = -1
 
+
     //console.log("%c HOT: ", "color: teal", hot)
 
     useEffect(() => {
-        //console.log("sdata: ", sdata);
-        checkSdata(0);
+        console.log("%c sdata: ", "color: pink", sdata);
+        checkSdata(0, sdata);
         setNameColumn();
-    }, [sdata])
+    }, [sdata, checkSdata])
 
     // initialize table
     useEffect(() => {
@@ -60,7 +73,7 @@ function SelectionHOT(props) {
                 //console.log("Row: ", row)
                 //console.log("Column: ", column)
                 //console.log("sdata: ", sdata);
-                if (!checkSdata(hot.current.getDataAtCell(row, 1))) {
+                if (!checkSdata(hot.current.getDataAtCell(row, 1), sdata)) {
                     setSdata(psdata => [...psdata, hot.current.getDataAtCell(row, 1)])
                     // set color
                     for (let i = 0; i < hot.current.countCols(); i++) {
@@ -135,6 +148,9 @@ function SelectionHOT(props) {
                 colHeaders: Object.keys(props.data[0]),
             })
             hot.current.updateData(props.data)
+            hot.current.getPlugin('Filters').clearConditions();
+            hot.current.getPlugin('Filters').filter();
+            hot.current.render();
         }
     }, [props.data])
 
@@ -155,17 +171,6 @@ function SelectionHOT(props) {
         }
     }, [props.view])
 
-    // Check if value is in sData
-    const checkSdata = (value) => {
-        //console.log("Checking for:", value)
-        //console.log("in:", sdata)
-        for (let i = 0; i < sdata.length; i++) {
-            if (sdata[i] === value) {
-                return true
-            }
-        }
-        return false
-    }
 
     // Check if value is within imp
     const isInImport = (val, imp) => {

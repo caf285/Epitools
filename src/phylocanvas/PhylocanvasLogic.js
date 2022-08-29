@@ -94,6 +94,7 @@ function PhylocanvasView(props) {
   }, [props.importSelection])
 
   useEffect(() => {
+    props.exportSelectionCallback([])
     let oldTree = phylocanvas.current.stringRepresentation
     try {
       phylocanvas.current.load(props.tree)
