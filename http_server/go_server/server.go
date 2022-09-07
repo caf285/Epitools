@@ -63,8 +63,8 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
     Lineage NullString
     Facility NullString
     Collection_date NullString
-    Sequence_date string
-    File string
+    Sequence_date NullString
+    File NullString
     Reference NullString
     Additional_metadata NullString
   }
