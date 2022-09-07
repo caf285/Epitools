@@ -74,7 +74,16 @@ function PhylocanvasView() {
         }
         return response.json()
       })
-      .then(data => setBranchesData(data))
+      .then(data => {
+        for (let i in data) {
+          if (data[i]?.Additional_metadata) {
+            let branchObj = JSON.parse(data[i]["Additional_metadata"])
+            data[i] = Object.assign(data[i], branchObj)
+          }
+          delete data[i].Additional_metadata
+        }
+        setBranchesData(data)
+      })
       .catch(ERR => window.alert(ERR))
   }
 
