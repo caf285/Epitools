@@ -14,6 +14,7 @@ function PhylocanvasView() {
   const [branches, setBranches] = useState([])
   const [branchesData, setBranchesData] = useState([])
   const [hotHeight, setHOTHeight] = useState(["300"])
+  const [phyloHeight, setPhyloHeight] = useState(["300"])
   const branchesRef = useRef([])
   const branchesDataRef = useRef([])
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
@@ -209,11 +210,13 @@ function PhylocanvasView() {
       </div>
       <SplitPane split="horizontal" onChange={(drag) => {
         console.log("Drag Finished ", drag)
-        console.log("Bottom height: ", calculateBottomPaneHeight(drag))
-        setHOTHeight(JSON.stringify(calculateBottomPaneHeight(drag)))
+        console.log("Bottom height: ", calculateBottomPaneHeight(drag));
+        setPhyloHeight(JSON.stringify(drag));
+        setHOTHeight(JSON.stringify(calculateBottomPaneHeight(drag)));
       }}>
         <Phylocanvas
           tree={tree}
+          height={phyloHeight}
           branchNameCallback={branchNameCallback}
           branchesData={branchesData}
           importSelection={importPhylocanvasSelection}

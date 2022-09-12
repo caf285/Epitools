@@ -49,10 +49,10 @@ function PhylocanvasView(props) {
 
   useEffect(() => {
     function handleResize() {
-      
+
       //setHeight(document.getElementsByClassName("Nav-body")[0].clientHeight)
-      let newHeight = Math.max( Math.max( document.documentElement.clientHeight || 0, window.innerHeight || 0) - document.getElementsByClassName("Nav-header")[0].clientHeight * 2, minHeight )
-      let newWidth = Math.max( document.documentElement.clientWidth || minWidth, window.innerWidth || minWidth, minWidth)
+      let newHeight = Math.max(Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - document.getElementsByClassName("Nav-header")[0].clientHeight * 2, minHeight)
+      let newWidth = Math.max(document.documentElement.clientWidth || minWidth, window.innerWidth || minWidth, minWidth)
       //let heightDelta = heightRef.current / newHeight
       //let widthDelta = widthRef.current / newWidth
       setHW([newHeight, newWidth])
@@ -61,9 +61,9 @@ function PhylocanvasView(props) {
       phylocanvas.current.setTextSize(textSizeRef.current);
     }
     function initialSize() {
-      window.dispatchEvent(new Event('resize')) 
+      window.dispatchEvent(new Event('resize'))
       phylocanvas.current.setTreeType(phylocanvas.current.treeType)
-    } 
+    }
     window.addEventListener("resize", handleResize);
     window.addEventListener("load", initialSize);
     return () => {
@@ -77,6 +77,7 @@ function PhylocanvasView(props) {
     phylocanvas.current.addListener("click", () => {
       props.exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
     })
+    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
@@ -105,18 +106,19 @@ function PhylocanvasView(props) {
     if (props.branchNameCallback) {
       props.branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
+    // eslint-disable-next-line
   }, [props.tree])
 
   useEffect(() => {
     if (props.branchesData) {
-    for (let meta of props.branchesData) {
-      //console.log("---------meta:", meta)
-      //console.log(phylocanvas.current.branches[meta.Name])
-      phylocanvas.current.branches[meta.Name].clearMetadata()
-      phylocanvas.current.branches[meta.Name].appendMetadata(["  Pathogen:", meta.Pathogen].join(' '))
-      phylocanvas.current.branches[meta.Name].appendMetadata(["  Facility:", meta.Facility].join(' '))
-      phylocanvas.current.branches[meta.Name].appendMetadata(["  Collection:", meta.Collection_date].join(' '))
-    }
+      for (let meta of props.branchesData) {
+        //console.log("---------meta:", meta)
+        //console.log(phylocanvas.current.branches[meta.Name])
+        phylocanvas.current.branches[meta.Name].clearMetadata()
+        phylocanvas.current.branches[meta.Name].appendMetadata(["  Pathogen:", meta.Pathogen].join(' '))
+        phylocanvas.current.branches[meta.Name].appendMetadata(["  Facility:", meta.Facility].join(' '))
+        phylocanvas.current.branches[meta.Name].appendMetadata(["  Collection:", meta.Collection_date].join(' '))
+      }
     }
   }, [props.branchesData])
 
@@ -130,7 +132,7 @@ function PhylocanvasView(props) {
     phylocanvas.current.setNodeSize(nodeSizeRef.current)
     phylocanvas.current.setTextSize(textSizeRef.current)
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
- }, [props.type, props.lineWidth])
+  }, [props.type, props.lineWidth])
 
   useEffect(() => {
     setNodeSize(props.nodeSize * getPixelRatio(phylocanvas.current.canvas) / 2)
@@ -158,9 +160,9 @@ function PhylocanvasView(props) {
   }, [props.clusterDistance, props.clusterSamples])
 
   return (
-    <div style={{height: "100%"}}>
+    <div style={{ height: "100%" }}>
       {/*<div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>*/}
-      <div id="phylocanvas" style={{height: "100%", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>
+      <div id="phylocanvas" style={{ height: "100%", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px" }}></div>
     </div>
   )
 }
