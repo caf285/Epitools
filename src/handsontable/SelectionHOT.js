@@ -1,5 +1,5 @@
 /* eslint-disable react/no-direct-mutation-state */
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.css';
 import './style.css'
@@ -23,7 +23,7 @@ function SelectionHOT(props) {
     const [header, setHeader] = useState(false)
     const [data, setData] = useState([{}])
     const [sdata, setSdata] = useState([])
-    const [height, setHeight] = useState("100%")
+    //const [height, setHeight] = useState("props.height")
     const [width, setWidth] = useState("auto")
     const views = useRef(["readonly"]);
     var NameColumn = -1
@@ -35,16 +35,18 @@ function SelectionHOT(props) {
         console.log("%c sdata: ", "color: pink", sdata);
         checkSdata(0, sdata);
         setNameColumn();
+        // eslint-disable-next-line
     }, [sdata, checkSdata])
 
     // initialize table
+    // eslint-disable-next-line
     useEffect(() => {
         //console.log("initial hot")
         const container = document.getElementById('handsontable');
         hot.current = new Handsontable(container, {
             data,
             colHeaders: header,
-            height: height,
+            height: props.height,
             width: width,
             licenseKey: licenseKey.current,
             columnSorting: true,
@@ -53,6 +55,7 @@ function SelectionHOT(props) {
         })
         hot.current.render()
         //console.log("hot:", hot)
+        // eslint-disable-next-line
     }, [])
 
     // Highlighting-------------------------
@@ -61,7 +64,7 @@ function SelectionHOT(props) {
             afterOnCellMouseDown: (event, coords, TD) => {
                 //console.log("CORDS____: ", coords)
                 var row = coords.row
-                var column = coords.column
+                // var column = coords.column
                 if (row < 0) {
                     return
                 }
@@ -100,10 +103,11 @@ function SelectionHOT(props) {
         props.exportTableSelectionCallback(sdata)
         //console.log("%c FINDING COLUMN: ", "color: pink", props.importSelection)
         setNameColumn()
+        // eslint-disable-next-line
     }, [sdata])
 
     useEffect(() => {
-        if (props.height) { setHeight(props.height) }
+        //if (props.height) { setHeight(props.height) }
         if (props.width) { setWidth(props.width) }
     }, [props.height, props.width])
 
@@ -136,7 +140,7 @@ function SelectionHOT(props) {
         }
         // make sdata the new list.
         setSdata(props.importSelection)
-
+        // eslint-disable-next-line
     }, [props.importSelection])
 
     // set data
@@ -153,6 +157,10 @@ function SelectionHOT(props) {
             hot.current.render();
         }
     }, [props.data])
+
+    useEffect(() => {
+        hot.current.updateSettings({ height: props.height })
+    }, [props.height])
 
     // set view type (default: 'readonly')
     useEffect(() => {

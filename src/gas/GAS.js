@@ -4,15 +4,21 @@
 import SvgButton from "../svgButton/SvgButton.js";
 import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 import SelectionHOT from "../handsontable/SelectionHOT.js";
+import SplitPane from "react-split-pane";
+import './style.css'
+
+
 
 function PhylocanvasView() {
   const [tree, setTree] = useState("(A:1)B;")
   const [branches, setBranches] = useState([])
   const [branchesData, setBranchesData] = useState([])
+  const [hotHeight, setHOTHeight] = useState(["300"])
   const branchesRef = useRef([])
   const branchesDataRef = useRef([])
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [importTableSelection, setImportTableSelection] = useState([])
+  const elementRef = useRef(null);
 
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
   useEffect(() => {
@@ -50,6 +56,10 @@ function PhylocanvasView() {
   const exportTableSelectionCallback = (e) => {
     //console.log("table selection:", e)
     setImportPhylocanvasSelection(e)
+  }
+
+  const calculateBottomPaneHeight = (topPaneHeight) => {
+    return elementRef.current?.clientHeight - topPaneHeight
   }
 
   // database query post request
@@ -180,7 +190,7 @@ function PhylocanvasView() {
   }
 
   return (
-    <div style={{ height: "100%" }}>
+    <div style={{ height: "100%" }} ref={elementRef}>
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
       <div style={{ position: "absolute", zIndex: "100" }}>
         <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
@@ -197,7 +207,11 @@ function PhylocanvasView() {
         <SvgButton onClick={e => lineageRequest("BA.5.5")} label="BA.5.5" />
         <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
       </div>
-      <div style={{ height: "50%" }}>
+      <SplitPane split="horizontal" onChange={(drag) => {
+        console.log("Drag Finished ", drag)
+        console.log("Bottom height: ", calculateBottomPaneHeight(drag))
+        setHOTHeight(JSON.stringify(calculateBottomPaneHeight(drag)))
+      }}>
         <Phylocanvas
           tree={tree}
           branchNameCallback={branchNameCallback}
@@ -205,17 +219,18 @@ function PhylocanvasView() {
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
         />
-      </div>
-      <div style={{ height: "50%" }}>
+
         <SelectionHOT
           label="Metadata:"
           data={branchesData}
           view="readonly"
+          height={hotHeight}
           importSelection={importTableSelection}
           exportTableSelectionCallback={exportTableSelectionCallback}
         />
-      </div>
-    </div>
+
+      </SplitPane>
+    </div >
   )
 }
 
