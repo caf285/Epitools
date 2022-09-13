@@ -1,9 +1,10 @@
 import React from "react";
+import "./Nav.css";
 
 function Footer() {
   return (
     <div className="Nav-footer">
-      hello footer
+      Epitools
     </div>
   )
 }

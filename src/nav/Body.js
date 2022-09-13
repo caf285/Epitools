@@ -1,7 +1,5 @@
 /* eslint-disable react/no-direct-mutation-state */
-
 import React from "react";
-
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 import DemoPhylocanvas from "../demo/DemoPhylocanvas.js";
@@ -10,6 +8,7 @@ import DemoPlotly from "../demo/DemoPlotly.js";
 import DemoMySQL from "../demo/DemoMySQL.js";
 import DemoHandsOnTable from "../demo/DemoHandsOnTable.js"
 import GAS from "../gas/GAS.js";
+import "./Nav.css";
 
 function Body() {
   return (
@@ -17,7 +16,7 @@ function Body() {
       <BrowserRouter basename="/epitools">
         <Switch>
           <Route exact path="/">
-            <p>default</p>
+            <GAS />
           </Route>
           <Route exact path="/demo-phylocanvas">
             <DemoPhylocanvas />
@@ -33,9 +32,6 @@ function Body() {
           </Route>
           <Route exact path="/demo-handsontable">
             <DemoHandsOnTable />
-          </Route>
-          <Route exact path="/gas">
-            <GAS />
           </Route>
         </Switch>
       </BrowserRouter>
