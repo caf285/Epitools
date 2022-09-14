@@ -13,13 +13,14 @@ function PhylocanvasView() {
   const [tree, setTree] = useState("(A:1)B;")
   const [branches, setBranches] = useState([])
   const [branchesData, setBranchesData] = useState([])
-  const [hotHeight, setHOTHeight] = useState(["300"])
   const [phyloHeight, setPhyloHeight] = useState(["300"])
+  const [hotHeight, setHOTHeight] = useState(["300"])
   const branchesRef = useRef([])
   const branchesDataRef = useRef([])
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [importTableSelection, setImportTableSelection] = useState([])
   const elementRef = useRef(null);
+
 
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
   useEffect(() => {
@@ -27,6 +28,11 @@ function PhylocanvasView() {
       host.current = "http://10.55.16.53:8888/"
     }
     //console.log("host:", host.current + "mysql")
+  }, [])
+
+  useEffect(() => {
+    setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
+    setPhyloHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
   }, [])
 
   useEffect(() => {
