@@ -15,7 +15,7 @@ function Body() {
     <div style={{ height: "100%", overflow: "hidden" }} className="Nav-body">
       <BrowserRouter basename="/epitools">
         <Switch>
-          <Route exact path="/">
+          <Route exact path="/home">
             <GAS />
           </Route>
           <Route exact path="/demo-phylocanvas">

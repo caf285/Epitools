@@ -61,7 +61,7 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
     External NullString
     Pathogen NullString
     Lineage NullString
-    Facility NullString
+    Location NullString
     Collection_date NullString
     Sequence_date NullString
     File NullString
@@ -101,7 +101,7 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
   for results.Next() {
     
     result := gasResultStruct{}
-    err = results.Scan(&result.Id, &result.Name, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Facility, &result.Collection_date, &result.Sequence_date, &result.File, &result.Reference, &result.Additional_metadata)
+    err = results.Scan(&result.Id, &result.Name, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Location, &result.Collection_date, &result.Sequence_date, &result.File, &result.Reference, &result.Additional_metadata)
 
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app

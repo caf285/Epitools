@@ -10,7 +10,7 @@ function Header() {
     return (
       <div className="Nav-header">
         <Navbar sticky="top" bg="light" variant="light">
-          <Navbar.Brand href="/">
+          <Navbar.Brand href="/epitools/home/">
             <img
               src={logo}
               height="50"
@@ -20,14 +20,14 @@ function Header() {
             One Health Genomic Epi Tools
           </Navbar.Brand>
           <Nav className="ml-auto">
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/">Epitools</Nav.Link>
+            <Nav.Link href="/epitools/home/">Home</Nav.Link>
+            <Nav.Link href="/epitools/home/">Epitools</Nav.Link>
             <NavDropdown title="Component Demo">
-              <NavDropdown.Item href="demo-phylocanvas">Phylocanvas</NavDropdown.Item>
-              <NavDropdown.Item href="demo-leaflet">Leaflet</NavDropdown.Item>
-              <NavDropdown.Item href="demo-plotly">Plotly</NavDropdown.Item>
-              <NavDropdown.Item href="demo-mysql">React MySQL</NavDropdown.Item>
-              <NavDropdown.Item href="demo-handsontable">React HandsOnTable</NavDropdown.Item>
+              <NavDropdown.Item href="/epitools/demo-phylocanvas/">Phylocanvas</NavDropdown.Item>
+              <NavDropdown.Item href="/epitools/demo-leaflet/">Leaflet</NavDropdown.Item>
+              <NavDropdown.Item href="/epitools/demo-plotly/">Plotly</NavDropdown.Item>
+              <NavDropdown.Item href="/epitools/demo-mysql/">React MySQL</NavDropdown.Item>
+              <NavDropdown.Item href="/epitools/demo-handsontable/">React HandsOnTable</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar>
@@ -38,7 +38,7 @@ function Header() {
     return (
       <div className="Nav-header">
         <Navbar sticky="top" bg="light" variant="light">
-          <Navbar.Brand href="/">
+          <Navbar.Brand href="/epitools/home/">
             <img
               src={logo}
               height="50"
@@ -48,8 +48,8 @@ function Header() {
             One Health Genomic Epi Tools
           </Navbar.Brand>
           <Nav className="ml-auto">
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/">Epitools</Nav.Link>
+            <Nav.Link href="/epitools/home/">Home</Nav.Link>
+            <Nav.Link href="/epitools/home/">Epitools</Nav.Link>
           </Nav>
         </Navbar>
       </div>
