@@ -27,8 +27,12 @@ function PhylocanvasView(props) {
     }
   }, [props.tree])
 
+  useEffect(() => {
+    console.log("phylocanvasHeight", props.height)
+  }, [props.height])
+
   return (
-    <div className="Phylocanvas" style={{ height: "100%" }}>
+    <div className="Phylocanvas">
       <Phylocanvas
         tree={tree}
         type={type}
@@ -43,6 +47,7 @@ function PhylocanvasView(props) {
         branchNameCallback={props.branchNameCallback}
         importSelection={props.importSelection}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
+        height={props.height}
       />
       <DropZ
         buttonObj={

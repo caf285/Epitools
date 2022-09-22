@@ -48,36 +48,13 @@ function PhylocanvasView(props) {
   //TODO: Fix height inheritance problem (relative height to window size without adding to window size for positive feedback loop)
 
   useEffect(() => {
-    function handleResize() {
-
-      //setHeight(document.getElementsByClassName("Nav-body")[0].clientHeight)
-      let newHeight = Math.max(Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - document.getElementsByClassName("Nav-header")[0].clientHeight * 2, minHeight)
-      let newWidth = Math.max(document.documentElement.clientWidth || minWidth, window.innerWidth || minWidth, minWidth)
-      //let heightDelta = heightRef.current / newHeight
-      //let widthDelta = widthRef.current / newWidth
-      setHW([newHeight, newWidth])
-      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
-      phylocanvas.current.setNodeSize(nodeSizeRef.current);
-      phylocanvas.current.setTextSize(textSizeRef.current);
-    }
-    function initialSize() {
-      window.dispatchEvent(new Event('resize'))
-      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
-    }
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("load", initialSize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("load", initialSize);
-    };
-  }, [minHeight, minWidth])
+  }, [props.height])
 
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
     phylocanvas.current.addListener("click", () => {
       props.exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
     })
-    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
@@ -160,9 +137,9 @@ function PhylocanvasView(props) {
   }, [props.clusterDistance, props.clusterSamples])
 
   return (
-    <div style={{ height: "100%" }}>
+    <div>
       {/*<div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>*/}
-      <div id="phylocanvas" style={{ height: "100%", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px" }}></div>
+      <div id="phylocanvas" style={{height: props.height}}></div>
     </div>
   )
 }

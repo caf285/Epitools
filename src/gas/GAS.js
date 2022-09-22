@@ -1,5 +1,4 @@
-
-/* eslint-disable react/no-direct-mutation-state */import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import SvgButton from "../svgButton/SvgButton.js";
 import Phylocanvas from "../phylocanvas/Phylocanvas.js";
@@ -13,7 +12,7 @@ function PhylocanvasView() {
   const [tree, setTree] = useState("(A:1)B;")
   const [branches, setBranches] = useState([])
   const [branchesData, setBranchesData] = useState([])
-  const [phyloHeight, setPhyloHeight] = useState(["300"])
+  const [phyloHeight, setPhyloHeight] = useState("50%")
   const [hotHeight, setHOTHeight] = useState(["300"])
   const branchesRef = useRef([])
   const branchesDataRef = useRef([])
@@ -21,18 +20,12 @@ function PhylocanvasView() {
   const [importTableSelection, setImportTableSelection] = useState([])
   const elementRef = useRef(null);
 
-
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
   useEffect(() => {
     if (window.location.hostname === "localhost" || window.location.hostname === "10.55.16.53") {
       host.current = "http://10.55.16.53:8888/"
     }
     //console.log("host:", host.current + "mysql")
-  }, [])
-
-  useEffect(() => {
-    setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
-    setPhyloHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
   }, [])
 
   useEffect(() => {
@@ -63,10 +56,6 @@ function PhylocanvasView() {
   const exportTableSelectionCallback = (e) => {
     //console.log("table selection:", e)
     setImportPhylocanvasSelection(e)
-  }
-
-  const calculateBottomPaneHeight = (topPaneHeight) => {
-    return elementRef.current?.clientHeight - topPaneHeight
   }
 
   // database query post request
@@ -214,11 +203,10 @@ function PhylocanvasView() {
         <SvgButton onClick={e => lineageRequest("BA.5.5")} label="BA.5.5" />
         <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
       </div>
-      <SplitPane split="horizontal" onChange={(drag) => {
-        console.log("Drag Finished ", drag)
-        console.log("Bottom height: ", calculateBottomPaneHeight(drag));
-        setPhyloHeight(JSON.stringify(drag));
-        setHOTHeight(JSON.stringify(calculateBottomPaneHeight(drag)));
+
+
+      <SplitPane split="vertical" onChange={(x,y,z) => {
+        console.log(x,y,z)
       }}>
         <Phylocanvas
           tree={tree}
@@ -228,7 +216,6 @@ function PhylocanvasView() {
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
         />
-
         <SelectionHOT
           label="Metadata:"
           data={branchesData}

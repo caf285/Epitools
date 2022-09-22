@@ -213,7 +213,7 @@ function SelectionHOT(props) {
 
 
     return (
-        <div style={{ position: "relative", height: "100%" }}>
+        <div style={{}}>
             <div id="handsontable" style={{ zIndex: "1" }}></div>
             <div style={{ zIndex: "1000" }}>
                 <DropZ
