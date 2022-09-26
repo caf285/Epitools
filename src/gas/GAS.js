@@ -5,6 +5,7 @@ import SvgButton from "../svgButton/SvgButton.js";
 import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 import SelectionHOT from "../handsontable/SelectionHOT.js";
 import SplitPane from "react-split-pane";
+import UploadScreen from "../uploadScreen/uploadScreen"
 import './style.css'
 
 
@@ -20,15 +21,10 @@ function PhylocanvasView() {
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [importTableSelection, setImportTableSelection] = useState([])
   const elementRef = useRef(null);
+  const [uploadScreen, setUploadScreen] = useState(false)
 
 
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
-  useEffect(() => {
-    if (window.location.hostname === "localhost" || window.location.hostname === "10.55.16.53") {
-      host.current = "http://10.55.16.53:8888/"
-    }
-    //console.log("host:", host.current + "mysql")
-  }, [])
 
   useEffect(() => {
     setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
@@ -77,10 +73,7 @@ function PhylocanvasView() {
       //console.log("hello new build")
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/mysql", {
       method: 'POST',
-      crossDomain: true,
       mode: 'cors',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: data,
       })
@@ -110,10 +103,9 @@ function PhylocanvasView() {
     await fetch(host.current + "neighborjoin", {
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/neighborjoin", {
       method: 'POST',
-      crossDomain: true,
+
       mode: 'cors',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
+
       body: JSON.stringify({
         fasta: data,
       })
@@ -133,10 +125,9 @@ function PhylocanvasView() {
     //const response = await fetch("/go-epitools/neighborjoin", {
     await fetch(host.current + "lineage", {
       method: 'POST',
-      crossDomain: true,
+
       mode: 'cors',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
+
       body: JSON.stringify({
         lineage: data,
       })
@@ -196,8 +187,10 @@ function PhylocanvasView() {
     }
   }
 
+
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
+      {uploadScreen && <UploadScreen setData={setBranchesData}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
       <div style={{ position: "absolute", zIndex: "100" }}>
         <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
@@ -228,15 +221,17 @@ function PhylocanvasView() {
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
         />
-
-        <SelectionHOT
-          label="Metadata:"
-          data={branchesData}
-          view="readonly"
-          height={hotHeight}
-          importSelection={importTableSelection}
-          exportTableSelectionCallback={exportTableSelectionCallback}
-        />
+        <div>
+          <button onClick={() => { setUploadScreen(!uploadScreen) }}>Upload</button>
+          <SelectionHOT
+            label="Metadata:"
+            data={branchesData}
+            view="readonly"
+            height={hotHeight}
+            importSelection={importTableSelection}
+            exportTableSelectionCallback={exportTableSelectionCallback}
+          />
+        </div>
 
       </SplitPane>
     </div >
