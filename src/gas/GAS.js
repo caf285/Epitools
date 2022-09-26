@@ -190,7 +190,7 @@ function PhylocanvasView() {
 
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
-      {uploadScreen && <UploadScreen setData={setBranchesData}></UploadScreen>}
+      {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
       <div style={{ position: "absolute", zIndex: "100" }}>
         <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />

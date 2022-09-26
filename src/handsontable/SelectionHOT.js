@@ -18,9 +18,12 @@ const checkSdata = (value, sdata) => {
 }
 
 function SelectionHOT(props) {
+
+    console.log("Data: ", props.data)
+
     const hot = useRef();
     const licenseKey = useRef("non-commercial-and-evaluation")
-    const [header, setHeader] = useState(false)
+    //const [header, setHeader] = useState(false)
     const [data, setData] = useState([{}])
     const [sdata, setSdata] = useState([])
     //const [height, setHeight] = useState("props.height")
@@ -45,7 +48,7 @@ function SelectionHOT(props) {
         const container = document.getElementById('handsontable');
         hot.current = new Handsontable(container, {
             data,
-            colHeaders: header,
+            //colHeaders: header,
             height: props.height,
             width: width,
             licenseKey: licenseKey.current,
@@ -147,7 +150,8 @@ function SelectionHOT(props) {
     useEffect(() => {
         if (props.data && props.data.length) {
             setData(props.data)
-            setHeader(Object.keys(props.data[0]))
+            //setHeader(Object.keys(props.data[0]))
+            console.log("Look here: ", props.data[0])
             hot.current.updateSettings({
                 colHeaders: Object.keys(props.data[0]),
             })

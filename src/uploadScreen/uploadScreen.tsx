@@ -36,7 +36,9 @@ function UploadScreen(props) {
                         console.log("Row data:", results.data);
                         console.log("Row errors:", results.errors);
                         console.log("Name Column:", nameColumn);
-                        //props.setData(results.data)
+                        console.log("Objectify: ", objectifyData(results.data, nameColumn))
+                        props.setData(objectifyData(results.data, nameColumn))
+                        props.setDisplay(false)
                     },
                     error: undefined,
                     download: false,
@@ -63,6 +65,34 @@ function UploadScreen(props) {
     // eslint-disable-next-line 
     const getColumnNames = (data: any[][], column: number): string[] => {
         return [];
+    }
+
+    const objectifyData = (data: string[][], column: number): object => {
+        interface TempObject {
+            [key: string]: string
+        }
+        let res: TempObject[] = []
+
+        // we assume the first row is the headers for the csv.
+        for (let i = 1; i < data.length; i++) {
+
+            let temp: TempObject = {}
+
+            for (let j = 0; j < data[i].length; j++) {
+                if (j === column) {
+                    temp["Name"] = data[i][j]
+                } else {
+                    temp[data[0][j]] = data[i][j]
+                }
+            }
+
+            res.push(temp)
+        }
+
+
+        return res
+
+
     }
 
 
