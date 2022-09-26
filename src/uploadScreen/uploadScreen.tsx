@@ -16,9 +16,9 @@ function UploadScreen(props) {
         reader.current.onloadend = () => {
             // if NWK
             if (file.name.toLowerCase().endsWith(".csv")) {
-                console.log(file.name, "IS A CSV!")
-                console.log(reader)
-                console.log(reader.current.result)
+                //console.log(file.name, "IS A CSV!")
+                //console.log(reader)
+                //console.log(reader.current.result)
                 let con = {
                     delimiter: "",	// auto-detect
                     newline: "",	// auto-detect
@@ -33,10 +33,10 @@ function UploadScreen(props) {
                     comments: false,
                     step: undefined,
                     complete: function (results, parser) {
-                        console.log("Row data:", results.data);
-                        console.log("Row errors:", results.errors);
-                        console.log("Name Column:", nameColumn);
-                        console.log("Objectify: ", objectifyData(results.data, nameColumn))
+                        //console.log("Row data:", results.data);
+                        //console.log("Row errors:", results.errors);
+                        //console.log("Name Column:", nameColumn);
+                        //console.log("Objectify: ", objectifyData(results.data, nameColumn))
                         props.setData(objectifyData(results.data, nameColumn))
                         props.setDisplay(false)
                     },
@@ -54,7 +54,7 @@ function UploadScreen(props) {
                     delimitersToGuess: [',', '\t', '|', ';', Papa.RECORD_SEP, Papa.UNIT_SEP]
                 }
                 Papa.parse(reader.current.result, con)
-                console.log(con)
+                //console.log(con)
                 //const text = e.target.result;
                 //const data = d3.csvParse(text);
                 //console.log(JSON.stringify(data));

@@ -19,8 +19,6 @@ const checkSdata = (value, sdata) => {
 
 function SelectionHOT(props) {
 
-    console.log("Data: ", props.data)
-
     const hot = useRef();
     const licenseKey = useRef("non-commercial-and-evaluation")
     //const [header, setHeader] = useState(false)
@@ -151,7 +149,6 @@ function SelectionHOT(props) {
         if (props.data && props.data.length) {
             setData(props.data)
             //setHeader(Object.keys(props.data[0]))
-            console.log("Look here: ", props.data[0])
             hot.current.updateSettings({
                 colHeaders: Object.keys(props.data[0]),
             })
