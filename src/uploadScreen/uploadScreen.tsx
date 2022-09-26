@@ -99,9 +99,11 @@ function UploadScreen(props) {
     return (
 
         <div className={"uploadScreen"}>
+            Which column in your CSV contains the name?
             <input type={"number"} id={"nameColumn"} value={nameColumn} onChange={(e) => { setNameColumn(Number(e.target.value)) }}></input>
             <input type="file" accept={".csv"} ref={hotFileInput} onChange={handleHOTFileInput} hidden />
-            <button onClick={e => hotFileInput.current.click()}></button>
+            <button onClick={e => hotFileInput.current.click()}>Upload</button>
+            <button onClick={e => props.setDisplay(false)}>Close</button>
         </div >
     )
 }
