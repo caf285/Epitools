@@ -99,13 +99,7 @@ function PhylocanvasView() {
     await fetch(host.current + "neighborjoin", {
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/neighborjoin", {
       method: 'POST',
-<<<<<<< HEAD
       mode: 'cors',
-=======
-
-      mode: 'cors',
-
->>>>>>> 52d46ccd7971d331d9b667b133097e67eea20f6a
       body: JSON.stringify({
         fasta: data,
       })
@@ -125,13 +119,7 @@ function PhylocanvasView() {
     //const response = await fetch("/go-epitools/neighborjoin", {
     await fetch(host.current + "lineage", {
       method: 'POST',
-<<<<<<< HEAD
       mode: 'cors',
-=======
-
-      mode: 'cors',
-
->>>>>>> 52d46ccd7971d331d9b667b133097e67eea20f6a
       body: JSON.stringify({
         lineage: data,
       })
