@@ -6,7 +6,7 @@ import * as Papa from "papaparse"
 
 function UploadScreen(props) {
     // eslint-disable-next-line 
-    const [nameColumn, setNameColumn] = useState(0)
+    const [nameColumn, setNameColumn] = useState()
     const hotFileInput = useRef(null)
     const reader = useRef(new FileReader())
 
@@ -37,7 +37,7 @@ function UploadScreen(props) {
                         //console.log("Row errors:", results.errors);
                         //console.log("Name Column:", nameColumn);
                         //console.log("Objectify: ", objectifyData(results.data, nameColumn))
-                        props.setData(objectifyData(results.data, nameColumn))
+                        props.setData(objectifyData(results.data, nameColumn - 1))
                         props.setDisplay(false)
                     },
                     error: undefined,

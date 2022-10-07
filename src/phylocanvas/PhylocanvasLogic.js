@@ -109,6 +109,8 @@ function PhylocanvasView(props) {
     // eslint-disable-next-line
   }, [props.tree])
 
+  /*
+  TODO: Uncomment this.
   useEffect(() => {
     if (props.branchesData) {
       for (let meta of props.branchesData) {
@@ -121,7 +123,7 @@ function PhylocanvasView(props) {
       }
     }
   }, [props.branchesData])
-
+  */
   useEffect(() => {
     if (typeList.current.includes(props.type)) {
       phylocanvas.current.setTreeType(props.type)
