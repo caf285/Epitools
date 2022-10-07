@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import "./SvgButton.css";
 
 import IconButton from '@mui/material/IconButton';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -6,6 +7,7 @@ import Chip from '@mui/material/Chip';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 function SvgButton(props) {
+  const [visibility, setVisibility] = useState("none");
 
   let svgList = useRef(
     {
@@ -22,7 +24,7 @@ function SvgButton(props) {
 
   let [svg, setSvg] = useState(svgList.current["blank"]);
   let [label, setLabel] = useState("");
-  let [drop, setDrop] = useState(false);
+  let [drop, setDrop] = useState();
 
   useEffect(() => {
     setSvg(svgList.current[props.svg])
@@ -35,7 +37,13 @@ function SvgButton(props) {
   function getDrop() {
     if (drop) {
       return (
-        props.onClick ? props.onClick : () => {}
+        props.onClick ? props.onClick : props.drop ? () => {
+            if (visibility === "flex") {
+              setVisibility("none")
+            } else {
+              setVisibility("flex")
+            }
+          } : () => {}
       )
     }
     return undefined;
@@ -44,9 +52,9 @@ function SvgButton(props) {
   function getIcon() {
     if (svg) {
       return (
-        <SvgIcon>
-          <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
-        </SvgIcon>
+          <SvgIcon>
+            <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
+          </SvgIcon>
       )
     }
     return undefined;
@@ -54,26 +62,43 @@ function SvgButton(props) {
 
   if (svg && !label && !drop) {
     return (
-      <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
-        <SvgIcon sx={{height: 16, width: 16}}>
-          <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
-        </SvgIcon>
-      </IconButton>
+      <div className="SvgButton">
+        <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
+          <SvgIcon sx={{height: 16, width: 16}}>
+            <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
+          </SvgIcon>
+        </IconButton>
+      </div>
     )
   } else {
     return (
-      <Chip
-        onClick={props.onClick}
-        size="small"
-        label={label ? label : undefined}
-        deleteIcon=<ArrowDropDownIcon />
-        onDelete={getDrop()}
-        sx={{backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee", cursor: "pointer"}}}
-        icon={getIcon()}
-        clickable
-        disableRipple={false}
-        centerRipple={false}
-      />
+      <div className="SvgButton" onMouseLeave={() => {setVisibility("none")}} style={{ alignItems: props.justify ? props.justify : "flex-start" }}>
+        <Chip
+          onClick={props.onClick ? props.onClick : props.drop ? () => {
+            if (visibility === "flex") {
+              setVisibility("none")
+            } else {
+              setVisibility("flex")
+            }
+          } : () => {}}
+          size="small"
+          label={label ? label : undefined}
+          deleteIcon=<ArrowDropDownIcon />
+          onDelete={getDrop()}
+          sx={{backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee", cursor: "pointer"}}}
+          icon={getIcon()}
+          clickable
+          disableRipple={false}
+          centerRipple={false}
+        />
+        <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility }}>
+          <div style={{ position: "absolute", right: 0, minWidth: "200px" }}>
+            <div className="DropZ">
+              {props.drop}
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 }

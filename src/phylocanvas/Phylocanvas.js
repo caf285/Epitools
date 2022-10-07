@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 import "./Phylocanvas.css";
 
 import SvgButton from "../svgButton/SvgButton.js";
-import DropZ from "../svgButton/dropZ/DropZ.js";
 
-import Phylocanvas from "./PhylocanvasLogic.js";
+import PhylocanvasLogic from "./PhylocanvasLogic.js";
 
 function PhylocanvasView(props) {
   const [tree, setTree] = useState("(A:1)B;");
@@ -27,14 +26,11 @@ function PhylocanvasView(props) {
     }
   }, [props.tree])
 
-  useEffect(() => {
-    console.log("phylocanvasHeight", props.height)
-  }, [props.height])
-
   return (
     <div className="Phylocanvas">
-      <Phylocanvas
+      <PhylocanvasLogic
         tree={tree}
+        height={props.height}
         type={type}
         labels={labels}
         align={align}
@@ -47,21 +43,42 @@ function PhylocanvasView(props) {
         branchNameCallback={props.branchNameCallback}
         importSelection={props.importSelection}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
-        height={props.height}
       />
-      <DropZ
-        buttonObj={
-          [
-            <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />,
-            <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />,
-            <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />,
-            <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />,
-            <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
-          ]
-        }
-      />
-
-
+      <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0}}>
+        <SvgButton label="cluster"
+          justify="flex-end"
+          drop={
+            <div style={{ display: "flex", flexFlow: "column" }}>
+              <h5>Cluster Detection:</h5>
+              <button onClick={() => setClusterDistance(clusterDistance + 1)}>ClusterDistance + 1</button>
+              <button onClick={() => setClusterDistance(Math.max(clusterDistance - 1, 1))}>ClusterDistance - 1</button>
+              <button onClick={() => setClusterSamples(clusterSamples + 1)}>ClusterSamples + 1</button>
+              <button onClick={() => setClusterSamples(Math.max(clusterSamples - 1, 1))}>ClusterSamples - 1</button>
+              <h5>Toggle:</h5>
+              <button onClick={() => setLabels(!labels)}>Labels</button>
+              <button onClick={() => setAlign(!align)}>Align</button>
+              <h5>Style:</h5>
+              <button onClick={() => setTextSize(textSize + 1)}>Text Size + 1</button>
+              <button onClick={() => setTextSize(Math.max(textSize - 1, 1))}>Text Size - 1</button>
+              <button onClick={() => setLineWidth(lineWidth + 1)}>Line Width + 1</button>
+              <button onClick={() => setLineWidth(Math.max(lineWidth - 1, 1))}>Line Width - 1</button>
+            </div>
+          }
+        />
+        <SvgButton label="tree type"
+          justify="flex-end"
+          drop={
+            <div>
+              <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
+              <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />
+              <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />
+              <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
+              <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
+            </div>
+          }
+        />
+      </div>
+      {/*
       <h5>SVG:</h5>
       <SvgButton onClick={() => setType("radial")} svg="treeRadial" />
       <SvgButton onClick={() => setType("rectangular")} svg="treeRectangular" />
@@ -102,22 +119,7 @@ function PhylocanvasView(props) {
       <SvgButton onClick={() => setType("hierarchical")} label="Hierarchical" drop={true} />
       <SvgButton label="Settings Menu" drop={true} />
       <SvgButton label="Context Menu" drop={true} />
-
-
-      <h5>Cluster Detection:</h5>
-      <button onClick={() => setClusterDistance(clusterDistance + 1)}>ClusterDistance + 1</button>
-      <button onClick={() => setClusterDistance(Math.max(clusterDistance - 1, 1))}>ClusterDistance - 1</button>
-      <button onClick={() => setClusterSamples(clusterSamples + 1)}>ClusterSamples + 1</button>
-      <button onClick={() => setClusterSamples(Math.max(clusterSamples - 1, 1))}>ClusterSamples - 1</button>
-      <h5>Toggle:</h5>
-      <button onClick={() => setLabels(!labels)}>Labels</button>
-      <button onClick={() => setAlign(!align)}>Align</button>
-      <h5>Style:</h5>
-      <button onClick={() => setTextSize(textSize + 1)}>Text Size + 1</button>
-      <button onClick={() => setTextSize(Math.max(textSize - 1, 1))}>Text Size - 1</button>
-      <button onClick={() => setLineWidth(lineWidth + 1)}>Line Width + 1</button>
-      <button onClick={() => setLineWidth(Math.max(lineWidth - 1, 1))}>Line Width - 1</button>
-
+      */}
     </div>
   )
 }

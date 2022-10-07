@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from "react";
 import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.css';
 import './style.css'
-import DropZ from "../svgButton/dropZ/DropZ.js";
 
 // Check if value is in sData
 const checkSdata = (value, sdata) => {
@@ -213,17 +212,8 @@ function SelectionHOT(props) {
 
 
     return (
-        <div style={{}}>
+        <div style={{ position: "relative", height: "100%" }}>
             <div id="handsontable" style={{ zIndex: "1" }}></div>
-            <div style={{ zIndex: "1000" }}>
-                <DropZ
-                    buttonObj={
-                        [
-                            //<SvgButton key="settings" onClick={() => { }} svg="menuContext" label="settings" />,
-                        ]
-                    }
-                />
-            </div>
         </div>
     )
 }

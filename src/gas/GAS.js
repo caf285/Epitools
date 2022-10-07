@@ -6,13 +6,11 @@ import SelectionHOT from "../handsontable/SelectionHOT.js";
 import SplitPane from "react-split-pane";
 import './style.css'
 
-
-
 function PhylocanvasView() {
   const [tree, setTree] = useState("(A:1)B;")
   const [branches, setBranches] = useState([])
   const [branchesData, setBranchesData] = useState([])
-  const [phyloHeight, setPhyloHeight] = useState("50%")
+  const [phyloHeight, setPhyloHeight] = useState(["300"])
   const [hotHeight, setHOTHeight] = useState(["300"])
   const branchesRef = useRef([])
   const branchesDataRef = useRef([])
@@ -21,11 +19,10 @@ function PhylocanvasView() {
   const elementRef = useRef(null);
 
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
+
   useEffect(() => {
-    if (window.location.hostname === "localhost" || window.location.hostname === "10.55.16.53") {
-      host.current = "http://10.55.16.53:8888/"
-    }
-    //console.log("host:", host.current + "mysql")
+    setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
+    setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
   }, [])
 
   useEffect(() => {
@@ -58,6 +55,10 @@ function PhylocanvasView() {
     setImportPhylocanvasSelection(e)
   }
 
+  const calculateBottomPaneHeight = (topPaneHeight) => {
+    return elementRef.current?.clientHeight - topPaneHeight
+  }
+
   // database query post request
   async function mysqlRequest(data = "") {
     //console.log("requestData:", data)
@@ -66,10 +67,7 @@ function PhylocanvasView() {
       //console.log("hello new build")
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/mysql", {
       method: 'POST',
-      crossDomain: true,
       mode: 'cors',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: data,
       })
@@ -99,10 +97,7 @@ function PhylocanvasView() {
     await fetch(host.current + "neighborjoin", {
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/neighborjoin", {
       method: 'POST',
-      crossDomain: true,
       mode: 'cors',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         fasta: data,
       })
@@ -122,10 +117,7 @@ function PhylocanvasView() {
     //const response = await fetch("/go-epitools/neighborjoin", {
     await fetch(host.current + "lineage", {
       method: 'POST',
-      crossDomain: true,
       mode: 'cors',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         lineage: data,
       })
@@ -188,25 +180,29 @@ function PhylocanvasView() {
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
-      <div style={{ position: "absolute", zIndex: "100" }}>
+        <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
         <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
-        <SvgButton onClick={e => lineageRequest("BA.2")} label="BA.2" />
-        <SvgButton onClick={e => lineageRequest("BA.2.18")} label="BA.2.18" />
-        <SvgButton onClick={e => lineageRequest("BA.2.12.1")} label="BA.2.12.1" />
-        <SvgButton onClick={e => lineageRequest("BA.2.3")} label="BA.2.3" />
-        <SvgButton onClick={e => lineageRequest("BA.2.9")} label="BA.2.9" />
-        <SvgButton onClick={e => lineageRequest("BA.4")} label="BA.4" />
-        <SvgButton onClick={e => lineageRequest("BA.4.1")} label="BA.4.1" />
-        <SvgButton onClick={e => lineageRequest("BA.5")} label="BA.5" />
-        <SvgButton onClick={e => lineageRequest("BA.5.1")} label="BA.5.1" />
-        <SvgButton onClick={e => lineageRequest("BA.5.2.1")} label="BA.5.2.1" />
-        <SvgButton onClick={e => lineageRequest("BA.5.5")} label="BA.5.5" />
-        <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
-      </div>
-
-
-      <SplitPane split="vertical" onChange={(x,y,z) => {
-        console.log(x,y,z)
+        <SvgButton label="load covid lineage" drop={
+          <div>
+          <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
+          <SvgButton onClick={e => lineageRequest("BA.2")} label="BA.2" />
+          <SvgButton onClick={e => lineageRequest("BA.2.18")} label="BA.2.18" />
+          <SvgButton onClick={e => lineageRequest("BA.2.12.1")} label="BA.2.12.1" />
+          <SvgButton onClick={e => lineageRequest("BA.2.3")} label="BA.2.3" />
+          <SvgButton onClick={e => lineageRequest("BA.2.9")} label="BA.2.9" />
+          <SvgButton onClick={e => lineageRequest("BA.4")} label="BA.4" />
+          <SvgButton onClick={e => lineageRequest("BA.4.1")} label="BA.4.1" />
+          <SvgButton onClick={e => lineageRequest("BA.5")} label="BA.5" />
+          <SvgButton onClick={e => lineageRequest("BA.5.1")} label="BA.5.1" />
+          <SvgButton onClick={e => lineageRequest("BA.5.2.1")} label="BA.5.2.1" />
+          <SvgButton onClick={e => lineageRequest("BA.5.5")} label="BA.5.5" />
+          <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
+          </div>
+        } />
+        </div>
+      <SplitPane split="horizontal" defaultSize={"50%"} onChange={(drag) => {
+        setPhyloHeight(drag);
+        setHOTHeight(JSON.stringify(calculateBottomPaneHeight(drag)));
       }}>
         <Phylocanvas
           tree={tree}
@@ -216,6 +212,7 @@ function PhylocanvasView() {
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
         />
+
         <SelectionHOT
           label="Metadata:"
           data={branchesData}

@@ -14,7 +14,18 @@ Phylocanvas.plugin(treeStats)
 
 const { getPixelRatio } = utils.canvas;
 
-function PhylocanvasView(props) {
+function PhylocanvasLogic(props) {
+
+  useEffect(() => {
+    setHW(props.height, widthRef.current)
+    window.dispatchEvent(new Event('resize'))
+    if (phylocanvas.current) {
+      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
+      phylocanvas.current.setNodeSize(nodeSizeRef.current);
+      phylocanvas.current.setTextSize(textSizeRef.current);
+    }
+  }, [props.height])
+
   let phylocanvas = useRef();
   let minHeight = 100
   let minWidth = 100
@@ -48,13 +59,22 @@ function PhylocanvasView(props) {
   //TODO: Fix height inheritance problem (relative height to window size without adding to window size for positive feedback loop)
 
   useEffect(() => {
-  }, [props.height])
+    function initialSize() {
+      window.dispatchEvent(new Event('resize'))
+      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
+    }
+    window.addEventListener("load", initialSize);
+    return () => {
+      window.removeEventListener("load", initialSize);
+    };
+  }, [heightRef.current])
 
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
     phylocanvas.current.addListener("click", () => {
       props.exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
     })
+    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
@@ -89,8 +109,8 @@ function PhylocanvasView(props) {
   useEffect(() => {
     if (props.branchesData) {
       for (let meta of props.branchesData) {
-        //console.log("---------meta:", meta)
-        //console.log(phylocanvas.current.branches[meta.Name])
+        console.log("---------meta:", meta)
+        console.log(phylocanvas.current.branches[meta.Name])
         phylocanvas.current.branches[meta.Name].clearMetadata()
         phylocanvas.current.branches[meta.Name].appendMetadata(["  Pathogen:", meta.Pathogen].join(' '))
         phylocanvas.current.branches[meta.Name].appendMetadata(["  Facility:", meta.Facility].join(' '))
@@ -137,11 +157,11 @@ function PhylocanvasView(props) {
   }, [props.clusterDistance, props.clusterSamples])
 
   return (
-    <div>
+    <div style={{ height: "100%" }}>
       {/*<div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>*/}
-      <div id="phylocanvas" style={{height: props.height}}></div>
+      <div id="phylocanvas" style={{ height: "100%", width: "100%", minHeight: props.height + "px", minWidth: minWidth + "px" }}></div>
     </div>
   )
 }
 
-export default PhylocanvasView;
+export default PhylocanvasLogic;
