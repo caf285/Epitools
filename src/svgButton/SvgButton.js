@@ -35,7 +35,7 @@ function SvgButton(props) {
   }, [props.svg, props.label, props.drop])
 
   function getDrop() {
-    if (drop) {
+    if (props.drop) {
       return (
         props.onClick ? props.onClick : props.drop ? () => {
             if (visibility === "flex") {
@@ -50,9 +50,9 @@ function SvgButton(props) {
   }
 
   function getIcon() {
-    if (svg) {
+    if (props.svg) {
       return (
-          <SvgIcon>
+          <SvgIcon sx={{height: 17, width: 17}}>
             <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
           </SvgIcon>
       )
@@ -60,11 +60,11 @@ function SvgButton(props) {
     return undefined;
   }
 
-  if (svg && !label && !drop) {
+  if (props.svg && !props.label && !props.drop) {
     return (
       <div className="SvgButton">
-        <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
-          <SvgIcon sx={{height: 16, width: 16}}>
+        <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{width: "25px", height: "24px", backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
+          <SvgIcon sx={{height: 17, width: 17}}>
             <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
           </SvgIcon>
         </IconButton>
@@ -92,7 +92,7 @@ function SvgButton(props) {
           centerRipple={false}
         />
         <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility }}>
-          <div style={{ position: "absolute", right: 0, minWidth: "200px" }}>
+          <div style={props.dropAlign && props.dropAlign.toLowerCase() == "right" ? { position: "absolute", right: 0, minWidth: "200px" } : { position: "absolute", left: 0, minWidth: "200px" }}>
             <div className="DropZ">
               {props.drop}
             </div>

@@ -20,6 +20,8 @@ function PhylocanvasView() {
   const elementRef = useRef(null);
   const [uploadScreen, setUploadScreen] = useState(false)
 
+  const [getImage, setGetImage] = useState(false)
+
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
   useEffect(() => {
@@ -179,31 +181,78 @@ function PhylocanvasView() {
     }
   }
 
+  // file downloader
+  function download(text, name, type) {
+    var a = document.createElement('a');
+    var file = URL.createObjectURL(new Blob([text], {type: type}));
+    a.href = file;
+    a.setAttribute('download', name);
+
+    document.body.appendChild(a);
+    a.click()
+    a.parentNode.removeChild(a);
+  }
+
+  const exportCanvasCallback = (e) => {
+    console.log("exportCanvasCallback", e)
+    setGetImage(false)
+
+
+
+    var a = document.createElement('a');
+    a.href = e;
+    a.setAttribute('download', "export.png");
+
+    document.body.appendChild(a);
+    a.click()
+    a.parentNode.removeChild(a);
+
+
+  }
 
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
       {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
-        <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
-        <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
-        <SvgButton label="load covid lineage" drop={
+      <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
+        <SvgButton label="export"
+          drop={
           <div>
-          <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
-          <SvgButton onClick={e => lineageRequest("BA.2")} label="BA.2" />
-          <SvgButton onClick={e => lineageRequest("BA.2.18")} label="BA.2.18" />
-          <SvgButton onClick={e => lineageRequest("BA.2.12.1")} label="BA.2.12.1" />
-          <SvgButton onClick={e => lineageRequest("BA.2.3")} label="BA.2.3" />
-          <SvgButton onClick={e => lineageRequest("BA.2.9")} label="BA.2.9" />
-          <SvgButton onClick={e => lineageRequest("BA.4")} label="BA.4" />
-          <SvgButton onClick={e => lineageRequest("BA.4.1")} label="BA.4.1" />
-          <SvgButton onClick={e => lineageRequest("BA.5")} label="BA.5" />
-          <SvgButton onClick={e => lineageRequest("BA.5.1")} label="BA.5.1" />
-          <SvgButton onClick={e => lineageRequest("BA.5.2.1")} label="BA.5.2.1" />
-          <SvgButton onClick={e => lineageRequest("BA.5.5")} label="BA.5.5" />
-          <SvgButton onClick={e => lineageRequest("BG.2")} label="BG.2" />
+            <SvgButton label="tree"
+              onClick={() => {
+                setGetImage(true)
+              }}
+            />
+            <SvgButton label="table"
+              onClick={() => {
+                var exportText = [Object.keys(branchesData[0]).join("\t")]
+                for (var i in branchesData) {
+                  exportText.push(Object.values(branchesData[i]).join("\t"))
+                }
+                download(exportText.join("\n"), "export.tsv", "text")
+              }}
+            />
           </div>
         } />
-        </div>
+        <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
+        <SvgButton label="load covid lineage" drop={
+          <div style={{display: "flex", flexFlow: "column"}}>
+            <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
+            <button onClick={() => lineageRequest("BA.2")}>BA.2</button>
+            <button onClick={() => lineageRequest("BA.2.18")}>BA.2.18</button>
+            <button onClick={() => lineageRequest("BA.2.12.1")}>BA.2.12.1</button>
+            <button onClick={() => lineageRequest("BA.2.3")}>BA.2.3</button>
+            <button onClick={() => lineageRequest("BA.2.9")}>BA.2.9</button>
+            <button onClick={() => lineageRequest("BA.4")}>BA.4</button>
+            <button onClick={() => lineageRequest("BA.4.1")}>BA.4.1</button>
+            <button onClick={() => lineageRequest("BA.5")}>BA.5</button>
+            <button onClick={() => lineageRequest("BA.5.1")}>BA.5.1</button>
+            <button onClick={() => lineageRequest("BA.5.2.1")}>BA.5.2.1</button>
+            <button onClick={() => lineageRequest("BA.5.5")}>BA.5.5</button>
+            <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
+          </div>
+        } />
+      </div>
       <SplitPane split="horizontal" defaultSize={"50%"} onChange={(drag) => {
         setPhyloHeight(drag);
         setHOTHeight(JSON.stringify(calculateBottomPaneHeight(drag)));
@@ -215,6 +264,8 @@ function PhylocanvasView() {
           branchesData={branchesData}
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
+          triggerCanvasCallback={getImage}
+          exportCanvasCallback={exportCanvasCallback}
         />
         <div>
           <button onClick={() => { setUploadScreen(!uploadScreen) }}>Upload</button>
@@ -227,7 +278,6 @@ function PhylocanvasView() {
             exportTableSelectionCallback={exportTableSelectionCallback}
           />
         </div>
-
       </SplitPane>
     </div >
   )

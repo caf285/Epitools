@@ -43,10 +43,12 @@ function PhylocanvasView(props) {
         branchNameCallback={props.branchNameCallback}
         importSelection={props.importSelection}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
+        exportCanvasCallback={props.exportCanvasCallback}
+        triggerCanvasCallback={props.triggerCanvasCallback}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0}}>
         <SvgButton label="cluster"
-          justify="flex-end"
+          dropAlign="right"
           drop={
             <div style={{ display: "flex", flexFlow: "column" }}>
               <h5>Cluster Detection:</h5>
@@ -65,8 +67,10 @@ function PhylocanvasView(props) {
             </div>
           }
         />
-        <SvgButton label="tree type"
-          justify="flex-end"
+        <SvgButton
+          label="tree type"
+          svg="treeRectangular"
+          dropAlign="right"
           drop={
             <div>
               <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />

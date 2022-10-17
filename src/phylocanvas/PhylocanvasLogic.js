@@ -158,6 +158,12 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.draw()
   }, [props.clusterDistance, props.clusterSamples])
 
+  useEffect(() => {
+    if (props.triggerCanvasCallback && props.triggerCanvasCallback === true) {
+      props.exportCanvasCallback(phylocanvas.current.canvas.canvas.toDataURL('image/png'))
+    }
+  }, [props.triggerCanvasCallback])
+
   return (
     <div style={{ height: "100%" }}>
       {/*<div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>*/}

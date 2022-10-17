@@ -39,7 +39,7 @@ def main():
       cursor.execute("SELECT * FROM " + table + " WHERE additional_metadata IS NOT NULL")
       for x in cursor.fetchall():
         print(x[1])
-        print(x[-1].decode('ascii'))
+        #print(x[-1].decode('ascii'))
         print(x[-1].decode('ascii').replace("\'", "\""))
         print("UPDATE " + table + " SET additional_metadata = \'" + x[-1].decode('ascii').replace("\'", "\"") + "\' WHERE id = \"" + str(x[0]) + "\"")
         print()
