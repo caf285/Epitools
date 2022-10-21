@@ -118,7 +118,6 @@ function PhylocanvasView() {
 
   // lineage
   async function lineageRequest(data = "") {
-    //const response = await fetch("/go-epitools/neighborjoin", {
     await fetch(host.current + "lineage", {
       method: 'POST',
       mode: 'cors',
@@ -250,6 +249,11 @@ function PhylocanvasView() {
             <button onClick={() => lineageRequest("BA.5.2.1")}>BA.5.2.1</button>
             <button onClick={() => lineageRequest("BA.5.5")}>BA.5.5</button>
             <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
+          </div>
+        } />
+        <SvgButton label="load gas lineage" drop={
+          <div style={{display: "flex", flexFlow: "column"}}>
+            <button onClick={() => lineageRequest("emm49")}>emm49</button>
           </div>
         } />
       </div>

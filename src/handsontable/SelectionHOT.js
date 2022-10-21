@@ -193,7 +193,7 @@ function SelectionHOT(props) {
 
     // Set which column is the name column
     const setNameColumn = () => {
-        var temp = locateColumn("Name")
+        var temp = locateColumn("Sample")
         //console.log("Setting Name column to : ", temp)
         NameColumn = temp
     }
