@@ -5,13 +5,13 @@ import "strings"
 import "strconv"
 import "sync"
 import "math"
+//import "log"
 
 func printHelp() {
   fmt.Println("\nconverts a FASTA file to neighbor joined NWK tree")
   fmt.Println("usage: NJ [-h] FASTA")
   fmt.Println("\tFASTA:\tfasta file, ie. 'bestsnp.fasta'")
   fmt.Println("example:\n\t./NJ bestsnp.fasta\n")
-  //os.Exit(0)
 }
 
 func sliceSum(s1 []int) (sum int) {
@@ -84,7 +84,6 @@ func getNewick(names []string, tree map[int]map[int]float64, path []int, score f
     thing := []string{}
     for index := range tree[path[len(path) - 1]]{
       if ! indexList(index, path) {
-  
         thing = append(thing, getNewick(names, tree, append(path, index), tree[path[len(path) - 1]][index]))
       }
     }
@@ -110,6 +109,56 @@ func Neighborjoin(f string) string {
     fasta[i] = strings.Join(strings.Split(fasta[i], "\n")[1:], "")
   }
 
+  // remove 100% consensus sites
+  piFasta := make([]string, len(names))
+  col := ""
+  ref := ""
+  for i := 0; i < len(fasta[0]); i++ {
+    col = ""
+    for j := 0; j < len(names); j++ {
+      col = col + strings.ToUpper(string(fasta[j][i]))
+      if !strings.Contains("XN", strings.ToUpper(string(fasta[j][i]))) {
+        ref = strings.ToUpper(string(fasta[j][i]))
+      }
+    }
+    //log.Printf("col count: " + string(strings.Count(col, string(col[0]))) + string(len(col)))
+    if strings.Count(col, "X") == 0 && strings.Count(col, "N") == 0 {
+      if strings.Count(col, ref) < len(col) {
+        for j := 0; j < len(names); j++ {
+          piFasta[j] = piFasta[j] + string(fasta[j][i])
+        }
+      }
+    }
+  }
+
+  // remove non-parsimony informative sites
+  /*
+  piFasta := make([]string, len(names))
+  col := ""
+  match := ""
+  matchCheck := "ACTG"
+  for i := 0; i < len(fasta[0]); i++ {
+    col = ""
+    for j := 0; j < len(names); j++ {
+      col = col + strings.ToUpper(string(fasta[j][i]))
+    }
+    match = ""
+    for j := 0; j < len(matchCheck); j++ {
+      if strings.Count(col, string(matchCheck[j])) > 1 {
+        match = match + string(matchCheck[j])
+      }
+      if len(match) > 1 {
+        break
+      }
+    }
+    if len(match) > 1 {
+      for j := 0; j < len(names); j++ {
+        piFasta[j] = piFasta[j] + string(fasta[j][i])
+      }
+    }
+  }
+  */
+
   // mk matrix
   matrix := make([][]int, len(names))
   for i := 0; i < len(names); i++ {
@@ -124,7 +173,7 @@ func Neighborjoin(f string) string {
       wg.Add(1)
       go func(i int, j int) {
         defer wg.Done()
-        matrix[i][j] = hamming(fasta[i], fasta[j])
+        matrix[i][j] = hamming(piFasta[i], piFasta[j])
       }(i, j)
     }
     //fmt.Println(i, len(names))
@@ -199,18 +248,10 @@ func Neighborjoin(f string) string {
     tree[count][tempTree[v]] = vLimb
     tree[tempTree[h]][count] = hLimb
     tree[tempTree[v]][count] = vLimb
-    
-
     tempTree[h] = count
     tempTree = append(tempTree[:v], tempTree[v+1:]...)
-
-    // getbest
   }
   tree[count + 1] = make(map[int]float64)
-  //tree[count + 1][tempTree[0]] = float64(matrix[0][1]) / 2
-  //tree[count + 1][tempTree[1]] = float64(matrix[0][1]) / 2
-  //tree[tempTree[0]][count + 1] = float64(matrix[0][1]) / 2
-  //tree[tempTree[1]][count + 1] = float64(matrix[0][1]) / 2
   tree[tempTree[0]][tempTree[1]] = float64(matrix[0][1])
   tree[tempTree[1]][tempTree[0]] = float64(matrix[0][1])
 
@@ -218,7 +259,6 @@ func Neighborjoin(f string) string {
   bestScore := []float64{0}
   bestPath := []int{}
   for i := 0; i < len(names); i++ {
-
     bestPath = getBest(tree, 0, []int{i}, bestScore, bestPath)
   }
 
@@ -242,19 +282,3 @@ func Neighborjoin(f string) string {
 
   return out
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

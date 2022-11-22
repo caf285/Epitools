@@ -164,6 +164,19 @@ function PhylocanvasLogic(props) {
     }
   }, [props.triggerCanvasCallback])
 
+  useEffect(() => {
+    for (let i in props.branchesData) {
+      let additionalMetadata = [phylocanvas.current.branches[props.branchesData[i]["Sample"]]["id"]]
+      phylocanvas.current.branches[props.branchesData[i]["Sample"]].clearMetadata()
+      for (let j in props.metadataLabels) {
+        additionalMetadata.push(props.branchesData[i][props.metadataLabels[j]])
+        phylocanvas.current.branches[props.branchesData[i]["Sample"]].appendMetadata(props.branchesData[i][props.metadataLabels[j]])
+      }
+      phylocanvas.current.branches[props.branchesData[i]["Sample"]]["label"] = additionalMetadata.join("_")
+    }
+    phylocanvas.current.draw()
+  }, [props.metadataLabels])
+
   return (
     <div style={{ height: "100%" }}>
       {/*<div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>*/}

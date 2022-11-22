@@ -67,7 +67,6 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
     Location NullString
     Collection_date NullString
     Sequence_date NullString
-    Reference NullString
     Additional_metadata NullString
   }
 
@@ -101,7 +100,7 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
   for results.Next() {
     
     result := gasResultStruct{}
-    err = results.Scan(&result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Reference, &result.Additional_metadata)
+    err = results.Scan(&result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata)
 
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app
@@ -147,8 +146,8 @@ func lineageHandler(w http.ResponseWriter, r *http.Request) {
 
   // db results
   log.Printf("results")
-  //log.Printf("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND (collection_date > date_sub(now(), interval 2 month) OR sequence_date > date_sub(now(), interval 1 month))")
-  //results, err := db.Query("SELECT id, name FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND (collection_date > date_sub(now(), interval 2 month) OR sequence_date > date_sub(now(), interval 1 month))")
+  //log.Printf("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND collection_date > date_sub(now(), interval 4 month)")
+  //results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%') AND collection_date > date_sub(now(), interval 4 month)")
   log.Printf("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
   results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
   if err != nil {
@@ -161,6 +160,7 @@ func lineageHandler(w http.ResponseWriter, r *http.Request) {
   var fasta []string
   for results.Next() {
     resultsCount += 1
+    log.Printf(strconv.Itoa(resultsCount))
     result := pathogenResultStruct{}
     err = results.Scan(&result.Id, &result.Sample)
     if err != nil {
@@ -179,7 +179,7 @@ func lineageHandler(w http.ResponseWriter, r *http.Request) {
       sequenceResults.Scan(&sequence)
     }
     if (len(sequence) > 0) { // only add sequence if query returns one
-      fasta = append(fasta, ">" + name + "\n" + string(sequence) + "\n", "")
+      fasta = append(fasta, ">" + name + "\n" + string(sequence) + "\n")
     }
 
   }
@@ -193,10 +193,14 @@ func lineageHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("... done")
 }
 
-func pathogenHandler(w http.ResponseWriter, r *http.Request) {
-  log.Printf("pathogen table requested ...")
+func emmHandler(w http.ResponseWriter, r *http.Request) {
+  log.Printf("lineage requested ...")
+  type requestBodyStruct struct {
+    Lineage string
+  }
 
   type pathogenResultStruct struct {
+    Id string
     Sample string
   }
 
@@ -207,26 +211,132 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
   }   
   defer db.Close()
 
+  // decode request
+  request := requestBodyStruct{}
+  log.Printf("decode")
+  err = json.NewDecoder(r.Body).Decode(&request)
+  if err != nil {
+    panic(err.Error())
+  }
+
   // db results
   log.Printf("results")
-  log.Printf("SELECT sample FROM epitools.pathogen")
-  results, err := db.Query("SELECT sample FROM epitools.pathogen")
+  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date > date_sub(now(), interval 4 month)")
+  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date > date_sub(now(), interval 4 month)")
+  //log.Printf("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
+  //results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
+  if err != nil {
+    panic(err.Error()) // proper error handling instead of panic in your app
+  }
 
-  var resultsJson []string
+  resultsCount := 0
 
+  // fill results
+  var fasta []string
   for results.Next() {
+    resultsCount += 1
+    log.Printf(strconv.Itoa(resultsCount))
     result := pathogenResultStruct{}
-    err = results.Scan(&result.Sample)
+    err = results.Scan(&result.Id, &result.Sample)
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app
     }
-    resultsJson = append(resultsJson, result.Sample)
+
+    id := result.Id
+    name := result.Sample
+    var sequence []byte
+
+    sequenceResults, err := db.Query("SELECT sequence FROM epitools.sequence WHERE sample=" + id)
+    if err != nil {
+      panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    for sequenceResults.Next() {
+      sequenceResults.Scan(&sequence)
+    }
+    if (len(sequence) > 0) { // only add sequence if query returns one
+      fasta = append(fasta, ">" + name + "\n" + string(sequence) + "\n")
+    }
+
   }
-  jsonData, err := json.Marshal(resultsJson)
+  log.Printf(strconv.Itoa(len(fasta)) + " results with sequences")
+  //log.Printf("%v", fasta)
+
+  // transcribe results
+  if len(fasta) >= 4 {
+    fmt.Fprintln(w, treebuilder.Neighborjoin(strings.Join(fasta, "")))
+  }
+  log.Printf("... done")
+}
+
+
+func pathogenHandler(w http.ResponseWriter, r *http.Request) {
+  log.Printf("pathogen table requested ...")
+  type requestBodyStruct struct {
+    Key string
+  }
+
+  type gasResultStruct struct {
+    SequenceId NullString
+    SequenceSample NullString
+    SequenceReference NullString
+    Id string
+    Sample string
+    Subsample NullString
+    External NullString
+    Pathogen NullString
+    Lineage NullString
+    Location NullString
+    Collection_date NullString
+    Sequence_date NullString
+    Additional_metadata NullString
+  }
+
+    db, err := sql.Open("mysql", "epitools:epiTools1-2-3-4-5@tcp(127.0.0.1:3306)/epitools")
+
+    // if there is an error opening the connection, handle it
+    if err != nil {
+        panic(err.Error())
+    }   
+
+    // defer the close till after the main function has finished
+    // executing
+    defer db.Close()
+
+  request := requestBodyStruct{}
+  log.Printf("decode")
+  err = json.NewDecoder(r.Body).Decode(&request)
   if err != nil {
-    log.Println(err)
+    panic(err.Error())
   }
-  fmt.Fprintln(w, string(jsonData))
+
+  if request.Key == "value" {
+    log.Printf("results")
+    log.Printf("SELECT sequence.id as 'sequenceId', sequence.sample as 'sequenceSample', pathogen.* FROM epitools.sequence RIGHT JOIN epitools.pathogen on sequence.sample=pathogen.id")
+    //results, err := db.Query("SELECT * FROM epitools.pathogen")
+    results, err := db.Query("SELECT sequence.id as 'sequenceId', sequence.sample as 'sequenceSample', sequence.reference as 'sequenceReference', pathogen.* FROM epitools.sequence RIGHT JOIN epitools.pathogen on sequence.sample=pathogen.id")
+    if err != nil {
+      panic(err.Error()) // proper error handling instead of panic in your app
+    }
+
+    var resultsJson []gasResultStruct
+
+    for results.Next() {
+    
+      result := gasResultStruct{}
+      err = results.Scan(&result.SequenceId, &result.SequenceSample, &result.SequenceReference, &result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata)
+
+      if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+      }
+      resultsJson = append(resultsJson, result)
+    }
+
+    jsonData, err := json.Marshal(resultsJson)
+    if err != nil {
+      log.Println(err)
+    }
+    fmt.Fprintln(w, string(jsonData))
+  }
   log.Printf("... done")
 }
 
@@ -241,6 +351,7 @@ func main() {
   http.HandleFunc("/neighborjoin", neighborjoinHandler)
   http.HandleFunc("/mysql", mysqlHandler)
   http.HandleFunc("/lineage", lineageHandler)
+  http.HandleFunc("/emm", emmHandler)
   http.HandleFunc("/pathogen", pathogenHandler)
 
   // spin server at argv[1] or 8888

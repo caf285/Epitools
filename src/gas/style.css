@@ -1,5 +1,17 @@
+.appendMetadataDiv {
+  display: flex;
+  flex-flow: column;
+  align-content: stretch;
+}
+.appendMetadataForm {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
 .SplitPane {
-        position: unset !important;
+  position: unset !important;
 }
 
 .Resizer {

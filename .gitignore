@@ -4,5 +4,6 @@
 # derived assets
 /build/*
 /node_modules/
-/http_server/py_populate/sequences/*
+/http_server/py_populate/*json
 /http_server/py_populate/tables/*
+/http_server/py_populate/sequences/*

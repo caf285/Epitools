@@ -15,6 +15,8 @@ function PhylocanvasView() {
   const [hotHeight, setHOTHeight] = useState(["300"])
   const branchesRef = useRef([])
   const branchesDataRef = useRef([])
+  const [metadataLabels, setMetadataLabels] = useState([])
+  const [metadataForms, setMetadataForms] = useState("")
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [importTableSelection, setImportTableSelection] = useState([])
   const elementRef = useRef(null);
@@ -37,7 +39,21 @@ function PhylocanvasView() {
 
   useEffect(() => {
     branchesDataRef.current = branchesData
-    //console.log("branchesData:", branchesData)
+    let appendMetadataDiv = document.getElementsByClassName("appendMetadataDiv")
+    let newMetadataForms = []
+    setMetadataForms(newMetadataForms)
+    if (branchesData) {
+      for (let key in branchesData[0]) {
+        newMetadataForms.push(
+          <form key={key} className="appendMetadataForm">
+            <label>{key}</label>
+            <input type="checkbox" onClick={() => appendMetadataHandler()} defaultChecked="" />
+          </form>
+        )
+      }
+    }
+    console.log(newMetadataForms)
+    setMetadataForms(newMetadataForms)
   }, [branchesData])
 
   // TODO: cleanup
@@ -117,8 +133,8 @@ function PhylocanvasView() {
   }
 
   // lineage
-  async function lineageRequest(data = "") {
-    await fetch(host.current + "lineage", {
+  async function lineageRequest(data = "", url = "lineage") {
+    await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
@@ -195,18 +211,20 @@ function PhylocanvasView() {
   const exportCanvasCallback = (e) => {
     console.log("exportCanvasCallback", e)
     setGetImage(false)
-
-
-
     var a = document.createElement('a');
     a.href = e;
     a.setAttribute('download', "export.png");
-
     document.body.appendChild(a);
     a.click()
     a.parentNode.removeChild(a);
+  }
 
-
+  function appendMetadataHandler() {
+    let checked = []
+    for (let e of [...document.getElementsByClassName("appendMetadataForm")].filter(x => x.childNodes[1].checked)) {
+      checked.push(e.childNodes[0].innerHTML)
+    }
+    setMetadataLabels(checked)
   }
 
   return (
@@ -214,26 +232,7 @@ function PhylocanvasView() {
       {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
-        <SvgButton label="export"
-          drop={
-          <div>
-            <SvgButton label="tree"
-              onClick={() => {
-                setGetImage(true)
-              }}
-            />
-            <SvgButton label="table"
-              onClick={() => {
-                var exportText = [Object.keys(branchesData[0]).join("\t")]
-                for (var i in branchesData) {
-                  exportText.push(Object.values(branchesData[i]).join("\t"))
-                }
-                download(exportText.join("\n"), "export.tsv", "text")
-              }}
-            />
-          </div>
-        } />
-        <SvgButton onClick={e => fileInput.current.click()} label="upload txt" drop={true} />
+        <SvgButton onClick={e => fileInput.current.click()} label="import data" drop={true} />
         <SvgButton label="load covid lineage" drop={
           <div style={{display: "flex", flexFlow: "column"}}>
             <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
@@ -253,9 +252,45 @@ function PhylocanvasView() {
         } />
         <SvgButton label="load gas lineage" drop={
           <div style={{display: "flex", flexFlow: "column"}}>
-            <button onClick={() => lineageRequest("emm49")}>emm49</button>
+            <button onClick={() => lineageRequest("emm22", "emm")}>emm22</button>
+            <button onClick={() => lineageRequest("emm43", "emm")}>emm43</button>
+            <button onClick={() => lineageRequest("emm49", "emm")}>emm49</button>
+            <button onClick={() => lineageRequest("emm53", "emm")}>emm53</button>
+            <button onClick={() => lineageRequest("emm58", "emm")}>emm58</button>
+            <button onClick={() => lineageRequest("emm59", "emm")}>emm59</button>
+            <button onClick={() => lineageRequest("emm60", "emm")}>emm60</button>
+            <button onClick={() => lineageRequest("emm77", "emm")}>emm77</button>
+            <button onClick={() => lineageRequest("emm82", "emm")}>emm82</button>
+            <button onClick={() => lineageRequest("emm83", "emm")}>emm83</button>
+            <button onClick={() => lineageRequest("emm89", "emm")}>emm89</button>
+            <button onClick={() => lineageRequest("emm91", "emm")}>emm91</button>
           </div>
         } />
+        <SvgButton label="append metadata" drop={
+          <div className="appendMetadataDiv">
+            {metadataForms}
+          </div>
+        } />
+        <SvgButton label="export" drop={
+          <div>
+            <SvgButton label="tree"
+              onClick={() => {
+                setGetImage(true)
+              }}
+            />
+            <SvgButton label="table"
+              onClick={() => {
+                var exportText = [Object.keys(branchesData[0]).join("\t")]
+                for (var i in branchesData) {
+                  exportText.push(Object.values(branchesData[i]).join("\t"))
+                }
+                download(exportText.join("\n"), "export.tsv", "text")
+              }}
+            />
+          </div>
+        } />
+
+
       </div>
       <SplitPane split="horizontal" defaultSize={"50%"} onChange={(drag) => {
         setPhyloHeight(drag);
@@ -266,6 +301,7 @@ function PhylocanvasView() {
           height={phyloHeight}
           branchNameCallback={branchNameCallback}
           branchesData={branchesData}
+          metadataLabels={metadataLabels}
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
           triggerCanvasCallback={getImage}

@@ -41,6 +41,7 @@ function PhylocanvasView(props) {
         clusterSamples={clusterSamples}
         branchesData={props.branchesData}
         branchNameCallback={props.branchNameCallback}
+        metadataLabels={props.metadataLabels}
         importSelection={props.importSelection}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
         exportCanvasCallback={props.exportCanvasCallback}
