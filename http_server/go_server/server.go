@@ -193,6 +193,73 @@ func lineageHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("... done")
 }
 
+func samplesHandler(w http.ResponseWriter, r *http.Request) {
+  log.Printf("samples requested ...")
+  type requestBodyStruct struct {
+    Query []string
+  }
+
+  type samplesResultStruct struct {
+    Id string
+    Sample string
+  }
+
+  db, err := sql.Open("mysql", "epitools:epiTools1-2-3-4-5@tcp(127.0.0.1:3306)/epitools")
+
+  // open db
+  if err != nil {
+      panic(err.Error())
+  }   
+  defer db.Close()
+
+  request := requestBodyStruct{}
+  log.Printf("decode")
+  err = json.NewDecoder(r.Body).Decode(&request)
+  if err != nil {
+    panic(err.Error())
+  }
+
+  log.Printf("results")
+  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
+  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
+  if err != nil {
+    panic(err.Error()) // proper error handling instead of panic in your app
+  }
+
+  var fasta []string
+  for results.Next() {
+
+    result := samplesResultStruct{}
+    err = results.Scan(&result.Id, &result.Sample)
+
+    if err != nil {
+      panic(err.Error()) // proper error handling instead of panic in your app
+    }
+
+    var sequence []byte
+
+    sequenceResults, err := db.Query("SELECT sequence FROM epitools.sequence WHERE sample=" + result.Id)
+    if err != nil {
+      panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    for sequenceResults.Next() {
+      sequenceResults.Scan(&sequence)
+    }
+    if (len(sequence) > 0) { // only add sequence if query returns one
+      fasta = append(fasta, ">" + result.Sample + "\n" + string(sequence) + "\n")
+    }
+
+  }
+  log.Printf(strconv.Itoa(len(fasta)) + " results with sequences")
+  //log.Printf("%v", fasta)
+
+  // transcribe results
+  if len(fasta) >= 4 {
+    fmt.Fprintln(w, treebuilder.Neighborjoin(strings.Join(fasta, "")))
+  }
+  log.Printf("... done")
+}
+
 func emmHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("lineage requested ...")
   type requestBodyStruct struct {
@@ -351,6 +418,7 @@ func main() {
   http.HandleFunc("/neighborjoin", neighborjoinHandler)
   http.HandleFunc("/mysql", mysqlHandler)
   http.HandleFunc("/lineage", lineageHandler)
+  http.HandleFunc("/samples", samplesHandler)
   http.HandleFunc("/emm", emmHandler)
   http.HandleFunc("/pathogen", pathogenHandler)
 

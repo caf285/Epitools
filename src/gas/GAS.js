@@ -81,7 +81,7 @@ function PhylocanvasView() {
 
   // database query post request
   async function mysqlRequest(data = "") {
-    //console.log("requestData:", data)
+    console.log("requestData:", data)
     //const response = await fetch("/go-epitools/mysql", {
     await fetch(host.current + "mysql", {
       //console.log("hello new build")
@@ -134,11 +134,38 @@ function PhylocanvasView() {
 
   // lineage
   async function lineageRequest(data = "", url = "lineage") {
+    console.log("data", data)
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
         lineage: data,
+      })
+    })
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status + " " + response.statusText);
+        }
+        return response.text()
+      })
+      .then(data => {
+        if (data) {
+          setTree(data)
+        } else {
+          console.log("no data")
+        }
+      })
+      .catch(ERR => window.alert(ERR))
+  }
+
+  // samples
+  async function samplesRequest(data = "", url = "samples") {
+    console.log("data", data)
+    await fetch(host.current + url, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        query: data,
       })
     })
       .then(response => {
@@ -233,6 +260,7 @@ function PhylocanvasView() {
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
         <SvgButton onClick={e => fileInput.current.click()} label="import data" drop={true} />
+        <SvgButton onClick={() => {samplesRequest(importPhylocanvasSelection)}} label="build from selection" />
         <SvgButton label="load covid lineage" drop={
           <div style={{display: "flex", flexFlow: "column"}}>
             <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
