@@ -118,6 +118,7 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// build tree from lineage (different from emmHandler) (no date range support)
 func lineageHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("lineage requested ...")
   type requestBodyStruct struct {
@@ -193,6 +194,7 @@ func lineageHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("... done")
 }
 
+// build tree from sample list
 func samplesHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("samples requested ...")
   type requestBodyStruct struct {
@@ -260,10 +262,13 @@ func samplesHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("... done")
 }
 
+// build tree from lineage (emm-type specific) (date range support)
 func emmHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("lineage requested ...")
   type requestBodyStruct struct {
     Lineage string
+    Date1 string
+    Date2 string
   }
 
   type pathogenResultStruct struct {
@@ -288,8 +293,8 @@ func emmHandler(w http.ResponseWriter, r *http.Request) {
 
   // db results
   log.Printf("results")
-  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date > date_sub(now(), interval 4 month)")
-  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date > date_sub(now(), interval 4 month)")
+  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
+  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
   //log.Printf("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
   //results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
   if err != nil {
@@ -335,7 +340,7 @@ func emmHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("... done")
 }
 
-
+// get complete pathogen table for external download
 func pathogenHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("pathogen table requested ...")
   type requestBodyStruct struct {
@@ -407,6 +412,61 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("... done")
 }
 
+// return query of lineages and lineage counts from a pathogen and left and right date range
+func dateRangeHandler(w http.ResponseWriter, r *http.Request) {
+  log.Printf("pathogen table requested ...")
+  type requestBodyStruct struct {
+    Pathogen string
+    Date1 string
+    Date2 string
+  }
+
+  type dateRangeResultStruct struct {
+    Lineage NullString
+    Count int
+  }
+
+  db, err := sql.Open("mysql", "epitools:epiTools1-2-3-4-5@tcp(127.0.0.1:3306)/epitools")
+  if err != nil {
+    panic(err.Error())
+  }   
+  defer db.Close()
+
+  request := requestBodyStruct{}
+  log.Printf("decode")
+  err = json.NewDecoder(r.Body).Decode(&request)
+  if err != nil {
+    panic(err.Error())
+  }
+
+  log.Printf("results")
+  log.Printf("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' GROUP BY lineage")
+  //results, err := db.Query("SELECT * FROM epitools.pathogen")
+  results, err := db.Query("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' GROUP BY lineage")
+  if err != nil {
+    panic(err.Error()) // proper error handling instead of panic in your app
+  }
+
+  var resultsJson []dateRangeResultStruct
+
+  for results.Next() {
+    
+    result := dateRangeResultStruct{}
+    err = results.Scan(&result.Lineage, &result.Count)
+
+    if err != nil {
+      panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    resultsJson = append(resultsJson, result)
+  }
+
+  jsonData, err := json.Marshal(resultsJson)
+  if err != nil {
+    log.Println(err)
+  }
+  fmt.Fprintln(w, string(jsonData))
+  log.Printf("... done")
+}
 
 func main() {
 
@@ -421,6 +481,7 @@ func main() {
   http.HandleFunc("/samples", samplesHandler)
   http.HandleFunc("/emm", emmHandler)
   http.HandleFunc("/pathogen", pathogenHandler)
+  http.HandleFunc("/dateRange", dateRangeHandler)
 
   // spin server at argv[1] or 8888
   var (

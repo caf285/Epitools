@@ -5,25 +5,35 @@ import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 import SelectionHOT from "../handsontable/SelectionHOT.js";
 import SplitPane from "react-split-pane";
 import UploadScreen from "../uploadScreen/uploadScreen"
+import Slider from "@mui/material/Slider";
+import Box from '@mui/material/Box';
 import './style.css'
 
 function PhylocanvasView() {
+  // phylocanvas
   const [tree, setTree] = useState("(A:1)B;")
   const [branches, setBranches] = useState([])
-  const [branchesData, setBranchesData] = useState([])
-  const [phyloHeight, setPhyloHeight] = useState(["300"])
-  const [hotHeight, setHOTHeight] = useState(["300"])
   const branchesRef = useRef([])
-  const branchesDataRef = useRef([])
+  const [phyloHeight, setPhyloHeight] = useState(["300"])
   const [metadataLabels, setMetadataLabels] = useState([])
-  const [metadataForms, setMetadataForms] = useState("")
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
-  const [importTableSelection, setImportTableSelection] = useState([])
+
+  // handsontable
+  const [hotHeight, setHOTHeight] = useState(["300"])
   const elementRef = useRef(null);
-  const [uploadScreen, setUploadScreen] = useState(false)
+  const [importTableSelection, setImportTableSelection] = useState([])
 
+  // both
+  const [branchesData, setBranchesData] = useState([])
+  const branchesDataRef = useRef([])
   const [getImage, setGetImage] = useState(false)
+  const [uploadScreen, setUploadScreen] = useState(false);
 
+  // other
+  const [dateSliderRange, setDateSliderRange] = useState([90, 180]);
+  const [dateRange, setDateRange] = useState([new Date(new Date() - (180 - dateSliderRange[0]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0], new Date(new Date() - (180 - dateSliderRange[1]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0]])
+  const [dateRangeForms, setDateRangeForms] = useState("")
+  const [metadataForms, setMetadataForms] = useState("")
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
   useEffect(() => {
@@ -133,13 +143,15 @@ function PhylocanvasView() {
   }
 
   // lineage
-  async function lineageRequest(data = "", url = "lineage") {
+  async function lineageRequest(data = "", url = "lineage", date1=dateRange[0], date2=dateRange[1]) {
     console.log("data", data)
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
         lineage: data,
+        date1: date1,
+        date2: date2,
       })
     })
       .then(response => {
@@ -183,6 +195,35 @@ function PhylocanvasView() {
       })
       .catch(ERR => window.alert(ERR))
   }
+
+  // dates
+  async function dateRangeRequest(pathogen, date1, date2, url = "dateRange") {
+    console.log(pathogen, date1, date2)
+    await fetch(host.current + url, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        pathogen: pathogen,
+        date1: date1,
+        date2: date2,
+      })
+    })
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status + " " + response.statusText);
+        }
+        return response.json()
+      })
+      .then(data => {
+        if (data) {
+          updateDateRangeForms(data)
+        } else {
+          console.log("no data")
+        }
+      })
+      .catch(ERR => window.alert(ERR))
+  }
+
 
   // file i/o
   const handleFileInput = (e) => {
@@ -254,6 +295,41 @@ function PhylocanvasView() {
     setMetadataLabels(checked)
   }
 
+  const handleDateRangeSlider = (event: Event, newValue: number | number[]) => {
+    setDateSliderRange(newValue);
+    let today = new Date()
+    let date0 = new Date(today - (180 - dateSliderRange[0]) * (1000 * 60 * 60 * 24))
+    let date1 = new Date(today - (180 - dateSliderRange[1]) * (1000 * 60 * 60 * 24))
+    setDateRange([date0.toISOString().split("T")[0], date1.toISOString().split("T")[0]])
+    dateRangeRequest("Group A Strep", dateRange[0], dateRange[1])
+  };
+
+  function updateDateRangeForms(data) {
+    let appendDateRangeDiv = document.getElementsByClassName("appendDateRangeDiv")
+    let newDateRangeForms = []
+    if (data) {
+      for (let line of data) {
+        console.log(line)
+        newDateRangeForms.push(
+          <button onClick={() => lineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
+
+
+
+          /*
+          <form key={key} className="appendMetadataForm">
+            <label>{key}</label>
+            <input type="checkbox" onClick={() => appendMetadataHandler()} defaultChecked="" />
+          </form>*/
+        )
+      }
+    }
+    console.log(newDateRangeForms)
+    setDateRangeForms(newDateRangeForms)
+
+
+
+  };
+
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
       {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
@@ -278,20 +354,16 @@ function PhylocanvasView() {
             <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
           </div>
         } />
+
         <SvgButton label="load gas lineage" drop={
           <div style={{display: "flex", flexFlow: "column"}}>
-            <button onClick={() => lineageRequest("emm22", "emm")}>emm22</button>
-            <button onClick={() => lineageRequest("emm43", "emm")}>emm43</button>
-            <button onClick={() => lineageRequest("emm49", "emm")}>emm49</button>
-            <button onClick={() => lineageRequest("emm53", "emm")}>emm53</button>
-            <button onClick={() => lineageRequest("emm58", "emm")}>emm58</button>
-            <button onClick={() => lineageRequest("emm59", "emm")}>emm59</button>
-            <button onClick={() => lineageRequest("emm60", "emm")}>emm60</button>
-            <button onClick={() => lineageRequest("emm77", "emm")}>emm77</button>
-            <button onClick={() => lineageRequest("emm82", "emm")}>emm82</button>
-            <button onClick={() => lineageRequest("emm83", "emm")}>emm83</button>
-            <button onClick={() => lineageRequest("emm89", "emm")}>emm89</button>
-            <button onClick={() => lineageRequest("emm91", "emm")}>emm91</button>
+            <Box sx={{ margin:"5px" }}>
+              <div>{dateRange.toString()}</div>
+              <Slider min={0} step={1} max={180} value={dateSliderRange} onChange={handleDateRangeSlider} />
+            </Box>
+            <div style={{display: "flex", flexFlow: "column"}} className="appendDateRangeDiv">
+              {dateRangeForms}
+            </div>
           </div>
         } />
         <SvgButton label="append metadata" drop={
