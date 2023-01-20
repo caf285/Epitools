@@ -8,7 +8,7 @@ import SvgButton from "../svgButton/SvgButton.js";
 import PhylocanvasLogic from "./PhylocanvasLogic.js";
 
 function PhylocanvasView(props) {
-  const [tree, setTree] = useState("(A:1)B;");
+  const [nwk, setNwk] = useState("(A:1)B;");
   const [type, setType] = useState("radial");
   const [labels, setLabels] = useState(true);
   const [align, setAlign] = useState(false);
@@ -21,15 +21,15 @@ function PhylocanvasView(props) {
   //TODO: Load Tree Externally
 
   useEffect(() => {
-    if (props.tree) {
-      setTree(props.tree)
+    if (props.nwk) {
+      setNwk(props.nwk)
     }
-  }, [props.tree])
+  }, [props.nwk])
 
   return (
     <div className="Phylocanvas">
       <PhylocanvasLogic
-        tree={tree}
+        nwk={nwk}
         height={props.height}
         type={type}
         labels={labels}
@@ -43,6 +43,7 @@ function PhylocanvasView(props) {
         branchNameCallback={props.branchNameCallback}
         metadataLabels={props.metadataLabels}
         importSelection={props.importSelection}
+        getTree={props.getTree}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
         exportCanvasCallback={props.exportCanvasCallback}
         triggerCanvasCallback={props.triggerCanvasCallback}

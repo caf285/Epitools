@@ -17,6 +17,12 @@ const { getPixelRatio } = utils.canvas;
 function PhylocanvasLogic(props) {
 
   useEffect(() => {
+    if (props.getTree) {
+      props.getTree(phylocanvas.current)
+    }
+  }, [props.getTree])
+
+  useEffect(() => {
     setHW(props.height, widthRef.current)
     window.dispatchEvent(new Event('resize'))
     if (phylocanvas.current) {
@@ -56,8 +62,6 @@ function PhylocanvasLogic(props) {
 
   let typeList = useRef(["radial", "rectangular", "circular", "diagonal", "hierarchical"]);
 
-  //TODO: Fix height inheritance problem (relative height to window size without adding to window size for positive feedback loop)
-
   useEffect(() => {
     function initialSize() {
       window.dispatchEvent(new Event('resize'))
@@ -95,7 +99,7 @@ function PhylocanvasLogic(props) {
     props.exportSelectionCallback([])
     let oldTree = phylocanvas.current.stringRepresentation
     try {
-      phylocanvas.current.load(props.tree)
+      phylocanvas.current.load(props.nwk)
       phylocanvas.current.setTreeType("rectangular")
     } catch (error) {
       phylocanvas.current.load(oldTree)
@@ -104,7 +108,7 @@ function PhylocanvasLogic(props) {
       props.branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
     // eslint-disable-next-line
-  }, [props.tree])
+  }, [props.nwk])
 
   /*
   TODO: Uncomment this.

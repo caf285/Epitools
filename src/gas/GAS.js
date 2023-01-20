@@ -11,12 +11,13 @@ import './style.css'
 
 function PhylocanvasView() {
   // phylocanvas
-  const [tree, setTree] = useState("(A:1)B;")
+  const [nwk, setNwk] = useState("(A:1)B;")
   const [branches, setBranches] = useState([])
   const branchesRef = useRef([])
   const [phyloHeight, setPhyloHeight] = useState(["300"])
   const [metadataLabels, setMetadataLabels] = useState([])
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
+  const [getTree, setGetTree] = useState()
 
   // handsontable
   const [hotHeight, setHOTHeight] = useState(["300"])
@@ -24,6 +25,8 @@ function PhylocanvasView() {
   const [importTableSelection, setImportTableSelection] = useState([])
 
   // both
+  const [dragCheck, setDragCheck] = useState(false)
+  const dragRef = useRef(0)
   const [branchesData, setBranchesData] = useState([])
   const branchesDataRef = useRef([])
   const [getImage, setGetImage] = useState(false)
@@ -39,6 +42,7 @@ function PhylocanvasView() {
   useEffect(() => {
     setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
     setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
+    dateRangeRequest("Group A Strep", dateRange[0], dateRange[1]) // fill GAS Lineage buttons on load
   }, [])
 
   useEffect(() => {
@@ -47,22 +51,22 @@ function PhylocanvasView() {
     mysqlRequest(branchesRef.current)
   }, [branches])
 
+  // fill metadata buttons
   useEffect(() => {
     branchesDataRef.current = branchesData
     let appendMetadataDiv = document.getElementsByClassName("appendMetadataDiv")
-    let newMetadataForms = []
-    setMetadataForms(newMetadataForms)
-    if (branchesData) {
-      for (let key in branchesData[0]) {
-        newMetadataForms.push(
-          <form key={key} className="appendMetadataForm">
-            <label>{key}</label>
-            <input type="checkbox" onClick={() => appendMetadataHandler()} defaultChecked="" />
-          </form>
-        )
-      }
+    while (appendMetadataDiv.firstChild) {appendMetadataDiv.removeChild(appendMetadataDiv.firstChild)}
+    var newMetadataForms = []
+    if (branchesData && branchesData.length >= 1) {
+      console.log("branchesData", branchesData)
+      newMetadataForms = Object.keys(branchesData[0]).map((branch) =>
+        <form key={branch} className="appendMetadataForm">
+          <label>{branch}</label>
+          <input type="checkbox" onClick={() => appendMetadataHandler()} defaultChecked="" />
+        </form>
+      )
+      appendMetadataHandler()
     }
-    console.log(newMetadataForms)
     setMetadataForms(newMetadataForms)
   }, [branchesData])
 
@@ -138,7 +142,7 @@ function PhylocanvasView() {
         }
         return response.text()
       })
-      .then(data => setTree(data))
+      .then(data => setNwk(data))
       .catch(ERR => window.alert(ERR))
   }
 
@@ -162,7 +166,7 @@ function PhylocanvasView() {
       })
       .then(data => {
         if (data) {
-          setTree(data)
+          setNwk(data)
         } else {
           console.log("no data")
         }
@@ -188,7 +192,7 @@ function PhylocanvasView() {
       })
       .then(data => {
         if (data) {
-          setTree(data)
+          setNwk(data)
         } else {
           console.log("no data")
         }
@@ -232,7 +236,7 @@ function PhylocanvasView() {
     reader.current.onloadend = () => {
       // if NWK
       if (file.name.toLowerCase().endsWith(".nwk")) {
-        setTree(reader.current.result)
+        setNwk(reader.current.result)
       }
       // if FASTA
       else if (file.name.toLowerCase().endsWith(".fasta")) {
@@ -264,18 +268,18 @@ function PhylocanvasView() {
     }
   }
 
-  // file downloader
-  function download(text, name, type) {
+  // text file downloader
+  function download(text, name, type = "text") {
     var a = document.createElement('a');
     var file = URL.createObjectURL(new Blob([text], {type: type}));
     a.href = file;
     a.setAttribute('download', name);
-
     document.body.appendChild(a);
     a.click()
     a.parentNode.removeChild(a);
   }
 
+  // image file downloader
   const exportCanvasCallback = (e) => {
     console.log("exportCanvasCallback", e)
     setGetImage(false)
@@ -287,14 +291,18 @@ function PhylocanvasView() {
     a.parentNode.removeChild(a);
   }
 
+  // append metadata to phylocanvas
   function appendMetadataHandler() {
     let checked = []
     for (let e of [...document.getElementsByClassName("appendMetadataForm")].filter(x => x.childNodes[1].checked)) {
       checked.push(e.childNodes[0].innerHTML)
     }
+    console.log(checked)
     setMetadataLabels(checked)
+    console.log(metadataLabels)
   }
 
+  // date range slider for adjusting gas buttons
   const handleDateRangeSlider = (event: Event, newValue: number | number[]) => {
     setDateSliderRange(newValue);
     let today = new Date()
@@ -308,35 +316,35 @@ function PhylocanvasView() {
     let appendDateRangeDiv = document.getElementsByClassName("appendDateRangeDiv")
     let newDateRangeForms = []
     if (data) {
-      for (let line of data) {
-        console.log(line)
+      console.log(data)
+      for (let line of data.filter(x => x.Count >= 4 && x.Lineage.includes("emm"))) {
         newDateRangeForms.push(
           <button onClick={() => lineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
-
-
-
-          /*
-          <form key={key} className="appendMetadataForm">
-            <label>{key}</label>
-            <input type="checkbox" onClick={() => appendMetadataHandler()} defaultChecked="" />
-          </form>*/
         )
       }
     }
-    console.log(newDateRangeForms)
     setDateRangeForms(newDateRangeForms)
-
-
-
   };
+
+  // update HOT and Phylocanvas window sizes
+  function updateDrag() {
+    setHOTHeight(JSON.stringify(calculateBottomPaneHeight(dragRef.current)));
+    setPhyloHeight(dragRef.current);
+  }
 
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
       {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
+
+        {/* initialize phylocanvas file upload */}
         <SvgButton onClick={e => fileInput.current.click()} label="import data" drop={true} />
+
+        {/* build new phylocanvas and table from current selection */}
         <SvgButton onClick={() => {samplesRequest(importPhylocanvasSelection)}} label="build from selection" />
+
+        {/* covid lineage buttons */}
         <SvgButton label="load covid lineage" drop={
           <div style={{display: "flex", flexFlow: "column"}}>
             <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
@@ -355,10 +363,13 @@ function PhylocanvasView() {
           </div>
         } />
 
+        {/* gas lineage buttons */}
         <SvgButton label="load gas lineage" drop={
           <div style={{display: "flex", flexFlow: "column"}}>
             <Box sx={{ margin:"5px" }}>
-              <div>{dateRange.toString()}</div>
+              <div style={{display: "flex", justifyContent: "center"}}>
+                {new Date(dateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(dateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
+              </div>
               <Slider min={0} step={1} max={180} value={dateSliderRange} onChange={handleDateRangeSlider} />
             </Box>
             <div style={{display: "flex", flexFlow: "column"}} className="appendDateRangeDiv">
@@ -366,19 +377,37 @@ function PhylocanvasView() {
             </div>
           </div>
         } />
+
+        {/* append metadata buttons */}
         <SvgButton label="append metadata" drop={
           <div className="appendMetadataDiv">
             {metadataForms}
           </div>
         } />
+
+        {/* export buttons */}
         <SvgButton label="export" drop={
           <div>
-            <SvgButton label="tree"
-              onClick={() => {
-                setGetImage(true)
-              }}
-            />
-            <SvgButton label="table"
+            <div>Tree Export:</div>
+            <SvgButton label="PNG Image Format" onClick={() => {setGetImage(true)}} />
+            <SvgButton label="NWK Text Format" onClick={() => {
+              setGetTree(() => (e) => {
+                let treeString = e.stringRepresentation
+                for (let leaf of e.leaves) {
+                  let label = leaf.label
+                  for (let character of ["(", ")", ":", ";", " "]) {
+                    label = label.replaceAll(character, "_")
+                  }
+                  treeString = treeString.replace(leaf.id, label)
+                }
+                download(treeString, "export.nwk")
+                setGetTree()
+              })
+              //console.log(tree)
+            }} />
+            <br />
+            <div>Table Export:</div>
+            <SvgButton label="TSV Text Format"
               onClick={() => {
                 var exportText = [Object.keys(branchesData[0]).join("\t")]
                 for (var i in branchesData) {
@@ -389,24 +418,37 @@ function PhylocanvasView() {
             />
           </div>
         } />
-
-
       </div>
-      <SplitPane split="horizontal" defaultSize={"50%"} onChange={(drag) => {
-        setPhyloHeight(drag);
-        setHOTHeight(JSON.stringify(calculateBottomPaneHeight(drag)));
-      }}>
+
+      {/* split pane drag */}
+      <SplitPane split="horizontal" defaultSize={"50%"} onChange={
+        (drag) => {
+          dragRef.current = drag
+          if (!dragCheck) {
+            setDragCheck(true)
+            setTimeout(function() {
+              setDragCheck(false)
+              updateDrag()
+            }, 1000);
+          }
+        }
+      }>
+
+       {/* phylocanvas component */}
         <Phylocanvas
-          tree={tree}
+          nwk={nwk}
           height={phyloHeight}
           branchNameCallback={branchNameCallback}
           branchesData={branchesData}
           metadataLabels={metadataLabels}
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
+          getTree={getTree}
           triggerCanvasCallback={getImage}
           exportCanvasCallback={exportCanvasCallback}
         />
+
+        {/* handsontable component */}
         <div>
           <button onClick={() => { setUploadScreen(!uploadScreen) }}>Upload</button>
           <SelectionHOT
@@ -417,6 +459,7 @@ function PhylocanvasView() {
             importSelection={importTableSelection}
             exportTableSelectionCallback={exportTableSelectionCallback}
           />
+
         </div>
       </SplitPane>
     </div >

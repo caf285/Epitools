@@ -4,7 +4,8 @@ import "./Nav.css";
 function Footer() {
   return (
     <div className="Nav-footer">
-      Epitools
+      <div>Epitools</div>
+      <div>{new Date().getFullYear()} © All Rights Reserved TGen.</div>
     </div>
   )
 }
