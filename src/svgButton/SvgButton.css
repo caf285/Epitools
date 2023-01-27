@@ -3,7 +3,8 @@
   flex-flow: column;
   align-items: flex-start;
   position: relative;
-  margin-right: 2px;
+  margin: 2px;
+  margin-bottom: 5px;
   z-index: 100;
 }
 

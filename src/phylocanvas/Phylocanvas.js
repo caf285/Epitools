@@ -1,6 +1,4 @@
-/* eslint-disable react/no-direct-mutation-state */
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./Phylocanvas.css";
 
 import SvgButton from "../svgButton/SvgButton.js";
@@ -8,23 +6,44 @@ import SvgButton from "../svgButton/SvgButton.js";
 import PhylocanvasLogic from "./PhylocanvasLogic.js";
 
 function PhylocanvasView(props) {
+  // default configurations
   const [nwk, setNwk] = useState("(A:1)B;");
-  const [type, setType] = useState("radial");
+  const [type, setType] = useState("rectangular");
   const [labels, setLabels] = useState(true);
   const [align, setAlign] = useState(false);
-  const [nodeSize] = useState(8);
-  const [textSize, setTextSize] = useState(15);
+  const [nodeSize] = useState(12);
+  const [textSize, setTextSize] = useState(24);
   const [lineWidth, setLineWidth] = useState(2);
-  const [clusterDistance, setClusterDistance] = useState(3);
+  const [clusterDistance, setClusterDistance] = useState(4);
   const [clusterSamples, setClusterSamples] = useState(3);
 
-  //TODO: Load Tree Externally
-
+  // pass nwk to logic component
   useEffect(() => {
     if (props.nwk) {
       setNwk(props.nwk)
     }
   }, [props.nwk])
+
+  // stretch orientation for scrollwheel zoom
+  const orientationRef = useRef(["both", "horizontal", "vertical"])
+  const [stretchOrientation, setStretchOrientation] = useState(orientationRef.current[0])
+  function cycleOrientation() {
+    if (["radial", "circular", "diagonal"].includes(type)) {
+      setStretchOrientation(orientationRef.current[0])
+    } else {
+      if (orientationRef.current.indexOf(stretchOrientation) + 1 >= orientationRef.current.length) {
+        setStretchOrientation(orientationRef.current[0])
+      } else {
+        setStretchOrientation(orientationRef.current[orientationRef.current.indexOf(stretchOrientation) + 1])
+      }
+    }
+  }
+  useEffect(() => {
+    if (["radial", "circular", "diagonal"].includes(type)) {
+      cycleOrientation()
+    }
+  }, [type])
+
 
   return (
     <div className="Phylocanvas">
@@ -42,13 +61,14 @@ function PhylocanvasView(props) {
         branchesData={props.branchesData}
         branchNameCallback={props.branchNameCallback}
         metadataLabels={props.metadataLabels}
+        stretchOrientation={stretchOrientation}
         importSelection={props.importSelection}
         getTree={props.getTree}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
         exportCanvasCallback={props.exportCanvasCallback}
         triggerCanvasCallback={props.triggerCanvasCallback}
       />
-      <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0}}>
+      <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0 }}>
         <SvgButton label="cluster"
           dropAlign="right"
           drop={
@@ -82,6 +102,12 @@ function PhylocanvasView(props) {
               <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
             </div>
           }
+        />
+      </div>
+      <div style={{ position: "absolute", display: "flex", flexFlow:"row", bottom: 0, right: 0 }}>
+        <SvgButton
+          svg={(type == "hierarchical" && stretchOrientation == "horizontal" ? "vertical" : type == "hierarchical" && stretchOrientation == "vertical" ? "horizontal" : stretchOrientation) + "Scale"}
+          onClick={() => cycleOrientation()}
         />
       </div>
       {/*

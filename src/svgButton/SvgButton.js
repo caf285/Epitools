@@ -9,6 +9,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 function SvgButton(props) {
   const [visibility, setVisibility] = useState("none");
 
+  // svg button canvas is 20x20 pixels
   let svgList = useRef(
     {
       "blank": "",
@@ -18,7 +19,10 @@ function SvgButton(props) {
       "treeRectangular": "m4,4h14zv13z m0,7h-3z  m6,6h-6zv-6zv4z m0,-6h12z m0,10h9z",
       "treeCircular": "m11,12l3.5,3.5z m-5,0h-5za5,5,0,1,0,8.5,-3.5a5,5,0,1,1,-8.5,3.5z m8.5,-3.5l3.5,-3.5z m-3,-6.5a10,10,0,0,1,0,20a10,10,0,0,0,0,-20z m-8,3.5a10,10,0,0,0,0,13a10,10,0,0,1,0,-13z",
       "treeDiagonal": "m0,12l18,-9zl18,9z m8,-4l10,5z",
-      "treeHierarchical": "m19,5v14zh-13z m-7,0v-3z m-6,6v-6zh-4zh6z m6,0v12z m-10,0v9z"
+      "treeHierarchical": "m19,5v14zh-13z m-7,0v-3z m-6,6v-6zh-4zh6z m6,0v12z m-10,0v9z",
+      "horizontalScale": "m0,12l4,3l0,-6l-4,3z m9,0a3,3,0,0,0,6,0a3,3,0,0,0,-6,0z m15,0l-4,3l0,-6l4,3z",
+      "verticalScale": "m12,0l3,4l-6,0l3,-4z m0,9a3,3,0,0,0,0,6a3,3,0,0,0,0,-6z m0,15l3,-4l-6,0l3,4z",
+      "bothScale": "m0,12l4,3l0,-6l-4,3z m9,0a3,3,0,0,0,6,0a3,3,0,0,0,-6,0z m15,0l-4,3l0,-6l4,3z   m-12,-12l3,4l-6,0l3,-4z  m0,24l3,-4l-6,0l3,4z"
     }
   );
 
@@ -53,7 +57,7 @@ function SvgButton(props) {
     if (props.svg) {
       return (
           <SvgIcon sx={{height: 17, width: 17}}>
-            <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
+            <path stroke="dimgray" fill="dimgray" strokeWidth="2" d={svg}></path>
           </SvgIcon>
       )
     }
@@ -65,7 +69,7 @@ function SvgButton(props) {
       <div className="SvgButton">
         <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{width: "25px", height: "24px", backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
           <SvgIcon sx={{height: 17, width: 17}}>
-            <path stroke="dimgray" fill="transparent" strokeWidth="2" strokeLinejoin="round" d={svg}></path>
+            <path stroke="dimgray" fill="dimgray" strokeWidth="2" d={svg}></path>
           </SvgIcon>
         </IconButton>
       </div>

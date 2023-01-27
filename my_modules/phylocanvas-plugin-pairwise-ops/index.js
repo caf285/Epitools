@@ -153,7 +153,7 @@ function drawClusterInfo() {
   let pixelRatio = getPixelRatio(ctx)
   ctx.save()
   ctx.font = `${30 * pixelRatio / 2}px Arial`;
-  ctx.fillText(label, ctx.canvas.width - ctx.measureText(label).width - 10, ctx.canvas.height - 10)
+  ctx.fillText(label, ctx.canvas.width - ctx.measureText(label).width - 75, ctx.canvas.height - 10)
   ctx.restore()
 }
 

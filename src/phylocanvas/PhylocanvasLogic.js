@@ -6,11 +6,13 @@ import branchLength from "phylocanvas-plugin-branch-length";
 import root from "phylocanvas-plugin-root";
 import pairwiseOps from "phylocanvas-plugin-pairwise-ops";
 import treeStats from "phylocanvas-plugin-tree-stats";
+import stretchOrientation from "phylocanvas-plugin-stretch-orientation";
 Phylocanvas.plugin(scalebar)
 Phylocanvas.plugin(branchLength)
 Phylocanvas.plugin(root)
 Phylocanvas.plugin(pairwiseOps)
 Phylocanvas.plugin(treeStats)
+Phylocanvas.plugin(stretchOrientation)
 
 const { getPixelRatio } = utils.canvas;
 
@@ -73,18 +75,17 @@ function PhylocanvasLogic(props) {
     };
   }, [heightRef.current])
 
+  // load tree on component load
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
     phylocanvas.current.addListener("click", () => {
       props.exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
     })
-    // eslint-disable-next-line
   }, [])
 
+  // select all branches from handsontable selection import
   useEffect(() => {
-    //console.log("phylocanvas import:", props.importSelection)
     for (let branch in phylocanvas.current.branches) {
-      //console.log("checking for", branch, "in", props.importSelection)
       if (props.importSelection.includes(branch)) {
         phylocanvas.current.branches[branch].selected = true
       } else {
@@ -92,9 +93,9 @@ function PhylocanvasLogic(props) {
       }
       phylocanvas.current.draw()
     }
-    //phylocanvas.current.clearSelect()
   }, [props.importSelection])
 
+  // return branch names on nwk change so names can be queried
   useEffect(() => {
     props.exportSelectionCallback([])
     let oldTree = phylocanvas.current.stringRepresentation
@@ -104,34 +105,22 @@ function PhylocanvasLogic(props) {
     } catch (error) {
       phylocanvas.current.load(oldTree)
     }
+    phylocanvas.current.setNodeSize(nodeSizeRef.current)
+    phylocanvas.current.setTextSize(textSizeRef.current)
+    phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
+    console.log(phylocanvas.current)
     if (props.branchNameCallback) {
       props.branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
-    // eslint-disable-next-line
   }, [props.nwk])
 
-  /*
-  TODO: Uncomment this.
-  useEffect(() => {
-    if (props.branchesData) {
-      for (let meta of props.branchesData) {
-        console.log("---------meta:", meta)
-        console.log(phylocanvas.current.branches[meta.Name])
-        phylocanvas.current.branches[meta.Name].clearMetadata()
-        phylocanvas.current.branches[meta.Name].appendMetadata(["  Pathogen:", meta.Pathogen].join(' '))
-        phylocanvas.current.branches[meta.Name].appendMetadata(["  Facility:", meta.Facility].join(' '))
-        phylocanvas.current.branches[meta.Name].appendMetadata(["  Collection:", meta.Collection_date].join(' '))
-      }
-    }
-  }, [props.branchesData])
-  */
+  // update and redraw tree when 
   useEffect(() => {
     if (typeList.current.includes(props.type)) {
       phylocanvas.current.setTreeType(props.type)
     } else {
       phylocanvas.current.setTreeType("rectangular")
     }
-    //setTextSize(props.textSize * getPixelRatio(phylocanvas.current.canvas) / 2);
     phylocanvas.current.setNodeSize(nodeSizeRef.current)
     phylocanvas.current.setTextSize(textSizeRef.current)
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
@@ -157,10 +146,13 @@ function PhylocanvasLogic(props) {
   useEffect(() => {
     phylocanvas.current.pairwiseOps.clusterDistance = props.clusterDistance
     phylocanvas.current.pairwiseOps.clusterSamples = props.clusterSamples
-    //console.log(phylocanvas.current)
     phylocanvas.current.pairwiseOps.clusterDraw = true
     phylocanvas.current.draw()
   }, [props.clusterDistance, props.clusterSamples])
+
+  useEffect(() => {
+    phylocanvas.current.stretchOrientation.orientation = props.stretchOrientation
+  }, [props.stretchOrientation])
 
   useEffect(() => {
     if (props.triggerCanvasCallback && props.triggerCanvasCallback === true) {

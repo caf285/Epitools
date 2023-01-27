@@ -334,6 +334,7 @@ function PhylocanvasView() {
 
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
+      {/* TODO: fix jonathon upload button */}
       {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
@@ -429,7 +430,7 @@ function PhylocanvasView() {
             setTimeout(function() {
               setDragCheck(false)
               updateDrag()
-            }, 1000);
+            }, 10);
           }
         }
       }>
@@ -450,7 +451,8 @@ function PhylocanvasView() {
 
         {/* handsontable component */}
         <div>
-          <button onClick={() => { setUploadScreen(!uploadScreen) }}>Upload</button>
+          {/* TODO: fix jonathon upload */}
+          {/*<button onClick={() => { setUploadScreen(!uploadScreen) }}>Upload</button>*/}
           <SelectionHOT
             label="Metadata:"
             data={branchesData}
