@@ -21,8 +21,9 @@ function addListeners() {
   if (this.treeStats.active) {
       //cleanup old event listeners
       for (let eventListener of this.eventListeners.mousemove.filter(eventListener => eventListener.listener.name == "treeStatsListener")) {
-        this.removeListener('mousemove', eventListener.listener, canvas)
+        this.canvas.canvas.removeEventListener('mousemove', eventListener.listener)
       }
+      this.eventListeners.mousemove = this.eventListeners.mousemove.filter(eventListener => eventListener.listener.name != "treeStatsListener")
       //console.log(this)
       for (let leaf of this.leaves) {
 
@@ -125,15 +126,15 @@ export default function plugin(decorate) {
     delegate.apply(this, args);
     addListeners.apply(this)
     let ctx = this.canvas
-    this.addListener('mousemove', (e) => {
-      if (this.treeStats.debug) {
-      let path = new Path2D()
-      path.moveTo(0, 0)
-      path.lineTo(e.offsetX * getPixelRatio(ctx), e.offsetY * getPixelRatio(ctx))
-      path.closePath()
-      ctx.stroke(path)
-      }
-    })
-
+    if (this.treeStats.debug) {
+      this.addListener('mousemove', (e) => {
+        let path = new Path2D()
+        path.moveTo(0, 0)
+        path.lineTo(e.offsetX * getPixelRatio(ctx), e.offsetY * getPixelRatio(ctx))
+        path.closePath()
+        ctx.stroke(path)
+      })
+    }
+    console.log(this)
   });
 }

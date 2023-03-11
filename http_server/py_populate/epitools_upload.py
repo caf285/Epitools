@@ -46,14 +46,16 @@ def main():
       for line in list(map(lambda x: tuple(x), uploadHash["new"])):
         print(line)
       print(sql)
-      cursor.executemany(sql, list(map(lambda x: tuple(x), uploadHash["new"])))
+      cursor.executemany(sql, list(map(lambda x: tuple(x + [""]), uploadHash["new"])))
+      #cursor.executemany(sql, list(map(lambda x: tuple(x), uploadHash["new"])))
       db.commit()
 
       sql = "UPDATE " + table + " SET " + ", ".join(list(map(lambda x: x + " = %s", columns[1:]))) + " WHERE sample = %s"
       for line in list(map(lambda x: tuple(x[1:] + [x[0]]), uploadHash["update"])):
         print(line)
       print(sql)
-      cursor.executemany(sql, list(map(lambda x: tuple(x[1:] + [x[0]]), uploadHash["update"])))
+      cursor.executemany(sql, list(map(lambda x: tuple(x[1:] + [x[0]] + [""]), uploadHash["update"])))
+      #cursor.executemany(sql, list(map(lambda x: tuple(x[1:] + [x[0]]), uploadHash["update"])))
       db.commit()
       '''
       sql = "DELETE FROM " + table + " WHERE subsample = %s"

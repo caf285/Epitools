@@ -27,6 +27,7 @@ def main():
   ### open json
   for uploadFile in list(filter(lambda x: "emm" in x, os.listdir("/var/www/pathogen-intelligence.tgen.org/epitools/http_server/py_populate"))):
     uploadHash = json.loads(read(uploadFile))
+    print(uploadFile)
 
     ### open cursor
     db = openDB()
@@ -44,7 +45,7 @@ def main():
     for line in uploadHash:
       data = []
       #print(line, uploadHash[line])
-      if not sequenceHash[line][0]:
+      if line in sequenceHash and not sequenceHash[line][0]:
         print(len(uploadHash[line]["sequence"]))
         data.append((sequenceHash[line][2], uploadHash[line]["reference"], uploadHash[line]["sequence"]))
 

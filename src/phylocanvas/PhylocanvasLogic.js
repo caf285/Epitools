@@ -75,7 +75,7 @@ function PhylocanvasLogic(props) {
     };
   }, [heightRef.current])
 
-  // load tree on component load
+  // load tree on component load and add listener for click action to export selected ids
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
     phylocanvas.current.addListener("click", () => {
@@ -114,7 +114,7 @@ function PhylocanvasLogic(props) {
     }
   }, [props.nwk])
 
-  // update and redraw tree when 
+  // update and redraw tree when treeType, lineWidth, text/label size changes
   useEffect(() => {
     if (typeList.current.includes(props.type)) {
       phylocanvas.current.setTreeType(props.type)
@@ -125,17 +125,14 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.setTextSize(textSizeRef.current)
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
   }, [props.type, props.lineWidth])
-
   useEffect(() => {
     setNodeSize(props.nodeSize * getPixelRatio(phylocanvas.current.canvas) / 2)
     phylocanvas.current.setNodeSize(nodeSizeRef.current)
   }, [props.nodeSize])
-
   useEffect(() => {
     setTextSize(props.textSize * getPixelRatio(phylocanvas.current.canvas) / 2);
     phylocanvas.current.setTextSize(textSizeRef.current)
   }, [props.textSize])
-
   useEffect(() => {
     phylocanvas.current.showLabels = props.labels
     phylocanvas.current.alignLabels = props.align
@@ -143,34 +140,46 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.draw()
   }, [props.labels, props.align, props.lineWidth])
 
+  // update and redraw when cluster size/distance changes
+  /*
+    TODO: Highlighting clusters is overwritten by appended metadata. Multiple clusters next to eachother are
+    also ambiguous. Update in phylocanvas pairwise ops plugin.
+  */
   useEffect(() => {
-    phylocanvas.current.pairwiseOps.clusterDistance = props.clusterDistance
-    phylocanvas.current.pairwiseOps.clusterSamples = props.clusterSamples
-    phylocanvas.current.pairwiseOps.clusterDraw = true
-    phylocanvas.current.draw()
+    if (phylocanvas.current.pairwiseOps) {
+      phylocanvas.current.pairwiseOps.clusterDistance = props.clusterDistance
+      phylocanvas.current.pairwiseOps.clusterSamples = props.clusterSamples
+      phylocanvas.current.pairwiseOps.clusterDraw = true
+      phylocanvas.current.draw()
+    }
   }, [props.clusterDistance, props.clusterSamples])
 
+  // for orientation of phylocanvas stretch, horizontal, vertical, or both
   useEffect(() => {
     phylocanvas.current.stretchOrientation.orientation = props.stretchOrientation
   }, [props.stretchOrientation])
 
+  // return PNG of immediate canvas draw (for export)
   useEffect(() => {
     if (props.triggerCanvasCallback && props.triggerCanvasCallback === true) {
       props.exportCanvasCallback(phylocanvas.current.canvas.canvas.toDataURL('image/png'))
     }
   }, [props.triggerCanvasCallback])
 
+  // append metadata to each branch label
   useEffect(() => {
-    for (let i in props.branchesData) {
-      let additionalMetadata = [phylocanvas.current.branches[props.branchesData[i]["Sample"]]["id"]]
-      phylocanvas.current.branches[props.branchesData[i]["Sample"]].clearMetadata()
-      for (let j in props.metadataLabels) {
-        additionalMetadata.push(props.branchesData[i][props.metadataLabels[j]])
-        phylocanvas.current.branches[props.branchesData[i]["Sample"]].appendMetadata(props.branchesData[i][props.metadataLabels[j]])
+    if (phylocanvas.current.treeStats) {
+      for (let i in props.branchesData) {
+        let additionalMetadata = [phylocanvas.current.branches[props.branchesData[i]["Sample"]]["id"]]
+        phylocanvas.current.branches[props.branchesData[i]["Sample"]].clearMetadata()
+        for (let j in props.metadataLabels) {
+          additionalMetadata.push(props.branchesData[i][props.metadataLabels[j]])
+          phylocanvas.current.branches[props.branchesData[i]["Sample"]].appendMetadata(props.branchesData[i][props.metadataLabels[j]])
+        }
+        phylocanvas.current.branches[props.branchesData[i]["Sample"]]["label"] = additionalMetadata.join("_")
       }
-      phylocanvas.current.branches[props.branchesData[i]["Sample"]]["label"] = additionalMetadata.join("_")
+      phylocanvas.current.draw()
     }
-    phylocanvas.current.draw()
   }, [props.metadataLabels])
 
   return (

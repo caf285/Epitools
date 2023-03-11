@@ -38,6 +38,9 @@ function properZoom() {
       oldHeight = Math.max(this.branches[branch]["center" + branchScalingAxis], oldHeight)
       this.branches[branch]["center" + branchScalingAxis] *= Math.pow(this.branchScalingStep, sign)
       newHeight = Math.max(this.branches[branch]["center" + branchScalingAxis], newHeight)
+      if (this.branches[branch]["parent"] == null) {  // hot fix for graphical glitch
+        this.branches[branch]["starty"] *= Math.pow(this.branchScalingStep, sign)
+      }
     }
     this.farthestNodeFromRootY *= Math.pow(this.branchScalingStep, sign)
 
@@ -51,6 +54,7 @@ function properZoom() {
   } else {
     this.smoothZoom(sign, this._point);
   }
+  console.log(this)
 }
 
 export default function plugin(decorate) {
@@ -61,7 +65,7 @@ export default function plugin(decorate) {
     return tree;
   });
   decorate(Tree, 'scroll', function (delegate, args) {
-    //delegate.apply(this, args);
+    //delegate.apply(this, args); // comment out to completely override scroll
     if (this.stretchOrientation.active) {
       properZoom.apply(this);
     }

@@ -18,6 +18,7 @@ function PhylocanvasView() {
   const [metadataLabels, setMetadataLabels] = useState([])
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [getTree, setGetTree] = useState()
+  const [mutationsJson, setMutationsJson] = useState()
 
   // handsontable
   const [hotHeight, setHOTHeight] = useState(["300"])
@@ -32,17 +33,25 @@ function PhylocanvasView() {
   const [getImage, setGetImage] = useState(false)
   const [uploadScreen, setUploadScreen] = useState(false);
 
+  // covid lineage
+  const [covidDateRangeSlider, setCovidDateRangeSlider] = useState([720, 1080]);
+  const [covidDateRange, setCovidDateRange] = useState([new Date(new Date() - (1080 - covidDateRangeSlider[0]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0], new Date(new Date() - (1080 - covidDateRangeSlider[1]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0]])
+  const [covidDateRangeForms, setCovidDateRangeForms] = useState("")
+
+  // gas lineage
+  const [gasDateRangeSlider, setGasDateRangeSlider] = useState([1350, 1440]);
+  const [gasDateRange, setGasDateRange] = useState([new Date(new Date() - (1440 - gasDateRangeSlider[0]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0], new Date(new Date() - (1440 - gasDateRangeSlider[1]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0]])
+  const [gasDateRangeForms, setGasDateRangeForms] = useState("")
+
   // other
-  const [dateSliderRange, setDateSliderRange] = useState([90, 180]);
-  const [dateRange, setDateRange] = useState([new Date(new Date() - (180 - dateSliderRange[0]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0], new Date(new Date() - (180 - dateSliderRange[1]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0]])
-  const [dateRangeForms, setDateRangeForms] = useState("")
   const [metadataForms, setMetadataForms] = useState("")
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
   useEffect(() => {
     setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
     setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
-    dateRangeRequest("Group A Strep", dateRange[0], dateRange[1]) // fill GAS Lineage buttons on load
+    covidDateRangeRequest("SARS-CoV-2", covidDateRange[0], covidDateRange[1]) // fill covid Lineage buttons on load
+    gasDateRangeRequest("Group A Strep", gasDateRange[0], gasDateRange[1]) // fill GAS Lineage buttons on load
   }, [])
 
   useEffect(() => {
@@ -50,6 +59,10 @@ function PhylocanvasView() {
     //console.log(branchesRef.current)
     mysqlRequest(branchesRef.current)
   }, [branches])
+
+  useEffect(() => {
+    console.log(mutationsJson)
+  }, [mutationsJson])
 
   // fill metadata buttons
   useEffect(() => {
@@ -146,8 +159,8 @@ function PhylocanvasView() {
       .catch(ERR => window.alert(ERR))
   }
 
-  // lineage
-  async function lineageRequest(data = "", url = "lineage", date1=dateRange[0], date2=dateRange[1]) {
+  // covid lineage request
+  async function covidLineageRequest(data = "", url = "lineage", date1=covidDateRange[0], date2=covidDateRange[1]) {
     console.log("data", data)
     await fetch(host.current + url, {
       method: 'POST',
@@ -174,7 +187,63 @@ function PhylocanvasView() {
       .catch(ERR => window.alert(ERR))
   }
 
-  // samples
+  // gas lineage request
+  async function gasLineageRequest(data = "", url = "lineage", date1=gasDateRange[0], date2=gasDateRange[1]) {
+    console.log("data", data)
+    await fetch(host.current + url, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        lineage: data,
+        date1: date1,
+        date2: date2,
+      })
+    })
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status + " " + response.statusText);
+        }
+        return response.text()
+      })
+      .then(data => {
+        if (data) {
+          setNwk(data)
+        } else {
+          console.log("no data")
+        }
+      })
+      .catch(ERR => window.alert(ERR))
+  }
+
+  // request Augur Ancestral
+  async function mutationsRequest(nwk = "", samples = [], url = "mutations") {
+    console.log("nwk", nwk)
+    console.log("samples", samples)
+    await fetch(host.current + url, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        nwk: nwk,
+        samples: samples,
+      })
+    })
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status + " " + response.statusText);
+        }
+        return response.json()
+      })
+      .then(data => {
+        if (data) {
+          setMutationsJson(data)
+        } else {
+          console.log("no data")
+        }
+      })
+      .catch(ERR => window.alert(ERR))
+  }
+
+  // rebuild tree from selected samples
   async function samplesRequest(data = "", url = "samples") {
     console.log("data", data)
     await fetch(host.current + url, {
@@ -200,8 +269,8 @@ function PhylocanvasView() {
       .catch(ERR => window.alert(ERR))
   }
 
-  // dates
-  async function dateRangeRequest(pathogen, date1, date2, url = "dateRange") {
+  // covid date range query
+  async function covidDateRangeRequest(pathogen, date1, date2, url = "dateRange") {
     console.log(pathogen, date1, date2)
     await fetch(host.current + url, {
       method: 'POST',
@@ -220,7 +289,7 @@ function PhylocanvasView() {
       })
       .then(data => {
         if (data) {
-          updateDateRangeForms(data)
+          updateCovidDateRangeForms(data)
         } else {
           console.log("no data")
         }
@@ -228,6 +297,33 @@ function PhylocanvasView() {
       .catch(ERR => window.alert(ERR))
   }
 
+  // gas date range query
+  async function gasDateRangeRequest(pathogen, date1, date2, url = "dateRange") {
+    console.log(pathogen, date1, date2)
+    await fetch(host.current + url, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        pathogen: pathogen,
+        date1: date1,
+        date2: date2,
+      })
+    })
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status + " " + response.statusText);
+        }
+        return response.json()
+      })
+      .then(data => {
+        if (data) {
+          updateGasDateRangeForms(data)
+        } else {
+          console.log("no data")
+        }
+      })
+      .catch(ERR => window.alert(ERR))
+  }
 
   // file i/o
   const handleFileInput = (e) => {
@@ -302,28 +398,50 @@ function PhylocanvasView() {
     console.log(metadataLabels)
   }
 
-  // date range slider for adjusting gas buttons
-  const handleDateRangeSlider = (event: Event, newValue: number | number[]) => {
-    setDateSliderRange(newValue);
+  // date range slider for adjusting covid buttons
+  const handleCovidDateRangeSlider = (event: Event, newValue: number | number[]) => {
+    setCovidDateRangeSlider(newValue);
     let today = new Date()
-    let date0 = new Date(today - (180 - dateSliderRange[0]) * (1000 * 60 * 60 * 24))
-    let date1 = new Date(today - (180 - dateSliderRange[1]) * (1000 * 60 * 60 * 24))
-    setDateRange([date0.toISOString().split("T")[0], date1.toISOString().split("T")[0]])
-    dateRangeRequest("Group A Strep", dateRange[0], dateRange[1])
+    let date0 = new Date(today - (1080 - covidDateRangeSlider[0]) * (1000 * 60 * 60 * 24))
+    let date1 = new Date(today - (1080 - covidDateRangeSlider[1]) * (1000 * 60 * 60 * 24))
+    setCovidDateRange([date0.toISOString().split("T")[0], date1.toISOString().split("T")[0]])
+    covidDateRangeRequest("SARS-CoV-2", covidDateRange[0], covidDateRange[1])
   };
 
-  function updateDateRangeForms(data) {
-    let appendDateRangeDiv = document.getElementsByClassName("appendDateRangeDiv")
+  // date range slider for adjusting gas buttons
+  const handleGasDateRangeSlider = (event: Event, newValue: number | number[]) => {
+    setGasDateRangeSlider(newValue);
+    let today = new Date()
+    let date0 = new Date(today - (1440 - gasDateRangeSlider[0]) * (1000 * 60 * 60 * 24))
+    let date1 = new Date(today - (1440 - gasDateRangeSlider[1]) * (1000 * 60 * 60 * 24))
+    setGasDateRange([date0.toISOString().split("T")[0], date1.toISOString().split("T")[0]])
+    gasDateRangeRequest("Group A Strep", gasDateRange[0], gasDateRange[1])
+  };
+
+  function updateCovidDateRangeForms(data) {
+    let newDateRangeForms = []
+    if (data) {
+      console.log(data)
+      for (let line of data.filter(x => x.Count >= 4 && x.Lineage)) {
+        newDateRangeForms.push(
+          <button onClick={() => covidLineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
+        )
+      }
+    }
+    setCovidDateRangeForms(newDateRangeForms)
+  };
+
+  function updateGasDateRangeForms(data) {
     let newDateRangeForms = []
     if (data) {
       console.log(data)
       for (let line of data.filter(x => x.Count >= 4 && x.Lineage.includes("emm"))) {
         newDateRangeForms.push(
-          <button onClick={() => lineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
+          <button onClick={() => gasLineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
         )
       }
     }
-    setDateRangeForms(newDateRangeForms)
+    setGasDateRangeForms(newDateRangeForms)
   };
 
   // update HOT and Phylocanvas window sizes
@@ -345,22 +463,21 @@ function PhylocanvasView() {
         {/* build new phylocanvas and table from current selection */}
         <SvgButton onClick={() => {samplesRequest(importPhylocanvasSelection)}} label="build from selection" />
 
-        {/* covid lineage buttons */}
+        {/* augments tre with mutations  */}
+        <SvgButton onClick={() => {mutationsRequest(nwk, branches)}} label="get mutations" />
+
+        {/* new covid lineage buttons */}
         <SvgButton label="load covid lineage" drop={
           <div style={{display: "flex", flexFlow: "column"}}>
-            <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
-            <button onClick={() => lineageRequest("BA.2")}>BA.2</button>
-            <button onClick={() => lineageRequest("BA.2.18")}>BA.2.18</button>
-            <button onClick={() => lineageRequest("BA.2.12.1")}>BA.2.12.1</button>
-            <button onClick={() => lineageRequest("BA.2.3")}>BA.2.3</button>
-            <button onClick={() => lineageRequest("BA.2.9")}>BA.2.9</button>
-            <button onClick={() => lineageRequest("BA.4")}>BA.4</button>
-            <button onClick={() => lineageRequest("BA.4.1")}>BA.4.1</button>
-            <button onClick={() => lineageRequest("BA.5")}>BA.5</button>
-            <button onClick={() => lineageRequest("BA.5.1")}>BA.5.1</button>
-            <button onClick={() => lineageRequest("BA.5.2.1")}>BA.5.2.1</button>
-            <button onClick={() => lineageRequest("BA.5.5")}>BA.5.5</button>
-            <button onClick={() => lineageRequest("BG.2")}>BG.2</button>
+            <Box sx={{ margin:"5px" }}>
+              <div style={{display: "flex", justifyContent: "center"}}>
+                {new Date(covidDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(covidDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
+              </div>
+              <Slider min={0} step={1} max={1080} value={covidDateRangeSlider} onChange={handleCovidDateRangeSlider} />
+            </Box>
+            <div style={{display: "flex", flexFlow: "column"}}>
+              {covidDateRangeForms}
+            </div>
           </div>
         } />
 
@@ -369,12 +486,12 @@ function PhylocanvasView() {
           <div style={{display: "flex", flexFlow: "column"}}>
             <Box sx={{ margin:"5px" }}>
               <div style={{display: "flex", justifyContent: "center"}}>
-                {new Date(dateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(dateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
+                {new Date(gasDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(gasDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
               </div>
-              <Slider min={0} step={1} max={180} value={dateSliderRange} onChange={handleDateRangeSlider} />
+              <Slider min={0} step={1} max={1440} value={gasDateRangeSlider} onChange={handleGasDateRangeSlider} />
             </Box>
-            <div style={{display: "flex", flexFlow: "column"}} className="appendDateRangeDiv">
-              {dateRangeForms}
+            <div style={{display: "flex", flexFlow: "column"}}>
+              {gasDateRangeForms}
             </div>
           </div>
         } />

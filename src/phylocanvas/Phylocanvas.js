@@ -110,48 +110,6 @@ function PhylocanvasView(props) {
           onClick={() => cycleOrientation()}
         />
       </div>
-      {/*
-      <h5>SVG:</h5>
-      <SvgButton onClick={() => setType("radial")} svg="treeRadial" />
-      <SvgButton onClick={() => setType("rectangular")} svg="treeRectangular" />
-      <SvgButton onClick={() => setType("circular")} svg="treeCircular" />
-      <SvgButton onClick={() => setType("diagonal")} svg="treeDiagonal" />
-      <SvgButton onClick={() => setType("hierarchical")} svg="treeHierarchical" />
-      <SvgButton svg="menuSettings" />
-      <SvgButton svg="menuContext" />
-      <h5>SVG With Label:</h5>
-      <SvgButton onClick={() => setType("radial")} svg="treeRadial" label="Radial" />
-      <SvgButton onClick={() => setType("rectangular")} svg="treeRectangular" label="Rectangular" />
-      <SvgButton onClick={() => setType("circular")} svg="treeCircular" label="Circular" />
-      <SvgButton onClick={() => setType("diagonal")} svg="treeDiagonal" label="Diagonal" />
-      <SvgButton onClick={() => setType("hierarchical")} svg="treeHierarchical" label="Hierarchical" />
-      <SvgButton svg="menuSettings" label="Settings Menu" />
-      <SvgButton svg="menuContext" label="Context Menu" />
-      <h5>SVG With Drop:</h5>
-      <SvgButton onClick={() => setType("radial")} svg="treeRadial" drop={true} />
-      <SvgButton onClick={() => setType("rectangular")} svg="treeRectangular" drop={true} />
-      <SvgButton onClick={() => setType("circular")} svg="treeCircular" drop={true} />
-      <SvgButton onClick={() => setType("diagonal")} svg="treeDiagonal" drop={true} />
-      <SvgButton onClick={() => setType("hierarchical")} svg="treeHierarchical" drop={true} />
-      <SvgButton svg="menuSettings" drop={true} />
-      <SvgButton svg="menuContext" drop={true} />
-      <h5>SVG With Both:</h5>
-      <SvgButton onClick={() => setType("radial")} svg="treeRadial" label="Radial" drop={true} />
-      <SvgButton onClick={() => setType("rectangular")} svg="treeRectangular" label="Rectangular" drop={true} />
-      <SvgButton onClick={() => setType("circular")} svg="treeCircular" label="Circular" drop={true} />
-      <SvgButton onClick={() => setType("diagonal")} svg="treeDiagonal" label="Diagonal" drop={true} />
-      <SvgButton onClick={() => setType("hierarchical")} svg="treeHierarchical" label="Hierarchical" drop={true} />
-      <SvgButton svg="menuSettings" label="Settings Menu" drop={true} />
-      <SvgButton svg="menuContext" label="Context Menu" drop={true} />
-      <h5>No SVG:</h5>
-      <SvgButton onClick={() => setType("radial")} label="Radial" drop={true} />
-      <SvgButton onClick={() => setType("rectangular")} label="Rectangular" drop={true} />
-      <SvgButton onClick={() => setType("circular")} label="Circular" drop={true} />
-      <SvgButton onClick={() => setType("diagonal")} label="Diagonal" drop={true} />
-      <SvgButton onClick={() => setType("hierarchical")} label="Hierarchical" drop={true} />
-      <SvgButton label="Settings Menu" drop={true} />
-      <SvgButton label="Context Menu" drop={true} />
-      */}
     </div>
   )
 }

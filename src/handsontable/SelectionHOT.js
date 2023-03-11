@@ -29,15 +29,15 @@ function SelectionHOT(props) {
     var NameColumn = -1
 
 
-    //console.log("%c HOT: ", "color: teal", hot)
+/*    //console.log("%c HOT: ", "color: teal", hot)
 
     useEffect(() => {
-        console.log("%c sdata: ", "color: pink", sdata);
-        checkSdata(0, sdata);
+        //console.log("%c sdata: ", "color: pink", sdata);
+        //checkSdata(0, sdata);
         setNameColumn();
         // eslint-disable-next-line
     }, [sdata, checkSdata])
-
+*/
     // initialize table
     // eslint-disable-next-line
     useEffect(() => {
@@ -123,19 +123,23 @@ function SelectionHOT(props) {
             // if on the list, highlight,
             //console.log("%c Is this on the list? ", 'color: brown', hot.current.getDataAtCell(k, NameColumn), props.importSelection)
             if (isInImport(hot.current.getDataAtCell(k, NameColumn), props.importSelection)) {
-                for (let i = 0; i < hot.current.countCols(); i++) {
-                    hot.current.setCellMeta(k, i, 'className', 'MyRow')
+                if (!hot.current.getCellMeta(k, 0).className || hot.current.getCellMeta(k, 0).className == '') {
+                  for (let i = 0; i < hot.current.countCols(); i++) {
+                      hot.current.setCellMeta(k, i, 'className', 'MyRow')
+                  }
                 }
                 //console.log("%c Highlighting:  ", 'color: blue', hot.current.getDataAtCell(k, NameColumn))
             } else {
                 // if not on the list clear highlight
-                for (var j = 0; j < hot.current.countCols(); j++) {
-                    hot.current.setCellMeta(k, j, 'className', '')
+                if (hot.current.getCellMeta(k, 0).className == 'MyRow') {
+                  for (var j = 0; j < hot.current.countCols(); j++) {
+                      hot.current.setCellMeta(k, j, 'className', '')
+                  }
                 }
                 //console.log("%c Clearing Highlighting:  ", 'color: red', hot.current.getDataAtCell(k, NameColumn))
             }
 
-            hot.current.render()
+            //hot.current.render()
 
         }
         // make sdata the new list.
