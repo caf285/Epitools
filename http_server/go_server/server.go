@@ -265,25 +265,13 @@ func samplesHandler(w http.ResponseWriter, r *http.Request) {
 /*** get and return Augur Ancestral json ***/
 func mutationsHandler(w http.ResponseWriter, r *http.Request) {
 
-  /*cmd, err := exec.Command("pwd").Output()
-  testDir, err := os.Getwd()
-  test := map[int]string{1:string(cmd), 2:string(testDir)}
-  newTest, err := json.Marshal(test)
-  fmt.Fprintln(w, string(newTest))
-  return*/
-
+  ///// decode request
   log.Printf("mutations request ...")
   type mutationsBodyStruct struct {
     Nwk string
     Samples []string
   }
 
-  type samplesResultStruct struct {
-    Id string
-    Sample string
-  }
-
-  /* decode request */
   request := mutationsBodyStruct{}
   log.Printf("decode")
   err := json.NewDecoder(r.Body).Decode(&request)
@@ -291,9 +279,13 @@ func mutationsHandler(w http.ResponseWriter, r *http.Request) {
     panic(err.Error())
   }
 
-  /* get alignment */
-  db, err := sql.Open("mysql", "epitools:epiTools1-2-3-4-5@tcp(127.0.0.1:3306)/epitools")
+  ///// get alignment
+  type samplesResultStruct struct {
+    Id string
+    Sample string
+  }
 
+  db, err := sql.Open("mysql", "epitools:epiTools1-2-3-4-5@tcp(127.0.0.1:3306)/epitools")
   log.Printf("results")
   log.Printf("SELECT id, sample FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Samples, "','") + "')")
   results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Samples, "','") + "')")
@@ -327,13 +319,8 @@ func mutationsHandler(w http.ResponseWriter, r *http.Request) {
   }
   log.Printf(strconv.Itoa(len(fasta)) + " results with sequences")
 
-  /* write request to file */
+  ///// write request to file
   dir := "/var/www/pathogen-intelligence.tgen.org/epitools/http_server/go_server/temp/"
-  //dir, err := os.Getwd()
-  //if err != nil {
-  //  panic(err.Error())
-  //}
-  //dir += "/temp/"
   err = os.WriteFile(dir + "test.nwk", []byte(request.Nwk), 0644)
   if err != nil {
     panic(err.Error())
@@ -343,31 +330,72 @@ func mutationsHandler(w http.ResponseWriter, r *http.Request) {
     panic(err.Error())
   }
 
+  ///// execute augur
+  log.Printf("executing augur ...")
   _, err = exec.Command("/var/www/pathogen-intelligence.tgen.org/epitools/http_server/go_server/test.bash").Output()
-  
+  if err != nil {
+    panic(err.Error())
+  }
+  log.Printf("augur complete")
 
+  ///// read results as json format
+  log.Printf("reading augur results ...")
   resultsJson, err := ioutil.ReadFile(dir + "test.json")
   if err != nil {
     panic(err.Error())
   }
 
-  var newJson interface{}
+  type Node struct {
+    Muts []string
+  }
 
-  left := strings.Index(string(resultsJson), "\"nodes\":")
+  var nodes map[string]Node
+
+  left := strings.Index(string(resultsJson), "\"nodes\":") + 8
   right := strings.Index(string(resultsJson), "\"reference\":")
   right = strings.LastIndex(string(resultsJson[:right]), ",")
-  log.Printf(string(strconv.Itoa(left)), strconv.Itoa(right))
 
-  var adjustedJson []byte
-  adjustedJson = append(adjustedJson, '{')
-  adjustedJson = append(adjustedJson, string(resultsJson[left:right])...)
-  adjustedJson = append(adjustedJson, '}')
-  err = json.Unmarshal(adjustedJson, &newJson)
+  err = json.Unmarshal(resultsJson[left:right], &nodes)
   if err != nil {
     panic(err.Error())
   }
 
-  outputJson, err := json.Marshal(newJson)
+  ///// get homoplastic mutations count
+  log.Printf("getting homoplastic count ...")
+  mutationsCount := make(map[string]int)
+  var mutationsList []string
+  for _, v := range nodes {
+    mutationsList = append(mutationsList, v.Muts ...)
+  }
+
+  for _, v := range mutationsList {
+    _, exist := mutationsCount[v]
+    if exist {
+      mutationsCount[v] += 1
+    } else {
+      mutationsCount[v] = 1
+    }
+  }
+
+  ///// build homoplastic mutations return obj
+  log.Printf("building mutations hash ...")
+  mutationsHash := make(map[string][]string)
+  for k, v := range nodes {
+    for i := range v.Muts {
+      if mutationsCount[v.Muts[i]] > 1 {
+        _, exist := mutationsHash[k]
+        if exist {
+          mutationsHash[k] = append(mutationsHash[k], v.Muts[i])
+        } else {
+          mutationsHash[k] = []string{}
+          mutationsHash[k] = append(mutationsHash[k], v.Muts[i])
+        }
+      }
+    }
+  }
+
+  ///// return homoplastic mutations
+  outputJson, err := json.Marshal(mutationsHash)
   if err != nil {
     panic(err.Error())
   }

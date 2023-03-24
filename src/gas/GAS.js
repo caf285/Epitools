@@ -7,6 +7,7 @@ import SplitPane from "react-split-pane";
 import UploadScreen from "../uploadScreen/uploadScreen"
 import Slider from "@mui/material/Slider";
 import Box from '@mui/material/Box';
+import ReactLoading from "react-loading";
 import './style.css'
 
 function PhylocanvasView() {
@@ -44,6 +45,7 @@ function PhylocanvasView() {
   const [gasDateRangeForms, setGasDateRangeForms] = useState("")
 
   // other
+  const [loadingScreen, setLoadingScreen] = useState("hidden")
   const [metadataForms, setMetadataForms] = useState("")
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
@@ -109,6 +111,7 @@ function PhylocanvasView() {
   // database query post request
   async function mysqlRequest(data = "") {
     console.log("requestData:", data)
+    setLoadingScreen("visible")
     //const response = await fetch("/go-epitools/mysql", {
     await fetch(host.current + "mysql", {
       //console.log("hello new build")
@@ -120,6 +123,7 @@ function PhylocanvasView() {
       })
     })
       .then(response => {
+        setLoadingScreen("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -141,6 +145,7 @@ function PhylocanvasView() {
   // neighborjoin post request
   async function neighborJoinRequest(data = "") {
     //const response = await fetch("/go-epitools/neighborjoin", {
+    setLoadingScreen("visible")
     await fetch(host.current + "neighborjoin", {
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/neighborjoin", {
       method: 'POST',
@@ -150,6 +155,7 @@ function PhylocanvasView() {
       })
     })
       .then(response => {
+        setLoadingScreen("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -162,6 +168,7 @@ function PhylocanvasView() {
   // covid lineage request
   async function covidLineageRequest(data = "", url = "lineage", date1=covidDateRange[0], date2=covidDateRange[1]) {
     console.log("data", data)
+    setLoadingScreen("visible")
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -172,6 +179,7 @@ function PhylocanvasView() {
       })
     })
       .then(response => {
+        setLoadingScreen("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -190,6 +198,7 @@ function PhylocanvasView() {
   // gas lineage request
   async function gasLineageRequest(data = "", url = "lineage", date1=gasDateRange[0], date2=gasDateRange[1]) {
     console.log("data", data)
+    setLoadingScreen("visible")
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -200,6 +209,7 @@ function PhylocanvasView() {
       })
     })
       .then(response => {
+        setLoadingScreen("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -219,6 +229,7 @@ function PhylocanvasView() {
   async function mutationsRequest(nwk = "", samples = [], url = "mutations") {
     console.log("nwk", nwk)
     console.log("samples", samples)
+    setLoadingScreen("visible")
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -228,6 +239,7 @@ function PhylocanvasView() {
       })
     })
       .then(response => {
+        setLoadingScreen("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -246,6 +258,7 @@ function PhylocanvasView() {
   // rebuild tree from selected samples
   async function samplesRequest(data = "", url = "samples") {
     console.log("data", data)
+    setLoadingScreen("visible")
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -254,6 +267,7 @@ function PhylocanvasView() {
       })
     })
       .then(response => {
+        setLoadingScreen("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -452,6 +466,26 @@ function PhylocanvasView() {
 
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
+      <div style={{ position: "relative", visibility: loadingScreen }}>
+        <div style={{ position: "absolute", height: "100vh", width: "100vw", backgroundColor: "rgba(255, 255, 255, 0.75)", zIndex: "1000" }}></div>
+        <div style={{ position: "absolute", left: "50%", top: "50vh", zIndex: "1000" }}>
+          <div style={{ position: "relative", left: "-25px", top: "-75px" }}>
+            <ReactLoading type="spin" color="#0000FF" height={100} width={50} />
+          </div>
+        </div>
+      </div>
+      
+
+      {/* Upload splash screen. Appear during database requests}
+      <div style={{ position: "absolute"}}>
+        <div style={{height: "100%", backgroundColor: "rgba(255,255,255,0.8)", zIndex: "1000"}}></div>
+        <div style={{position: "absolute", left: "50%", top: "50%", zIndex: "1000"}}>
+          <div style={{position: "relative", left: "-25px", top: "-25px"}}>
+            <ReactLoading type="spin" color="#0000FF" height={100} width={50} />
+          </div>
+        </div>
+      </div>
+
       {/* TODO: fix jonathon upload button */}
       {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
