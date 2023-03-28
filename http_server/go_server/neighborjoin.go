@@ -78,14 +78,14 @@ func getBest(tree map[int]map[int]float64, tempScore float64, tempPath []int, be
   return bestPath
 }
 
-func getNewick(names []string, tree map[int]map[int]float64, path []int, score float64) string {
+func getNewick(names []string, tree map[int]map[int]float64, path []int, nodeCount *int, score float64) string {
   if path[len(path) - 1] < len(names) && path[len(path) - 1] >= 0 {
     return names[path[len(path) - 1]] + ":" + strconv.FormatFloat(math.Abs(score), 'f', -1, 64)
   } else if score == 0 {
     thing := []string{}
     for index := range tree[path[len(path) - 1]]{
       if ! indexList(index, path) {
-        thing = append(thing, getNewick(names, tree, append(path, index), tree[path[len(path) - 1]][index]))
+        thing = append(thing, getNewick(names, tree, append(path, index), nodeCount, tree[path[len(path) - 1]][index]))
       }
     }
     return strings.Join(thing, ",")
@@ -93,10 +93,13 @@ func getNewick(names []string, tree map[int]map[int]float64, path []int, score f
     thing := []string{}
     for index := range tree[path[len(path) - 1]]{
       if ! indexList(index, path) {
-        thing = append(thing, getNewick(names, tree, append(path, index), tree[path[len(path) - 1]][index]))
+        thing = append(thing, getNewick(names, tree, append(path, index), nodeCount, tree[path[len(path) - 1]][index]))
       }
     }
-    return "(" + strings.Join(thing, ",") + "):" + strconv.FormatFloat(math.Abs(score), 'f', -1, 64)
+    tempCount := "0000000" + strconv.Itoa(*nodeCount)
+    tempCount = tempCount[len(tempCount)-7:]
+    *nodeCount += 1
+    return "(" + strings.Join(thing, ",") + ")NODE_" + tempCount + ":" + strconv.FormatFloat(math.Abs(score), 'f', -1, 64)
   }
 }
 
@@ -279,7 +282,12 @@ func Neighborjoin(f string) string {
 
   // print nwk
   path := []int{-1}
-  out := "(" + getNewick(names, tree, path, 0) + "):0;"
+  nodeCount := 0
+  tempCount := "0000000" + strconv.Itoa(nodeCount)
+  tempCount = tempCount[len(tempCount)-7:]
+  nodeCount += 1
+
+  out := "(" + getNewick(names, tree, path, &nodeCount, 0) + ")NODE_" + tempCount + ":0;"
 
   return out
 }

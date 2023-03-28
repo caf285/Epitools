@@ -11,6 +11,7 @@ import ReactLoading from "react-loading";
 import './style.css'
 
 function PhylocanvasView() {
+  ///// set variables
   // phylocanvas
   const [nwk, setNwk] = useState("(A:1)B;")
   const [branches, setBranches] = useState([])
@@ -49,6 +50,7 @@ function PhylocanvasView() {
   const [metadataForms, setMetadataForms] = useState("")
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
+  //====================(  ) 
   useEffect(() => {
     setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
     setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
@@ -58,7 +60,6 @@ function PhylocanvasView() {
 
   useEffect(() => {
     branchesRef.current = branches
-    //console.log(branchesRef.current)
     mysqlRequest(branchesRef.current)
   }, [branches])
 
@@ -66,7 +67,7 @@ function PhylocanvasView() {
     console.log(mutationsJson)
   }, [mutationsJson])
 
-  // fill metadata buttons
+  //====================( fill metadata buttons )
   useEffect(() => {
     branchesDataRef.current = branchesData
     let appendMetadataDiv = document.getElementsByClassName("appendMetadataDiv")
@@ -108,6 +109,7 @@ function PhylocanvasView() {
     return elementRef.current?.clientHeight - topPaneHeight
   }
 
+  //====================( database queries )
   // database query post request
   async function mysqlRequest(data = "") {
     console.log("requestData:", data)
@@ -339,6 +341,7 @@ function PhylocanvasView() {
       .catch(ERR => window.alert(ERR))
   }
 
+  //====================( import/export )
   // file i/o
   const handleFileInput = (e) => {
     let file = e.target.files[0]
@@ -401,6 +404,7 @@ function PhylocanvasView() {
     a.parentNode.removeChild(a);
   }
 
+  //====================( button drivers )
   // append metadata to phylocanvas
   function appendMetadataHandler() {
     let checked = []
@@ -432,10 +436,16 @@ function PhylocanvasView() {
     gasDateRangeRequest("Group A Strep", gasDateRange[0], gasDateRange[1])
   };
 
+  // sort array or maps by 'Lineage'
+  function sortForms(data) {
+    data = data.sort((a, b) => {return a.Lineage > b.Lineage})
+    return data
+  }
+
   function updateCovidDateRangeForms(data) {
     let newDateRangeForms = []
     if (data) {
-      console.log(data)
+      data = sortForms(data)
       for (let line of data.filter(x => x.Count >= 4 && x.Lineage)) {
         newDateRangeForms.push(
           <button onClick={() => covidLineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
@@ -448,7 +458,7 @@ function PhylocanvasView() {
   function updateGasDateRangeForms(data) {
     let newDateRangeForms = []
     if (data) {
-      console.log(data)
+      data = sortForms(data)
       for (let line of data.filter(x => x.Count >= 4 && x.Lineage.includes("emm"))) {
         newDateRangeForms.push(
           <button onClick={() => gasLineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
@@ -466,6 +476,7 @@ function PhylocanvasView() {
 
   return (
     <div style={{ height: "100%" }} ref={elementRef}>
+      {/* loading splash screen */}
       <div style={{ position: "relative", visibility: loadingScreen }}>
         <div style={{ position: "absolute", height: "100vh", width: "100vw", backgroundColor: "rgba(255, 255, 255, 0.75)", zIndex: "1000" }}></div>
         <div style={{ position: "absolute", left: "50%", top: "50vh", zIndex: "1000" }}>
@@ -475,101 +486,94 @@ function PhylocanvasView() {
         </div>
       </div>
       
-
-      {/* Upload splash screen. Appear during database requests}
-      <div style={{ position: "absolute"}}>
-        <div style={{height: "100%", backgroundColor: "rgba(255,255,255,0.8)", zIndex: "1000"}}></div>
-        <div style={{position: "absolute", left: "50%", top: "50%", zIndex: "1000"}}>
-          <div style={{position: "relative", left: "-25px", top: "-25px"}}>
-            <ReactLoading type="spin" color="#0000FF" height={100} width={50} />
-          </div>
-        </div>
-      </div>
-
       {/* TODO: fix jonathon upload button */}
       {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
       <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
-      <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
 
-        {/* initialize phylocanvas file upload */}
-        <SvgButton onClick={e => fileInput.current.click()} label="import data" drop={true} />
+      {/* buttons */}
+      <div style={{ position: "relative"}}>
+        <div style={{ position: "absolute", display: "flex", flexFlow: "row"}}>
 
-        {/* build new phylocanvas and table from current selection */}
-        <SvgButton onClick={() => {samplesRequest(importPhylocanvasSelection)}} label="build from selection" />
+          {/* initialize phylocanvas file upload */}
+          <SvgButton onClick={e => fileInput.current.click()} label="import data" drop={true} />
 
-        {/* augments tre with mutations  */}
-        <SvgButton onClick={() => {mutationsRequest(nwk, branches)}} label="get mutations" />
+          {/* build new phylocanvas and table from current selection */}
+          <SvgButton onClick={() => {samplesRequest(importPhylocanvasSelection)}} label="build from selection" />
 
-        {/* new covid lineage buttons */}
-        <SvgButton label="load covid lineage" drop={
-          <div style={{display: "flex", flexFlow: "column"}}>
-            <Box sx={{ margin:"5px" }}>
-              <div style={{display: "flex", justifyContent: "center"}}>
-                {new Date(covidDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(covidDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
-              </div>
-              <Slider min={0} step={1} max={1080} value={covidDateRangeSlider} onChange={handleCovidDateRangeSlider} />
-            </Box>
+          {/* augments tre with mutations  */}
+          <SvgButton onClick={() => {mutationsRequest(nwk, branches)}} label="get mutations" />
+
+          {/* new covid lineage buttons */}
+          <SvgButton label="load covid lineage" drop={
             <div style={{display: "flex", flexFlow: "column"}}>
-              {covidDateRangeForms}
-            </div>
-          </div>
-        } />
-
-        {/* gas lineage buttons */}
-        <SvgButton label="load gas lineage" drop={
-          <div style={{display: "flex", flexFlow: "column"}}>
-            <Box sx={{ margin:"5px" }}>
-              <div style={{display: "flex", justifyContent: "center"}}>
-                {new Date(gasDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(gasDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
+              <Box sx={{ margin:"5px" }}>
+                <div style={{display: "flex", justifyContent: "center"}}>
+                  {new Date(covidDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(covidDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
+                </div>
+                <Slider min={0} step={1} max={1080} value={covidDateRangeSlider} onChange={handleCovidDateRangeSlider} />
+              </Box>
+              <div style={{display: "flex", flexFlow: "column"}}>
+                {covidDateRangeForms}
               </div>
-              <Slider min={0} step={1} max={1440} value={gasDateRangeSlider} onChange={handleGasDateRangeSlider} />
-            </Box>
-            <div style={{display: "flex", flexFlow: "column"}}>
-              {gasDateRangeForms}
             </div>
-          </div>
-        } />
+          } />
 
-        {/* append metadata buttons */}
-        <SvgButton label="append metadata" drop={
-          <div className="appendMetadataDiv">
-            {metadataForms}
-          </div>
-        } />
+          {/* gas lineage buttons */}
+          <SvgButton label="load gas lineage" drop={
+            <div style={{display: "flex", flexFlow: "column"}}>
+              <Box sx={{ margin:"5px" }}>
+                <div style={{display: "flex", justifyContent: "center"}}>
+                  {new Date(gasDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(gasDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
+                </div>
+                <Slider min={0} step={1} max={1440} value={gasDateRangeSlider} onChange={handleGasDateRangeSlider} />
+              </Box>
+              <div style={{display: "flex", flexFlow: "column"}}>
+                {gasDateRangeForms}
+              </div>
+            </div>
+          } />
 
-        {/* export buttons */}
-        <SvgButton label="export" drop={
-          <div>
-            <div>Tree Export:</div>
-            <SvgButton label="PNG Image Format" onClick={() => {setGetImage(true)}} />
-            <SvgButton label="NWK Text Format" onClick={() => {
-              setGetTree(() => (e) => {
-                let treeString = e.stringRepresentation
-                for (let leaf of e.leaves) {
-                  let label = leaf.label
-                  for (let character of ["(", ")", ":", ";", " "]) {
-                    label = label.replaceAll(character, "_")
+          {/* append metadata buttons */}
+          <SvgButton label="append metadata" drop={
+            <div className="appendMetadataDiv">
+              {metadataForms}
+            </div>
+          } />
+
+          {/* export buttons */}
+          <SvgButton label="export" drop={
+            <div>
+              <div>Tree Export:</div>
+              <SvgButton label="PNG Image Format" onClick={() => {setGetImage(true)}} />
+              <SvgButton label="NWK Text Format" onClick={() => {
+                setGetTree(() => (e) => {
+                  let treeString = e.stringRepresentation
+                  for (let leaf of e.leaves) {
+                    let label = leaf.label
+                    for (let character of ["(", ")", ":", ";", " "]) {
+                      label = label.replaceAll(character, "_")
+                    }
+                    treeString = treeString.replace(leaf.id, label)
                   }
-                  treeString = treeString.replace(leaf.id, label)
-                }
-                download(treeString, "export.nwk")
-                setGetTree()
-              })
-              //console.log(tree)
-            }} />
-            <br />
-            <div>Table Export:</div>
-            <SvgButton label="TSV Text Format"
-              onClick={() => {
-                var exportText = [Object.keys(branchesData[0]).join("\t")]
-                for (var i in branchesData) {
-                  exportText.push(Object.values(branchesData[i]).join("\t"))
-                }
-                download(exportText.join("\n"), "export.tsv", "text")
-              }}
-            />
-          </div>
-        } />
+                  download(treeString, "export.nwk")
+                  setGetTree()
+                })
+                //console.log(tree)
+              }} />
+              <br />
+              <div>Table Export:</div>
+              <SvgButton label="TSV Text Format"
+                onClick={() => {
+                  var exportText = [Object.keys(branchesData[0]).join("\t")]
+                  for (var i in branchesData) {
+                    exportText.push(Object.values(branchesData[i]).join("\t"))
+                  }
+                  download(exportText.join("\n"), "export.tsv", "text")
+                }}
+              />
+            </div>
+          } />
+        </div>
       </div>
 
       {/* split pane drag */}

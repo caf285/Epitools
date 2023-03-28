@@ -379,16 +379,24 @@ func mutationsHandler(w http.ResponseWriter, r *http.Request) {
 
   ///// build homoplastic mutations return obj
   log.Printf("building mutations hash ...")
-  mutationsHash := make(map[string][]string)
+  // {"T204A": {"count": 3, "nodes": ["NODE_00001", "TG123456"]}}
+
+  type mutationsStruct struct {
+    Count int
+    Nodes []string
+  }
+
+  mutationsHash := make(map[string]*mutationsStruct)
   for k, v := range nodes {
     for i := range v.Muts {
       if mutationsCount[v.Muts[i]] > 1 {
-        _, exist := mutationsHash[k]
+        _, exist := mutationsHash[v.Muts[i]]
         if exist {
-          mutationsHash[k] = append(mutationsHash[k], v.Muts[i])
+          mutationsHash[v.Muts[i]].Nodes = append(mutationsHash[v.Muts[i]].Nodes, k)
         } else {
-          mutationsHash[k] = []string{}
-          mutationsHash[k] = append(mutationsHash[k], v.Muts[i])
+          mutationsHash[v.Muts[i]] = &mutationsStruct{}
+          mutationsHash[v.Muts[i]].Count = mutationsCount[v.Muts[i]]
+          mutationsHash[v.Muts[i]].Nodes = append(mutationsHash[v.Muts[i]].Nodes, k)
         }
       }
     }

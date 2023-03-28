@@ -54,7 +54,6 @@ function properZoom() {
   } else {
     this.smoothZoom(sign, this._point);
   }
-  console.log(this)
 }
 
 export default function plugin(decorate) {
