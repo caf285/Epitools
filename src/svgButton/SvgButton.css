@@ -2,29 +2,18 @@
   display: flex;
   flex-flow: column;
   align-items: flex-start;
-  position: relative;
-  margin: 2px;
-  margin-bottom: 5px;
-  z-index: 100;
 }
 
 .SvgButton:hover {
 }
 
 .DropZ {
-  width: 300px;
-  position: relative;
+  min-width: 300px;
+  max-width: 600px;
   background-color: #fbfbfb;
   margin-top: 6px;
   border-radius: 10px;
-  box-shadow: -2px 2px 7px rgba(0,0,0,0.4);
-  padding: 5px !important;
+  box-shadow: -1px 1px 4px rgba(0,0,0,0.4);
   max-height: 50vh;
   overflow-y: scroll;
-}
-
-.DropZ > div {
-  padding: 5px;
-  padding-left: 10px;
-  padding-right: 12px;
 }

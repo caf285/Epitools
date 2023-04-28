@@ -89,16 +89,18 @@ function SvgButton(props) {
           label={label ? label : undefined}
           deleteIcon=<ArrowDropDownIcon />
           onDelete={getDrop()}
-          sx={{backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee", cursor: "pointer"}}}
+          sx={{zIndex: "100", backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee", cursor: "pointer"}}}
           icon={getIcon()}
           clickable
           disableRipple={false}
           centerRipple={false}
         />
         <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility }}>
-          <div style={props.dropAlign && props.dropAlign.toLowerCase() == "right" ? { position: "absolute", right: 0, minWidth: "200px" } : { position: "absolute", left: 0, minWidth: "200px" }}>
-            <div className="DropZ">
-              {props.drop}
+          <div style={props.dropAlign && props.dropAlign.toLowerCase() == "right" ? { zIndex: "101", position: "absolute", minWidth: "200px" } : { zIndex: "101", position: "absolute", minWidth: "200px" }}>
+            <div style={{ position: "relative" }}>
+              <div className="DropZ">
+                {props.drop}
+              </div>
             </div>
           </div>
         </div>

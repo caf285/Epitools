@@ -505,14 +505,14 @@ function PhylocanvasView() {
 
           {/* new covid lineage buttons */}
           <SvgButton label="load covid lineage" drop={
-            <div style={{display: "flex", flexFlow: "column"}}>
-              <Box sx={{ margin:"5px" }}>
-                <div style={{display: "flex", justifyContent: "center"}}>
+            <div style={{ maxHeight: "50vh", overflowY: "scroll", display: "flex", flexFlow: "column" }}>
+              <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
+                <div style={{ display: "flex", justifyContent: "center" }}>
                   {new Date(covidDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(covidDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
                 </div>
                 <Slider min={0} step={1} max={1080} value={covidDateRangeSlider} onChange={handleCovidDateRangeSlider} />
               </Box>
-              <div style={{display: "flex", flexFlow: "column"}}>
+              <div style={{ display: "flex", flexFlow: "column" }}>
                 {covidDateRangeForms}
               </div>
             </div>
@@ -520,8 +520,8 @@ function PhylocanvasView() {
 
           {/* gas lineage buttons */}
           <SvgButton label="load gas lineage" drop={
-            <div style={{display: "flex", flexFlow: "column"}}>
-              <Box sx={{ margin:"5px" }}>
+            <div style={{ maxHeight: "50vh", overflowY: "scroll", display: "flex", flexFlow: "column" }}>
+              <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
                 <div style={{display: "flex", justifyContent: "center"}}>
                   {new Date(gasDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(gasDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
                 </div>
@@ -535,8 +535,10 @@ function PhylocanvasView() {
 
           {/* append metadata buttons */}
           <SvgButton label="append metadata" drop={
-            <div className="appendMetadataDiv">
-              {metadataForms}
+            <div style={{maxHeight: "50vh", overflowY: "scroll" }}>
+              <div className="appendMetadataDiv">
+                {metadataForms}
+              </div>
             </div>
           } />
 

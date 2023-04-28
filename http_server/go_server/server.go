@@ -637,6 +637,7 @@ func main() {
   http.HandleFunc("/emm", emmHandler)
   http.HandleFunc("/pathogen", pathogenHandler)
   http.HandleFunc("/dateRange", dateRangeHandler)
+  http.HandleFunc("/pathogen_list", GetPathogenTypeList)
 
   // spin server at argv[1] or 8888
   var (
