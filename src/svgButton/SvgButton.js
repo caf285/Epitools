@@ -76,7 +76,7 @@ function SvgButton(props) {
     )
   } else {
     return (
-      <div className="SvgButton" onMouseLeave={() => {setVisibility("none")}} style={{ alignItems: props.justify ? props.justify : "flex-start" }}>
+      <div className="SvgButton" onMouseLeave={() => {setVisibility("none")}}>
         <Chip
           onClick={props.onClick ? props.onClick : props.drop ? () => {
             if (visibility === "flex") {
@@ -95,8 +95,8 @@ function SvgButton(props) {
           disableRipple={false}
           centerRipple={false}
         />
-        <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility }}>
-          <div style={props.dropAlign && props.dropAlign.toLowerCase() == "right" ? { zIndex: "101", position: "absolute", minWidth: "200px" } : { zIndex: "101", position: "absolute", minWidth: "200px" }}>
+        <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility, alignSelf: props.dropAlign && props.dropAlign.toLowerCase() == "right" ? "flex-end" : "flex-start" }}>
+          <div style={props.dropAlign && props.dropAlign.toLowerCase() == "right" ? { transform: "translateX(-100%)", zIndex: "101", position: "absolute", minWidth: "200px" } : { zIndex: "101", position: "absolute", minWidth: "200px" }}>
             <div style={{ position: "relative" }}>
               <div className="DropZ">
                 {props.drop}

@@ -2,12 +2,15 @@
   display: flex;
   flex-flow: column;
   align-items: flex-start;
+  margin: 3px;
 }
 
 .SvgButton:hover {
 }
 
 .DropZ {
+  padding: 6px;
+  min-height: 30px;
   min-width: 300px;
   max-width: 600px;
   background-color: #fbfbfb;

@@ -490,19 +490,20 @@ function Epitools(props) {
             </div>
           } />
 
-          {/* start date */}
+          {/* start date *}
           <SvgButton label="Start Date" drop={
             <div>
               <DatePicker />
             </div>
           } />
 
-          {/* end date */}
+          {/* end date *}
           <SvgButton label="End Date" drop={
             <div>
               <DatePicker />
             </div>
           } />
+          {*/}
 
           <SvgButton label={"load " + props.pathogenType + " lineage"} drop={
             <div style={{ display: "flex", flexFlow: "column" }}>

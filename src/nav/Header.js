@@ -31,6 +31,7 @@ function Header(props) {
   useEffect(() => {
     if (pathogenTypeList) {
       let newPathogenDropdown = []
+      props.setPathogenType(pathogenTypeList[0])
       for (let line of pathogenTypeList) {
         newPathogenDropdown.push(<NavDropdown.Item onClick={() => {props.setPathogenType(line)}}>{line}</NavDropdown.Item>)
       }
@@ -42,6 +43,12 @@ function Header(props) {
 
   return (
     <div className="Nav-header">
+
+      {/* upon header load, immediately get a list of pathogen types from the DB */}
+      <RequestPathogenList
+        setPathogenTypeList = {setPathogenTypeList}
+      />
+
       <Navbar sticky="top" bg="light" variant="light">
         <Navbar.Brand href="/epitools/home/">
           <img
@@ -56,9 +63,6 @@ function Header(props) {
           <Nav.Link href="/epitools/home/">Home</Nav.Link>
           <Nav.Link href="/epitools/home/">Epitools</Nav.Link>
           <NavDropdown title={props.pathogenType ? "Pathogen (" + props.pathogenType + ")" : "Pathogen"}>
-            <RequestPathogenList
-              setPathogenTypeList = {setPathogenTypeList}
-            />
             {pathogenDropdown}
           </NavDropdown>
           {demoNav}

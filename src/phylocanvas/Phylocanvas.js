@@ -69,7 +69,8 @@ function PhylocanvasView(props) {
         triggerCanvasCallback={props.triggerCanvasCallback}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0 }}>
-        <SvgButton label="cluster"
+        <SvgButton
+          label="cluster"
           dropAlign="right"
           drop={
             <div style={{ display: "flex", flexFlow: "column" }}>

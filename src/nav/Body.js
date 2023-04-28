@@ -7,7 +7,6 @@ import DemoLeaflet from "../demo/DemoLeaflet.js";
 import DemoPlotly from "../demo/DemoPlotly.js";
 import DemoMySQL from "../demo/DemoMySQL.js";
 import DemoHandsOnTable from "../demo/DemoHandsOnTable.js"
-import GAS from "../gas/GAS.js";
 import Epitools from "../gas/Epitools.js";
 import "./Nav.css";
 
@@ -17,9 +16,6 @@ function Body(props) {
       <BrowserRouter basename="/epitools">
         <Switch>
           <Route exact path="/home">
-            <GAS />
-          </Route>
-          <Route exact path="/epitools">
             <Epitools
               pathogenType = {props.pathogenType}
             />
