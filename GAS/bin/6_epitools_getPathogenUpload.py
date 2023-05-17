@@ -43,7 +43,7 @@ def main():
       dbHash[line["Sample"]] = list(line.values())
 
   #==================================================( Upload Missing Data to DB )
-  ### get ['Sample', 'Subsample', 'External', 'Pathogen', 'Lineage', 'Location', 'Collection_date', 'Sequence_date', 'Reference', 'Additional_metadata'] from google sheet
+  ### get ['Sample', 'Subsample', 'External', 'Pathogen', 'Lineage', 'Facility', 'Location', 'Collection_date', 'Sequence_date', 'Reference', 'Additional_metadata'] from google sheet
   uploadHash = {"new": [], "update": []}
   for sample in googleHash:
     uploadSample = googleHash[sample][googleHeader.index("original_sample_id")]
@@ -51,15 +51,16 @@ def main():
     uploadExternal = googleHash[sample][googleHeader.index("external_id")]
     uploadPathogen = "Group A Strep"
     uploadLineage = googleHash[sample][googleHeader.index("emm-type")]
-    uploadLocation = googleHash[sample][googleHeader.index("Original facility source")]
+    uploadFacility = googleHash[sample][googleHeader.index("Original facility source")]
+    uploadLocation = googleHash[sample][googleHeader.index("County")]
     try:
-      uploadCollectionDate = datetime.strptime(googleHash[sample][googleHeader.index("Date Extracted")].split(" ")[0].split(",")[0].strip(), "%m/%d/%Y")
+      uploadCollectionDate = datetime.strptime(googleHash[sample][googleHeader.index("Date collected from patient")].split(" ")[0].split(",")[0].strip(), "%m/%d/%Y")
     except:
       try:
-        uploadCollectionDate = datetime.strptime(googleHash[sample][googleHeader.index("Date Extracted")].split(" ")[0].split(",")[0].strip(), "%m/%d/%y")
+        uploadCollectionDate = datetime.strptime(googleHash[sample][googleHeader.index("Date collected from patient")].split(" ")[0].split(",")[0].strip(), "%m/%d/%y")
       except:
         uploadCollectionDate = ""
-        print("wrong date format", sample, googleHash[sample][googleHeader.index("Date Extracted")])
+        print("wrong date format", sample, googleHash[sample][googleHeader.index("Date collected from patient")])
     try:
       uploadSequenceDate = datetime.strptime(googleHash[sample][googleHeader.index("Sequence date")].split(" ")[0].split(",")[0].strip(), "%m/%d/%Y")
     except:
@@ -72,7 +73,7 @@ def main():
     for head in googleHeader:
       if googleHash[sample][googleHeader.index(head)]:
         uploadAdditionalMetadata[head] = googleHash[sample][googleHeader.index(head)]
-    uploadObj = list(map(lambda x: x if x else None, [uploadSample, uploadSubsample, uploadExternal, uploadPathogen, uploadLineage, uploadLocation, str(uploadCollectionDate), str(uploadSequenceDate), json.dumps(uploadAdditionalMetadata)]))
+    uploadObj = list(map(lambda x: x if x else None, [uploadSample, uploadSubsample, uploadExternal, uploadPathogen, uploadLineage, uploadFacility, uploadLocation, str(uploadCollectionDate), str(uploadSequenceDate), json.dumps(uploadAdditionalMetadata)]))
     if sample not in dbHash:
       uploadHash["new"].append(uploadObj)
     else:

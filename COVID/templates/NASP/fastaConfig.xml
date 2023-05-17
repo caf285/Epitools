@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<NaspInputData>
+    <Options>
+
+        <!-- <lineage> -->
+        <RunName>=====</RunName>
+
+        <!-- <lineage>-output -->
+        <OutputFolder>=====</OutputFolder>
+
+        <!-- ref ref -->
+        <Reference name="=====" path="=====">
+            <FindDups>False</FindDups>
+        </Reference>
+        <Filters/>
+        <JobSubmitter>SLURM</JobSubmitter>
+    </Options>
+    <Files>
+        <!-- /path/to/assemblies/ -->
+            <!-- sampleName sampleName.fasta -->
+=====
+<!--
+        <AssemblyFolder path="/scratch/EPITOOLS/COVID/bin/tempFasta/13">
+            <Assembly sample="CDC-LC0007663">CDC-LC0007663.fasta</Assembly>
+            <Assembly sample="CDC-LC0220283">CDC-LC0220283.fasta</Assembly>
+        </AssemblyFolder>
+-->
+
+    </Files>
+    <ExternalApplications>
+        <Index name="Index" path="/packages/easy-build/4.3.0/software/Python/3.7.4-GCCcore-8.3.0/bin">
+            <AdditionalArguments/>
+            <JobParameters name="nasp_index">
+                <MemRequested>2</MemRequested>
+                <NumCPUs>1</NumCPUs>
+                <Walltime>4</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </Index>
+        <MatrixGenerator name="MatrixGenerator" path="/packages/easy-build/4.3.0/software/Python/3.7.4-GCCcore-8.3.0/lib/python3.7/site-packages/nasp/nasptool_linux_64">
+            <AdditionalArguments/>
+            <JobParameters name="nasp_matrix">
+                <MemRequested>8</MemRequested>
+                <NumCPUs>8</NumCPUs>
+                <Walltime>48</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </MatrixGenerator>
+        <Samtools name="Samtools" path="/packages/easy-build/4.3.0/software/SAMtools/0.1.18/samtools">
+            <AdditionalArguments/>
+        </Samtools>
+        <DupFinder name="DupFinder" path="/packages/easy-build/4.3.0/software/MUMmer/4.0.0beta2-foss-2019b/bin/nucmer">
+            <AdditionalArguments/>
+            <JobParameters>
+                <MemRequested>4</MemRequested>
+                <NumCPUs>1</NumCPUs>
+                <Walltime>4</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </DupFinder>
+        <AssemblyImporter name="AssemblyImporter" path="/packages/easy-build/4.3.0/software/MUMmer/4.0.0beta2-foss-2019b/bin/delta-filter">
+            <AdditionalArguments/>
+            <JobParameters>
+                <MemRequested>4</MemRequested>
+                <NumCPUs>1</NumCPUs>
+                <Walltime>4</Walltime>
+                <Queue/>
+                <JobSubmitterArgs/>
+            </JobParameters>
+        </AssemblyImporter>
+    </ExternalApplications>
+</NaspInputData>

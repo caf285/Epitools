@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<matrix_data>
+     <parameters>
+
+          <!-- DIR DIR DIR DIR -->
+          <reference-fasta>=====</reference-fasta>
+          <matrix-folder>=====</matrix-folder>
+          <stats-folder>=====</stats-folder>
+          <reference-dups>=====</reference-dups>
+          <minimum-coverage>10</minimum-coverage>
+          <minimum-proportion>0.9</minimum-proportion>
+     </parameters>
+     <files>
+
+          <!-- sampleName path -->
+=====
+     </files>
+</matrix_data>

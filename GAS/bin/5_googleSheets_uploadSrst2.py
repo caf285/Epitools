@@ -149,6 +149,8 @@ def main():
 
   userInput = ""
   while userInput.lower() not in ["y", "yes"]:
+    print(str(len(uploadHash)) + " total samples found ...")
+    print("ignoring " + str(len(uploadHash) - len(data)) + " samples with matching data ...")
     userInput = input("upload data for " + str(len(data)) + " samples [y/n]? ")
     if userInput.lower() in ["n", "no"]:
       print("... quitting")

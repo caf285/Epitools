@@ -58,8 +58,8 @@ def main():
       subprocess.Popen("ln -sf " + rpHash[sample][1] + " " + pd + "analysis/" + str(datetime.date.today()) + "/MLST_AMR/" + sample + "_R2.fastq.gz", universal_newlines=True, shell=True, stdout=subprocess.PIPE).stdout.read()
   if samples:
     print("... files written to " + pd + "analysis/" + str(datetime.date.today()) + "/MLST_AMR/\n")
-    print("BASH script to run srst2 in " + pd + "analysis/" + str(datetime.date.today()) + "/MLST_AMR/\n")
-    print("conda activate srst2; srst2 --input_pe *.fastq.gz --forward _R1 --reverse _R2 --output emmtypes --mlst_db Streptococcus_pyogenes.fasta --mlst_definitions spyogenes.txt --mlst_delimiter _\n")
+    print("BASH script to run srst2 in t" + pd + "analysis/" + str(datetime.date.today()) + "/MLST_AMR/\n")
+    print("cd " + pd + "analysis/" + str(datetime.date.today()) + "/MLST_AMR/; conda activate srst2; srst2 --input_pe *.fastq.gz --forward _R1 --reverse _R2 --output emmtypes --mlst_db Streptococcus_pyogenes.fasta --mlst_definitions spyogenes.txt --mlst_delimiter _\n")
   else:
     print("no new samples for MLST_AMR\n")
 
@@ -77,7 +77,7 @@ def main():
   if samples:
     print("... files written to " + pd + "analysis/" + str(datetime.date.today()) + "/RESgannot/\n")
     print("BASH script to run srst2 in " + pd + "analysis/" + str(datetime.date.today()) + "/RESgannot/\n") 
-    print("conda activate srst2; srst2  --input_pe *.fastq.gz --forward _R1 --reverse _R2 --output amr_results --gene_db ARGannot.fasta\n")
+    print("cd " + pd + "analysis/" + str(datetime.date.today()) + "/RESgannot/; conda activate srst2; srst2  --input_pe *.fastq.gz --forward _R1 --reverse _R2 --output amr_results --gene_db ARGannot.fasta\n")
   else:
     print("no new samples for RESgannot\n")
 

@@ -48,9 +48,12 @@ def main():
       run = googleHash[key][googleHeader.index("Run # if re-sequenced")].strip()
     elif googleHash[key][googleHeader.index("Seq run #")].strip():
       run = googleHash[key][googleHeader.index("Seq run #")].strip()
-    if run:
-      run = subprocess.Popen("find /TGenNextGen/ -maxdepth 1 -type d -iname *" + run + "* 2>/dev/null", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+    if run: # first search for non-trailing character in run names (avoides dirs like 'TGN-NextSeq0472-old')
+      run = subprocess.Popen("find /TGenNextGen/ -maxdepth 1 -type d -iname *" + run + " 2>/dev/null", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
       run = run.stdout.read()
+      if not run: # search for trailing characters after run name
+        run = subprocess.Popen("find /TGenNextGen/ -maxdepth 1 -type d -iname *" + run + "* 2>/dev/null", universal_newlines=True, shell=True, stdout=subprocess.PIPE)
+        run = run.stdout.read()
       if run:
         run = sorted(run.strip().split("\n"))[0]
         if key:
