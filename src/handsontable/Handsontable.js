@@ -6,6 +6,7 @@ import 'handsontable/dist/handsontable.full.css';
 function HandsontableView(props) {
   const hot = useRef();
   const licenseKey = useRef("non-commercial-and-evaluation")
+  const containerRef = useRef()
   const [header, setHeader] = useState(false)
   const [data, setData] = useState([{}])
   const [height, setHeight] = useState("100%")
@@ -14,9 +15,7 @@ function HandsontableView(props) {
 
   // initialize table
   useEffect(() => {
-    //console.log("initial hot")
-    const container = document.getElementById('handsontable');
-    hot.current = new Handsontable(container, {
+    hot.current = new Handsontable(containerRef.current, {
       data,
       colHeaders: header,
       height: height,
@@ -24,25 +23,22 @@ function HandsontableView(props) {
       licenseKey: licenseKey.current
     })
     hot.current.render()
-    //console.log("hot:", hot)
-  }, [data, header, height, width])
+  }, [])
 
   useEffect(() => {
     if (props.height) { setHeight(props.height) }
     if (props.width) { setWidth(props.width) }
   }, [props.height, props.width])
 
-  // set data
+  // set data / header
   useEffect(() => {
-    if (props.data && props.data.length) {
-      setData(props.data)
-      setHeader(Object.keys(props.data[0]))
+    if (containerRef.current && props.data && props.data.length) {
       hot.current.updateSettings({
-        colHeaders: Object.keys(props.data[0]),
+        colHeaders: props.header,
       })
       hot.current.updateData(props.data)
     }
-  }, [props.data])
+  }, [props.data, props.header])
 
   // set view type (default: 'readonly')
   useEffect(() => {
@@ -63,7 +59,7 @@ function HandsontableView(props) {
 
   return (
     <div style={{ position: "relative", height: "100%" }}>
-      <div id="handsontable" style={{ zIndex: "1" }}></div>
+      <div ref={containerRef} style={{ zIndex: "1" }}></div>
     </div>
   )
 }

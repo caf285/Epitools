@@ -17,7 +17,7 @@ const checkSdata = (value, sdata) => {
 }
 
 function SelectionHOT(props) {
-
+    const containerRef = useRef();
     const hot = useRef();
     const licenseKey = useRef("non-commercial-and-evaluation")
     //const [header, setHeader] = useState(false)
@@ -42,8 +42,7 @@ function SelectionHOT(props) {
     // eslint-disable-next-line
     useEffect(() => {
         //console.log("initial hot")
-        const container = document.getElementById('handsontable');
-        hot.current = new Handsontable(container, {
+        hot.current = new Handsontable(containerRef.current, {
             data,
             //colHeaders: header,
             height: props.height,
@@ -77,14 +76,14 @@ function SelectionHOT(props) {
                 //console.log("Column: ", column)
                 //console.log("sdata: ", sdata);
                 if (!checkSdata(hot.current.getDataAtCell(row, 1), sdata)) {
-                    setSdata(psdata => [...psdata, hot.current.getDataAtCell(row, 1)])
+                    setSdata(psdata => [...psdata, hot.current.getDataAtCell(row, props.primaryColumn)])
                     // set color
                     for (let i = 0; i < hot.current.countCols(); i++) {
                         hot.current.setCellMeta(row, i, 'className', 'MyRow')
                     }
                 } else {
                     setSdata(sdata.filter(function (v) {
-                        return v !== hot.current.getDataAtCell(row, 1)
+                        return v !== hot.current.getDataAtCell(row, props.primaryColumn)
                     }))
                     for (let i = 0; i < hot.current.countCols(); i++) {
                         hot.current.setCellMeta(row, i, 'className', '')
@@ -149,7 +148,7 @@ function SelectionHOT(props) {
 
     // set data
     useEffect(() => {
-        if (props.data && props.data.length) {
+        if (containerRef.current && props.data && props.data.length) {
             setData(props.data)
             //setHeader(Object.keys(props.data[0]))
             hot.current.updateSettings({
@@ -212,14 +211,13 @@ function SelectionHOT(props) {
         }
 
         return -1
-
     }
 
 
     return (
-        <div style={{ position: "relative", height: "100%" }}>
-            <div id="handsontable" style={{ zIndex: "1" }}></div>
-        </div>
+      <div style={{ position: "relative", height: "100%" }}>
+        <div ref={containerRef} style={{ zIndex: "1" }}></div>
+      </div>
     )
 }
 

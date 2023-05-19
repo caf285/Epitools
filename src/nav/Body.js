@@ -1,6 +1,6 @@
 /* eslint-disable react/no-direct-mutation-state */
-import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Route, Routes, useSearchParams, useNavigate } from "react-router-dom";
 
 import DemoPhylocanvas from "../demo/DemoPhylocanvas.js";
 import DemoLeaflet from "../demo/DemoLeaflet.js";
@@ -11,32 +11,31 @@ import Epitools from "../gas/Epitools.js";
 import "./Nav.css";
 
 function Body(props) {
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  //for (let entry of searchParams.entries()) {
+  //  console.log(entry)
+  //}
+  //console.log("pathogen pre-load", searchParams.getAll())
+  const navigate = useNavigate()
+  //useEffect(() => {
+    //setSearchParams({ "answer": 14 })
+    //navigate("?", { replace: true });
+  //}, [])
+
+
   return (
     <div style={{ height: "100%", overflow: "hidden" }} className="Nav-body">
-      <BrowserRouter basename="/epitools">
-        <Switch>
-          <Route exact path="/home">
-            <Epitools
-              pathogenType = {props.pathogenType}
-            />
-          </Route>
-          <Route exact path="/demo-phylocanvas">
-            <DemoPhylocanvas />
-          </Route>
-          <Route exact path="/demo-leaflet">
-            <DemoLeaflet />
-          </Route>
-          <Route exact path="/demo-plotly">
-            <DemoPlotly />
-          </Route>
-          <Route exact path="/demo-mysql">
-            <DemoMySQL />
-          </Route>
-          <Route exact path="/demo-handsontable">
-            <DemoHandsOnTable />
-          </Route>
-        </Switch>
-      </BrowserRouter>
+        <Routes>
+          <Route exact path="/home" element={
+            <Epitools pathogenType = {props.pathogenType}/>
+          } />
+          <Route exact path="/demo-phylocanvas" element={<DemoPhylocanvas />} />
+          <Route exact path="/demo-leaflet" element={<DemoLeaflet />} />
+          <Route exact path="/demo-plotly" element={<DemoPlotly />} />
+          <Route exact path="/demo-mysql" element={<DemoMySQL />} />
+          <Route exact path="/demo-handsontable" element={<DemoHandsOnTable />} />
+        </Routes>
     </div>
   )
 }

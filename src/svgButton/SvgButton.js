@@ -28,15 +28,11 @@ function SvgButton(props) {
 
   let [svg, setSvg] = useState(svgList.current["blank"]);
   let [label, setLabel] = useState("");
-  let [drop, setDrop] = useState();
 
   useEffect(() => {
     setSvg(svgList.current[props.svg])
     setLabel(props.label)
-    if (props.drop) {
-      setDrop(props.drop)
-    }
-  }, [props.svg, props.label, props.drop])
+  }, [props.svg, props.label])
 
   function getDrop() {
     if (props.drop) {
@@ -95,10 +91,10 @@ function SvgButton(props) {
           disableRipple={false}
           centerRipple={false}
         />
-        <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility, alignSelf: props.dropAlign && props.dropAlign.toLowerCase() == "right" ? "flex-end" : "flex-start" }}>
-          <div style={props.dropAlign && props.dropAlign.toLowerCase() == "right" ? { transform: "translateX(-100%)", zIndex: "101", position: "absolute", minWidth: "200px" } : { zIndex: "101", position: "absolute", minWidth: "200px" }}>
+        <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility, alignSelf: props.dropAlign && props.dropAlign.toLowerCase() === "right" ? "flex-end" : "flex-start" }}>
+          <div style={props.dropAlign && props.dropAlign.toLowerCase() === "right" ? { transform: "translateX(-100%)", zIndex: "101", position: "absolute", minWidth: "200px" } : { zIndex: "101", position: "absolute", minWidth: "200px" }}>
             <div style={{ position: "relative" }}>
-              <div className="DropZ">
+              <div className="DropZ" style={(props.maxHeight) ? { maxHeight: props.maxHeight } : {}}>
                 {props.drop}
               </div>
             </div>

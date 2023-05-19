@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 
 function RequestPathogenList(props) {
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")

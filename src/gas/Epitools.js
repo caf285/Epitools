@@ -1,29 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
+import "./Epitools.css";
+import "./style.css";
 
 import SvgButton from "../svgButton/SvgButton.js";
 import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 import SelectionHOT from "../handsontable/SelectionHOT.js";
 import SplitPane from "react-split-pane";
-import UploadScreen from "../uploadScreen/uploadScreen"
+//import UploadScreen from "../uploadScreen/uploadScreen"
 import Slider from "@mui/material/Slider";
 import Box from '@mui/material/Box';
 import ReactLoading from "react-loading";
-import DatePicker from "react-datepicker";
+//import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./Epitools.css";
-import "./style.css";
+import TableUpload from "./TableUpload.js";
 
 function Epitools(props) {
-  //====================( set variables )
+  //====================================================================================================( set variables )
   // phylocanvas
   const [nwk, setNwk] = useState("(A:1)B;")
-  const [branches, setBranches] = useState([])
-  const branchesRef = useRef([])
+  const [phylocanvasLeafNames, setPhylocanvasLeafNames] = useState([])
   const [phyloHeight, setPhyloHeight] = useState(["300"])
   const [metadataLabels, setMetadataLabels] = useState([])
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [getTree, setGetTree] = useState()
   const [mutationsJson, setMutationsJson] = useState()
+  const [updateTable, setUpdateTable] = useState(false)
 
   // handsontable
   const [hotHeight, setHOTHeight] = useState(["300"])
@@ -36,7 +37,7 @@ function Epitools(props) {
   const [branchesData, setBranchesData] = useState([])
   const branchesDataRef = useRef([])
   const [getImage, setGetImage] = useState(false)
-  const [uploadScreen, setUploadScreen] = useState(false);
+  //const [uploadScreen, setUploadScreen] = useState(false);
 
   // pathogen lineage
   const [pathogenDateRangeSlider, setPathogenDateRangeSlider] = useState([720, 1080]);
@@ -44,11 +45,15 @@ function Epitools(props) {
   const [pathogenDateRangeForms, setPathogenDateRangeForms] = useState("")
 
   // other
-  const [loadingScreen, setLoadingScreen] = useState("hidden")
+  const [loadingScreenVisibility, setLoadingScreenVisibility] = useState("hidden")
+  const [tableUploadFormVisibility, setTableUploadFormVisibility] = useState("hidden")
+  const [tableUploadFileName, setTableUploadFileName] = useState("")
+  const [tableUploadFileText, setTableUploadFileText] = useState("")
+  const [tablePrimaryColumn, setTablePrimaryColumn] = useState(1)
   const [metadataForms, setMetadataForms] = useState("")
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
-  //====================( initialize variables ) 
+  //====================================================================================================( initialize variables ) 
   useEffect(() => {
     setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
     setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
@@ -75,18 +80,22 @@ function Epitools(props) {
     }
   }, [])
 
-  //====================( handle branch selection ) 
+  //====================================================================================================( handle branch selection ) 
   useEffect(() => {
-    branchesRef.current = branches
-    mysqlRequest(branchesRef.current)
-  }, [branches])
+    if (updateTable) {
+      setTablePrimaryColumn(1) // resets to default column on DB data load
+      mysqlRequest(phylocanvasLeafNames) // request data using leaf names and fill table
+    }
+    setUpdateTable(false)
+  }, [phylocanvasLeafNames])
 
   useEffect(() => {
     console.log(mutationsJson)
   }, [mutationsJson])
 
-  //====================( fill metadata buttons )
+  //====================================================================================================( fill metadata buttons )
   useEffect(() => {
+    console.log("branchesData", branchesData)
     branchesDataRef.current = branchesData
     let appendMetadataDiv = document.getElementsByClassName("appendMetadataDiv")
     while (appendMetadataDiv.firstChild) {appendMetadataDiv.removeChild(appendMetadataDiv.firstChild)}
@@ -105,12 +114,13 @@ function Epitools(props) {
   }, [branchesData])
 
   // TODO: cleanup
-  const fileInput = useRef(null)
+  const treeInput = useRef(null)
+  const tableInput = useRef(null)
   const reader = useRef(new FileReader())
 
   // get branch names callback
   const branchNameCallback = (e) => {
-    setBranches(e)
+    setPhylocanvasLeafNames(e)
   }
 
   // get selection list
@@ -127,11 +137,11 @@ function Epitools(props) {
     return elementRef.current?.clientHeight - topPaneHeight
   }
 
-  //====================( database queries )
+  //====================================================================================================( database queries )
   // database query post request
   async function mysqlRequest(data = "") {
     console.log("requestData:", data)
-    setLoadingScreen("visible")
+    setLoadingScreenVisibility("visible")
     //const response = await fetch("/go-epitools/mysql", {
     await fetch(host.current + "mysql", {
       //console.log("hello new build")
@@ -143,7 +153,7 @@ function Epitools(props) {
       })
     })
       .then(response => {
-        setLoadingScreen("hidden")
+        setLoadingScreenVisibility("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -165,7 +175,7 @@ function Epitools(props) {
   // neighborjoin post request
   async function neighborJoinRequest(data = "") {
     //const response = await fetch("/go-epitools/neighborjoin", {
-    setLoadingScreen("visible")
+    setLoadingScreenVisibility("visible")
     await fetch(host.current + "neighborjoin", {
       //const response = await fetch("https://pathogen-intelligence.org/go-epitools/neighborjoin", {
       method: 'POST',
@@ -175,7 +185,7 @@ function Epitools(props) {
       })
     })
       .then(response => {
-        setLoadingScreen("hidden")
+        setLoadingScreenVisibility("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -188,7 +198,7 @@ function Epitools(props) {
   // pathogen lineage request
   async function pathogenLineageRequest(data = "", url = "lineage", date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
     console.log("data", data)
-    setLoadingScreen("visible")
+    setLoadingScreenVisibility("visible")
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -199,7 +209,7 @@ function Epitools(props) {
       })
     })
       .then(response => {
-        setLoadingScreen("hidden")
+        setLoadingScreenVisibility("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -219,7 +229,7 @@ function Epitools(props) {
   async function mutationsRequest(nwk = "", samples = [], url = "mutations") {
     console.log("nwk", nwk)
     console.log("samples", samples)
-    setLoadingScreen("visible")
+    setLoadingScreenVisibility("visible")
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -229,7 +239,7 @@ function Epitools(props) {
       })
     })
       .then(response => {
-        setLoadingScreen("hidden")
+        setLoadingScreenVisibility("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -248,7 +258,7 @@ function Epitools(props) {
   // rebuild tree from selected samples
   async function samplesRequest(data = "", url = "samples") {
     console.log("data", data)
-    setLoadingScreen("visible")
+    setLoadingScreenVisibility("visible")
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -257,7 +267,7 @@ function Epitools(props) {
       })
     })
       .then(response => {
-        setLoadingScreen("hidden")
+        setLoadingScreenVisibility("hidden")
         if (response.status >= 400) {
           throw new Error(response.status + " " + response.statusText);
         }
@@ -301,9 +311,9 @@ function Epitools(props) {
       .catch(ERR => window.alert(ERR))
   }
 
-  //====================( import/export )
+  //====================================================================================================( import/export )
   // file i/o
-  const handleFileInput = (e) => {
+  const handleTreeInput = (e) => {
     let file = e.target.files[0]
     reader.current.readAsText(file)
     reader.current.onloadend = () => {
@@ -339,6 +349,30 @@ function Epitools(props) {
         neighborJoinRequest(fasta);
       }
     }
+    // reset for same file upload
+    e.target.value = ""
+  }
+
+  const handleTableInput = (e) => {
+    let file = e.target.files[0]
+    setTableUploadFileName(file.name)
+    reader.current.readAsText(file)
+    reader.current.onloadend = () => {
+      // if TSV
+      if (file.name.toLowerCase().endsWith(".tsv")) {
+        setTableUploadFormVisibility("visible")
+        let tsv = reader.current.result.split("\n").map((x) => { return x.split("\t") })
+        setTableUploadFileText(tsv)
+      }
+      // if CSV
+      else if (file.name.toLowerCase().endsWith(".csv")) {
+        setTableUploadFormVisibility("visible")
+        let csv = reader.current.result.split("\n").map((x) => { return x.split(",") })
+        setTableUploadFileText(csv)
+      }
+    }
+    // reset for same file upload
+    e.target.value = ""
   }
 
   // text file downloader
@@ -364,7 +398,7 @@ function Epitools(props) {
     a.parentNode.removeChild(a);
   }
 
-  //====================( button drivers )
+  //====================================================================================================( button drivers )
   // append metadata to phylocanvas
   function appendMetadataHandler() {
     let checked = []
@@ -396,11 +430,10 @@ function Epitools(props) {
     let newDateRangeForms = []
     if (data) {
       data = sortForms(data)
-      for (let line of data.filter(x => x.Count >= 4 && x.Lineage)) {
-        newDateRangeForms.push(
-          <button onClick={() => pathogenLineageRequest(line["Lineage"], "emm")}>{line["Lineage"]} ({line["Count"]})</button>
-        )
-      }
+      newDateRangeForms = data.filter(x => x.Count >= 4 && x.Lineage).map((v, k) => {return <button key={k} onClick={() => {
+        setUpdateTable(true)
+        pathogenLineageRequest(v["Lineage"], "emm")
+      }}>{v["Lineage"]} ({v["Count"]})</button>})
     }
     setPathogenDateRangeForms(newDateRangeForms)
   };
@@ -412,20 +445,28 @@ function Epitools(props) {
   }
 
   return (
-    <div style={{ height: "100%" }} ref={elementRef}>
+    <div style={{ position: "relative", height: "100%" }} ref={elementRef}>
       {/* loading splash screen */}
-      <div style={{ position: "relative", visibility: loadingScreen }}>
-        <div style={{ position: "absolute", height: "100vh", width: "100vw", backgroundColor: "rgba(255, 255, 255, 0.75)", zIndex: "1000" }}></div>
-        <div style={{ position: "absolute", left: "50%", top: "50vh", zIndex: "1000" }}>
-          <div style={{ position: "relative", left: "-25px", top: "-75px" }}>
-            <ReactLoading type="spin" color="#0000FF" height={100} width={50} />
+      <div style={{ visibility: loadingScreenVisibility }}>
+        <div style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(255, 255, 255, 0.75)", zIndex: "1000" }}></div>
+        <div style={{ position: "absolute", left: "50%", top: "50%", zIndex: "1000" }}>
+          <div style={{ position: "relative", left: "-25px", top: "-25px" }}>
+            <ReactLoading type="spin" color="#0000FF" height={50} width={50} />
           </div>
         </div>
       </div>
       
       {/* TODO: fix jonathon upload button */}
-      {uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>}
-      <input type="file" ref={fileInput} onChange={handleFileInput} hidden />
+      <TableUpload
+        primaryColumn={tablePrimaryColumn}
+        setPrimaryColumn={setTablePrimaryColumn}
+        fileName={tableUploadFileName}
+        fileText={tableUploadFileText}
+        visibility={tableUploadFormVisibility}
+        setVisibility={setTableUploadFormVisibility}
+        importData={setBranchesData}
+      />
+      {/*uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>*/}
 
       {/* buttons */}
       <div style={{ position: "relative"}}>
@@ -446,15 +487,28 @@ function Epitools(props) {
               <SvgButton onClick={() => {samplesRequest(importPhylocanvasSelection)}} label="build from selection" />
 
               {/* augments tree with mutations  */}
-              <SvgButton onClick={() => {mutationsRequest(nwk, branches)}} label="get mutations" />
+              <SvgButton onClick={() => {mutationsRequest(nwk, phylocanvasLeafNames)}} label="get mutations" />
 
               <br/>
 
               {/* initialize phylocanvas file upload */}
-              <SvgButton onClick={e => fileInput.current.click()} label="import data" drop={true} />
+              <SvgButton label="import data" drop={
+                <div>
+                  <div>Tree Import:</div>
+                  <input type="file" ref={treeInput} onChange={handleTreeInput} hidden />
+                  <SvgButton onClick={e => treeInput.current.click()} label="NWK Tree Format" drop={true} />
+                  <SvgButton onClick={e => treeInput.current.click()} label="FASTA Alignment Format" drop={true} />
+                  <SvgButton onClick={e => treeInput.current.click()} label="TSV NASP Matrix Format" drop={true} />
+                  <br />
+                  <div>Table Import</div>
+                  <input type="file" ref={tableInput} onChange={handleTableInput} hidden />
+                  <SvgButton onClick={e => tableInput.current.click()} label="TSV Text Format" drop={true} />
+                  <SvgButton onClick={e => tableInput.current.click()} label="CSV Text Format" drop={true} />
+                </div>
+              } />
 
               {/* export buttons */}
-              <SvgButton label="export" drop={
+              <SvgButton label="export data" drop={
                 <div>
                   <div>Tree Export:</div>
                   <SvgButton label="PNG Image Format" onClick={() => {setGetImage(true)}} />
@@ -548,6 +602,7 @@ function Epitools(props) {
           getTree={getTree}
           triggerCanvasCallback={getImage}
           exportCanvasCallback={exportCanvasCallback}
+          primaryColumn={tablePrimaryColumn}
         />
 
         {/* handsontable component */}
@@ -561,6 +616,7 @@ function Epitools(props) {
             height={hotHeight}
             importSelection={importTableSelection}
             exportTableSelectionCallback={exportTableSelectionCallback}
+            primaryColumn={tablePrimaryColumn}
           />
 
         </div>

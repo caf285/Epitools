@@ -30,12 +30,8 @@ function Header(props) {
   const [pathogenDropdown, setPathogenDropdown] = useState();
   useEffect(() => {
     if (pathogenTypeList) {
-      let newPathogenDropdown = []
       props.setPathogenType(pathogenTypeList[0])
-      for (let line of pathogenTypeList) {
-        newPathogenDropdown.push(<NavDropdown.Item onClick={() => {props.setPathogenType(line)}}>{line}</NavDropdown.Item>)
-      }
-      setPathogenDropdown(newPathogenDropdown)
+      setPathogenDropdown(pathogenTypeList.map((v, k) => {return <NavDropdown.Item key={k} onClick={() => {props.setPathogenType(v)}}>{v}</NavDropdown.Item>}))
     }
   }, [pathogenTypeList])
 

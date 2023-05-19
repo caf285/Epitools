@@ -26,6 +26,7 @@ def openCursor(db):
 def main():
   ### open json
   for uploadFile in list(filter(lambda x: "cov" in x, os.listdir("/var/www/pathogen-intelligence.tgen.org/epitools/http_server/py_populate"))):
+    print("uploadFile", uploadFile)
     uploadHash = json.loads(read(uploadFile))
 
     ### open cursor
@@ -37,16 +38,17 @@ def main():
     sequenceHeader = list(map(lambda x: x[0], cursor.fetchall()))[1:]
     cursor.execute("SELECT sequence.sample, sequence.reference, pathogen.id, pathogen.sample FROM epitools.sequence RIGHT JOIN epitools.pathogen ON sequence.sample = pathogen.id")
     sequenceList = cursor.fetchall()
+
     sequenceHash = {}
     for line in sequenceList:
       sequenceHash[line[-1]] = line
 
-    for line in uploadHash:
+    for line in uploadHash["new"]:
       data = []
       #print(line, uploadHash[line])
       if line in sequenceHash and not sequenceHash[line][0]:
-        print(len(uploadHash[line]["sequence"]))
-        data.append((sequenceHash[line][2], uploadHash[line]["reference"], uploadHash[line]["sequence"]))
+        print(len(uploadHash["new"][line]))
+        data.append((sequenceHash[line][2], None, uploadHash["new"][line]))
 
       sql = "INSERT INTO epitools.sequence (sample, reference, sequence) VALUES (%s, %s, %s)"
       cursor.executemany(sql, data)

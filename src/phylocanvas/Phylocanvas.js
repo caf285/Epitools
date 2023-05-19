@@ -67,6 +67,7 @@ function PhylocanvasView(props) {
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
         exportCanvasCallback={props.exportCanvasCallback}
         triggerCanvasCallback={props.triggerCanvasCallback}
+        primaryColumn={props.primaryColumn}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0 }}>
         <SvgButton
@@ -105,9 +106,9 @@ function PhylocanvasView(props) {
           }
         />
       </div>
-      <div style={{ position: "absolute", display: "flex", flexFlow:"row", bottom: 0, right: 0 }}>
+      <div style={{ zIndex: "100", position: "absolute", display: "flex", flexFlow:"row", bottom: 0, right: 0 }}>
         <SvgButton
-          svg={(type == "hierarchical" && stretchOrientation == "horizontal" ? "vertical" : type == "hierarchical" && stretchOrientation == "vertical" ? "horizontal" : stretchOrientation) + "Scale"}
+          svg={(type === "hierarchical" && stretchOrientation === "horizontal" ? "vertical" : type === "hierarchical" && stretchOrientation === "vertical" ? "horizontal" : stretchOrientation) + "Scale"}
           onClick={() => cycleOrientation()}
         />
       </div>

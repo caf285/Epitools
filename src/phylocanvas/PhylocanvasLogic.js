@@ -166,19 +166,33 @@ function PhylocanvasLogic(props) {
     }
   }, [props.triggerCanvasCallback])
 
+
+  
   // append metadata to each branch label
+
   useEffect(() => {
+    console.log("primary column", props.primaryColumn)
+    console.log(phylocanvas.current.branches)
+    console.log(Object.keys(phylocanvas.current.branches))
+    if (props.branchesData && props.branchesData.length >= 1) {
+      console.log(props.branchesData[0][Object.keys(props.branchesData[0])[props.primaryColumn]])
+    }
+
+
     if (phylocanvas.current.treeStats) {
       for (let i in props.branchesData) {
-        let additionalMetadata = [phylocanvas.current.branches[props.branchesData[i]["Sample"]]["id"]]
-        phylocanvas.current.branches[props.branchesData[i]["Sample"]].clearMetadata()
-        for (let j in props.metadataLabels) {
-          additionalMetadata.push(props.branchesData[i][props.metadataLabels[j]])
-          phylocanvas.current.branches[props.branchesData[i]["Sample"]].appendMetadata(props.branchesData[i][props.metadataLabels[j]])
+
+        if (Object.keys(phylocanvas.current.branches).includes(props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]])) {
+          let additionalMetadata = [phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]]["id"]]
+          phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]].clearMetadata()
+          for (let j in props.metadataLabels) {
+            additionalMetadata.push(props.branchesData[i][props.metadataLabels[j]])
+            phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]].appendMetadata(props.branchesData[i][props.metadataLabels[j]])
+          }
+          phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]]["label"] = additionalMetadata.join("_")
         }
-        phylocanvas.current.branches[props.branchesData[i]["Sample"]]["label"] = additionalMetadata.join("_")
+        phylocanvas.current.draw()
       }
-      phylocanvas.current.draw()
     }
   }, [props.metadataLabels])
 
