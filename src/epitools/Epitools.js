@@ -1,3 +1,5 @@
+// TODO: hook up props.pathogenTypeList and props.searchParams ... replace props.pathogenType
+
 import React, { useState, useRef, useEffect } from "react";
 import "./Epitools.css";
 import "./style.css";
@@ -22,7 +24,8 @@ function Epitools(props) {
   const [phyloHeight, setPhyloHeight] = useState(["300"])
   const [metadataLabels, setMetadataLabels] = useState([])
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
-  const [getTree, setGetTree] = useState()
+  const [getNwk, setGetNwk] = useState(() => () => {})
+  const [getCanvas, setGetCanvas] = useState(() => () => {})
   const [mutationsJson, setMutationsJson] = useState()
   const [updateTable, setUpdateTable] = useState(false)
 
@@ -36,15 +39,15 @@ function Epitools(props) {
   const dragRef = useRef(0)
   const [branchesData, setBranchesData] = useState([])
   const branchesDataRef = useRef([])
-  const [getImage, setGetImage] = useState(false)
-  //const [uploadScreen, setUploadScreen] = useState(false);
 
   // pathogen lineage
-  const [pathogenDateRangeSlider, setPathogenDateRangeSlider] = useState([720, 1080]);
-  const [pathogenDateRange, setPathogenDateRange] = useState([new Date(new Date() - (1080 - pathogenDateRangeSlider[0]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0], new Date(new Date() - (1080 - pathogenDateRangeSlider[1]) * (1000 * 60 * 60 * 24)).toISOString().split("T")[0]])
+  const [pathogenDateRangeSliderMax, setPathogenDateRangeSliderMax] = useState(1080)
+  const [pathogenDateRangeSlider, setPathogenDateRangeSlider] = useState([720, pathogenDateRangeSliderMax]);
+  const [pathogenDateRange, setPathogenDateRange] = useState([new Date(new Date() - (pathogenDateRangeSliderMax - pathogenDateRangeSlider[0]) * (1000 * 60 * 60 * 24)).toLocaleDateString("sv-SE"), new Date(new Date() - (pathogenDateRangeSliderMax - pathogenDateRangeSlider[1]) * (1000 * 60 * 60 * 24)).toLocaleDateString("sv-SE")])
   const [pathogenDateRangeForms, setPathogenDateRangeForms] = useState("")
 
   // other
+  const [pathogenType, setPathogenType] = useState()
   const [loadingScreenVisibility, setLoadingScreenVisibility] = useState("hidden")
   const [tableUploadFormVisibility, setTableUploadFormVisibility] = useState("hidden")
   const [tableUploadFileName, setTableUploadFileName] = useState("")
@@ -59,26 +62,59 @@ function Epitools(props) {
     setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
   }, [])
 
+  // if query parameter is already in address bar on load, but does not match acceptable parameter, load default
   useEffect(() => {
-    setPathogenDateRangeForms("")
-    pathogenDateRangeRequest(props.pathogenType, pathogenDateRange[0], pathogenDateRange[1]) // fill pathogen Lineage buttons on load
-  }, [props.pathogenType])
-
-  useEffect(() => {
-    var acc = document.getElementsByClassName("accordion");
-    var i;
-    for (i = 0; i < acc.length; i++) {
-      acc[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var panel = this.nextElementSibling;
-        if (panel.style.display === "block") {
-          panel.style.display = "none";
-        } else {
-          panel.style.display = "block";
-        }
-      });
+    if (props.pathogenTypeList && props.pathogenTypeList.length > 1) {
+      if (!props.pathogenTypeList.includes(pathogenType)) {
+        setPathogenType(props.pathogenTypeList[0])
+      }
     }
-  }, [])
+  }, [props.pathogenTypeList])
+
+  // if query parameter changes, make sure it matches acceptable parameter, then load pathogenType from query parameter
+  useEffect(() => {
+    if (props.searchParams && props.searchParams.get("pathogen")) {
+      //console.log(props.pathogenTypeList, props.searchParams.get("pathogen"))
+      if (props.pathogenTypeList && props.pathogenTypeList.includes(props.searchParams.get("pathogen"))) {
+        setPathogenType(props.searchParams.get("pathogen"))
+      }
+    }
+  }, [props.searchParams])
+
+  // import date ranges if applicable and fill pathogen lineage button dropdown on pathogen change
+  useEffect(() => {
+    if (props.searchParams) {
+      let sliderMin = pathogenDateRangeSlider[0]
+      let sliderMax = pathogenDateRangeSlider[1]
+      let dmin = pathogenDateRange[0]
+      let dmax = pathogenDateRange[1]
+      if (props.searchParams.get("dmin")) {
+        if ( !isNaN(new Date(props.searchParams.get("dmin"))) ) {
+          dmin = new Date(props.searchParams.get("dmin"))
+          sliderMin = pathogenDateRangeSliderMax + Math.ceil((new Date(props.searchParams.get("dmin")) - new Date()) / 1000 / 60 / 60 / 24) + 1
+        } else {
+          console.log("bad min")
+          props.searchParams.set("dmin", pathogenDateRange[0])
+          props.setSearchParams(props.searchParams)
+        }
+      }
+      if (props.searchParams.get("dmax")) {
+        if ( !isNaN(new Date(props.searchParams.get("dmax"))) ) {
+          dmax = new Date(props.searchParams.get("dmax"))
+          sliderMax = pathogenDateRangeSliderMax + Math.ceil((new Date(props.searchParams.get("dmax")) - new Date()) / 1000 / 60 / 60 / 24) + 1
+        } else {
+          console.log("bad max")
+          props.searchParams.set("dmax", pathogenDateRange[1])
+          props.setSearchParams(props.searchParams)
+        }
+      }
+      console.log(sliderMin, sliderMax)
+      setPathogenDateRangeSlider([sliderMin, sliderMax])
+      setPathogenDateRange([dmin, dmax])
+    }
+    setPathogenDateRangeForms("")
+    pathogenDateRangeRequest(pathogenType, pathogenDateRange[0], pathogenDateRange[1]) // fill pathogen Lineage buttons on load
+  }, [pathogenType])
 
   //====================================================================================================( handle branch selection ) 
   useEffect(() => {
@@ -95,13 +131,13 @@ function Epitools(props) {
 
   //====================================================================================================( fill metadata buttons )
   useEffect(() => {
-    console.log("branchesData", branchesData)
+    //console.log("branchesData", branchesData)
     branchesDataRef.current = branchesData
     let appendMetadataDiv = document.getElementsByClassName("appendMetadataDiv")
     while (appendMetadataDiv.firstChild) {appendMetadataDiv.removeChild(appendMetadataDiv.firstChild)}
     var newMetadataForms = []
     if (branchesData && branchesData.length >= 1) {
-      console.log("branchesData", branchesData)
+      //console.log("branchesData", branchesData)
       newMetadataForms = Object.keys(branchesData[0]).map((branch) =>
         <form key={branch} className="appendMetadataForm">
           <label>{branch}</label>
@@ -140,7 +176,7 @@ function Epitools(props) {
   //====================================================================================================( database queries )
   // database query post request
   async function mysqlRequest(data = "") {
-    console.log("requestData:", data)
+    //console.log("requestData:", data)
     setLoadingScreenVisibility("visible")
     //const response = await fetch("/go-epitools/mysql", {
     await fetch(host.current + "mysql", {
@@ -197,7 +233,7 @@ function Epitools(props) {
 
   // pathogen lineage request
   async function pathogenLineageRequest(data = "", url = "lineage", date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
-    console.log("data", data)
+    //console.log("data", data)
     setLoadingScreenVisibility("visible")
     await fetch(host.current + url, {
       method: 'POST',
@@ -227,8 +263,8 @@ function Epitools(props) {
 
   // request Augur Ancestral
   async function mutationsRequest(nwk = "", samples = [], url = "mutations") {
-    console.log("nwk", nwk)
-    console.log("samples", samples)
+    //console.log("nwk", nwk)
+    //console.log("samples", samples)
     setLoadingScreenVisibility("visible")
     await fetch(host.current + url, {
       method: 'POST',
@@ -257,7 +293,7 @@ function Epitools(props) {
 
   // rebuild tree from selected samples
   async function samplesRequest(data = "", url = "samples") {
-    console.log("data", data)
+    //console.log("data", data)
     setLoadingScreenVisibility("visible")
     await fetch(host.current + url, {
       method: 'POST',
@@ -285,7 +321,7 @@ function Epitools(props) {
 
   // pathogen date range query
   async function pathogenDateRangeRequest(pathogen, date1, date2, url = "dateRange") {
-    console.log(pathogen, date1, date2)
+    //console.log(pathogen, date1, date2)
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
@@ -376,9 +412,9 @@ function Epitools(props) {
   }
 
   // text file downloader
-  function download(text, name, type = "text") {
-    var a = document.createElement('a');
-    var file = URL.createObjectURL(new Blob([text], {type: type}));
+  function downloadText(text, name, type = "text") {
+    let a = document.createElement('a');
+    let file = URL.createObjectURL(new Blob([text], {type: type}));
     a.href = file;
     a.setAttribute('download', name);
     document.body.appendChild(a);
@@ -387,12 +423,20 @@ function Epitools(props) {
   }
 
   // image file downloader
-  const exportCanvasCallback = (e) => {
-    console.log("exportCanvasCallback", e)
-    setGetImage(false)
-    var a = document.createElement('a');
-    a.href = e;
-    a.setAttribute('download', "export.png");
+  function downloadImage(imageType) {
+    let a = document.createElement('a');
+    let srcCanvas = getCanvas();
+    let bgCanvas = document.createElement("canvas"); // create and fill dummy canvas
+    bgCanvas.width = srcCanvas.width;
+    bgCanvas.height = srcCanvas.height;
+    let bgCtx = bgCanvas.getContext('2d');
+    if (imageType.toLowerCase() === "jpeg") { // only paint white background if jpeg export
+      bgCtx.fillStyle = "#FFFFFF";
+      bgCtx.fillRect(0,0,srcCanvas.width,srcCanvas.height);
+    }
+    bgCtx.drawImage(srcCanvas, 0, 0); // draw phylocanvas to dummy canvas and export
+    a.href = bgCanvas.toDataURL("image/" + imageType);
+    a.setAttribute('download', "export." + imageType);
     document.body.appendChild(a);
     a.click()
     a.parentNode.removeChild(a);
@@ -405,9 +449,9 @@ function Epitools(props) {
     for (let e of [...document.getElementsByClassName("appendMetadataForm")].filter(x => x.childNodes[1].checked)) {
       checked.push(e.childNodes[0].innerHTML)
     }
-    console.log(checked)
+    //console.log(checked)
     setMetadataLabels(checked)
-    console.log(metadataLabels)
+    //console.log(metadataLabels)
   }
 
   // date range slider for adjusting pathogen buttons
@@ -416,8 +460,13 @@ function Epitools(props) {
     let today = new Date()
     let date0 = new Date(today - (1080 - pathogenDateRangeSlider[0]) * (1000 * 60 * 60 * 24))
     let date1 = new Date(today - (1080 - pathogenDateRangeSlider[1]) * (1000 * 60 * 60 * 24))
-    setPathogenDateRange([date0.toISOString().split("T")[0], date1.toISOString().split("T")[0]])
-    pathogenDateRangeRequest(props.pathogenType, pathogenDateRange[0], pathogenDateRange[1])
+    //console.log("DATE====>", new Date().toLocaleDateString("sv-SE"), date0.toLocaleDateString("sv-SE"), date1.toLocaleDateString("sv-SE"))
+    //console.log("DATE=Delts===>", Math.floor((new Date() - date0) / 1000 / 60 / 60 / 24), date0.toLocaleDateString("sv-SE"), date1.toLocaleDateString("sv-SE"))
+    props.searchParams.set("dmin", date0.toLocaleDateString("sv-SE"))
+    props.searchParams.set("dmax", date1.toLocaleDateString("sv-SE"))
+    props.setSearchParams(props.searchParams)
+    setPathogenDateRange([date0.toLocaleDateString("sv-SE"), date1.toLocaleDateString("sv-SE")])
+    pathogenDateRangeRequest(pathogenType, pathogenDateRange[0], pathogenDateRange[1])
   };
 
   // sort array or maps by 'Lineage'
@@ -444,6 +493,7 @@ function Epitools(props) {
     setPhyloHeight(dragRef.current);
   }
 
+  //====================================================================================================( return )
   return (
     <div style={{ position: "relative", height: "100%" }} ref={elementRef}>
       {/* loading splash screen */}
@@ -466,7 +516,6 @@ function Epitools(props) {
         setVisibility={setTableUploadFormVisibility}
         importData={setBranchesData}
       />
-      {/*uploadScreen && <UploadScreen setData={(e) => { setBranchesData(e) }} setDisplay={(e) => { setUploadScreen(e) }}></UploadScreen>*/}
 
       {/* buttons */}
       <div style={{ position: "relative"}}>
@@ -484,7 +533,10 @@ function Epitools(props) {
               } />
 
               {/* build new phylocanvas and table from current selection */}
-              <SvgButton onClick={() => {samplesRequest(importPhylocanvasSelection)}} label="build from selection" />
+              <SvgButton onClick={() => {
+                setUpdateTable(true)
+                samplesRequest(importPhylocanvasSelection)
+              }} label="build from selection" />
 
               {/* augments tree with mutations  */}
               <SvgButton onClick={() => {mutationsRequest(nwk, phylocanvasLeafNames)}} label="get mutations" />
@@ -511,22 +563,9 @@ function Epitools(props) {
               <SvgButton label="export data" drop={
                 <div>
                   <div>Tree Export:</div>
-                  <SvgButton label="PNG Image Format" onClick={() => {setGetImage(true)}} />
-                  <SvgButton label="NWK Text Format" onClick={() => {
-                    setGetTree(() => (e) => {
-                      let treeString = e.stringRepresentation
-                      for (let leaf of e.leaves) {
-                        let label = leaf.label
-                        for (let character of ["(", ")", ":", ";", " "]) {
-                          label = label.replaceAll(character, "_")
-                        }
-                        treeString = treeString.replace(leaf.id, label)
-                      }
-                      download(treeString, "export.nwk")
-                      setGetTree()
-                    })
-                    //console.log(tree)
-                  }} />
+                  <SvgButton label="PNG Image Format" onClick={() => {downloadImage("png")}} />
+                  <SvgButton label="JPEG Image Format" onClick={() => {downloadImage("jpeg")}} />
+                  <SvgButton label="NWK Text Format" onClick={() => {downloadText(getNwk(), "export.nwk")}} />
                   <br />
                   <div>Table Export:</div>
                   <SvgButton label="TSV Text Format"
@@ -535,7 +574,7 @@ function Epitools(props) {
                       for (var i in branchesData) {
                         exportText.push(Object.values(branchesData[i]).join("\t"))
                       }
-                      download(exportText.join("\n"), "export.tsv", "text")
+                      downloadText(exportText.join("\n"), "export.tsv", "text")
                     }}
                   />
                 </div>
@@ -559,7 +598,7 @@ function Epitools(props) {
           } />
           {*/}
 
-          <SvgButton label={"load " + props.pathogenType + " lineage"} drop={
+          <SvgButton label={"load " + pathogenType + " lineage"} drop={
             <div style={{ display: "flex", flexFlow: "column" }}>
               <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
                 <div style={{ display: "flex", justifyContent: "center" }}>
@@ -599,16 +638,13 @@ function Epitools(props) {
           metadataLabels={metadataLabels}
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
-          getTree={getTree}
-          triggerCanvasCallback={getImage}
-          exportCanvasCallback={exportCanvasCallback}
+          setGetNwk={setGetNwk}
+          setGetCanvas={setGetCanvas}
           primaryColumn={tablePrimaryColumn}
         />
 
         {/* handsontable component */}
         <div>
-          {/* TODO: fix jonathon upload */}
-          {/*<button onClick={() => { setUploadScreen(!uploadScreen) }}>Upload</button>*/}
           <SelectionHOT
             label="Metadata:"
             data={branchesData}

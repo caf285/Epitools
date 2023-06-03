@@ -63,10 +63,9 @@ function PhylocanvasView(props) {
         metadataLabels={props.metadataLabels}
         stretchOrientation={stretchOrientation}
         importSelection={props.importSelection}
-        getTree={props.getTree}
+        setGetNwk={props.setGetNwk}
+        setGetCanvas={props.setGetCanvas}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
-        exportCanvasCallback={props.exportCanvasCallback}
-        triggerCanvasCallback={props.triggerCanvasCallback}
         primaryColumn={props.primaryColumn}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0 }}>

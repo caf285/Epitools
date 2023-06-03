@@ -4,7 +4,6 @@ import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import logo from "../tgen-coh.png";
 import "./Nav.css";
-import RequestPathogenList from "./RequestPathogenList";
 
 function Header(props) {
   // demo loaded on localhost only
@@ -23,28 +22,23 @@ function Header(props) {
     }
   }, [])
 
-  // populates with pathogen types from DB query
-  const [pathogenTypeList, setPathogenTypeList] = useState();
-
   // populates with pathogen types converted to Nav.Dropdown.Items
   const [pathogenDropdown, setPathogenDropdown] = useState();
   useEffect(() => {
-    if (pathogenTypeList) {
-      props.setPathogenType(pathogenTypeList[0])
-      setPathogenDropdown(pathogenTypeList.map((v, k) => {return <NavDropdown.Item key={k} onClick={() => {props.setPathogenType(v)}}>{v}</NavDropdown.Item>}))
+    if (props.pathogenTypeList && props.pathogenTypeList.length > 1) {
+      props.searchParams.set("pathogen", props.pathogenTypeList[0])
+      props.setSearchParams(props.searchParams)
+      setPathogenDropdown(props.pathogenTypeList.map((v, k) => {return <NavDropdown.Item key={k} onClick={() => {
+        props.searchParams.set("pathogen", v)
+        props.setSearchParams(props.searchParams)
+      }}>{v}</NavDropdown.Item>}))
     }
-  }, [pathogenTypeList])
+  }, [props.pathogenTypeList])
 
   // pathogen button
 
   return (
     <div className="Nav-header">
-
-      {/* upon header load, immediately get a list of pathogen types from the DB */}
-      <RequestPathogenList
-        setPathogenTypeList = {setPathogenTypeList}
-      />
-
       <Navbar sticky="top" bg="light" variant="light">
         <Navbar.Brand href="/epitools/home/">
           <img
@@ -57,8 +51,7 @@ function Header(props) {
         </Navbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="/epitools/home/">Home</Nav.Link>
-          <Nav.Link href="/epitools/home/">Epitools</Nav.Link>
-          <NavDropdown title={props.pathogenType ? "Pathogen (" + props.pathogenType + ")" : "Pathogen"}>
+          <NavDropdown title={props.searchParams.get("pathogen") ? "Pathogen (" + props.searchParams.get("pathogen") + ")" : "Pathogen"}>
             {pathogenDropdown}
           </NavDropdown>
           {demoNav}

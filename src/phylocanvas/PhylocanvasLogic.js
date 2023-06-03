@@ -19,12 +19,6 @@ const { getPixelRatio } = utils.canvas;
 function PhylocanvasLogic(props) {
 
   useEffect(() => {
-    if (props.getTree) {
-      props.getTree(phylocanvas.current)
-    }
-  }, [props.getTree])
-
-  useEffect(() => {
     setHW(props.height, widthRef.current)
     window.dispatchEvent(new Event('resize'))
     if (phylocanvas.current) {
@@ -63,6 +57,31 @@ function PhylocanvasLogic(props) {
   }
 
   let typeList = useRef(["radial", "rectangular", "circular", "diagonal", "hierarchical"]);
+
+  useEffect(() => {
+    // set data getters on component load
+    if (props.setGetNwk) {
+      props.setGetNwk(() => () => {
+        // get nwk string
+        let treeString = phylocanvas.current.stringRepresentation
+        // append leaf labels to nwk string
+        for (let leaf of phylocanvas.current.leaves) {
+          let label = leaf.label
+          for (let character of ["(", ")", ":", ";", " "]) {
+            label = label.replaceAll(character, "_")
+          }   
+          treeString = treeString.replace(leaf.id, label)
+        }
+        // export nwk string
+        return treeString
+      })
+    }
+    if (props.setGetCanvas) {
+      props.setGetCanvas(() => () => {
+        return phylocanvas.current.canvas.canvas;
+      })
+    }
+  }, [])
 
   useEffect(() => {
     function initialSize() {
@@ -159,17 +178,7 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.stretchOrientation.orientation = props.stretchOrientation
   }, [props.stretchOrientation])
 
-  // return PNG of immediate canvas draw (for export)
-  useEffect(() => {
-    if (props.triggerCanvasCallback && props.triggerCanvasCallback === true) {
-      props.exportCanvasCallback(phylocanvas.current.canvas.canvas.toDataURL('image/png'))
-    }
-  }, [props.triggerCanvasCallback])
-
-
-  
   // append metadata to each branch label
-
   useEffect(() => {
     console.log("primary column", props.primaryColumn)
     console.log(phylocanvas.current.branches)
@@ -177,8 +186,6 @@ function PhylocanvasLogic(props) {
     if (props.branchesData && props.branchesData.length >= 1) {
       console.log(props.branchesData[0][Object.keys(props.branchesData[0])[props.primaryColumn]])
     }
-
-
     if (phylocanvas.current.treeStats) {
       for (let i in props.branchesData) {
 
