@@ -1,6 +1,6 @@
 // TODO: hook up props.pathogenTypeList and props.searchParams ... replace props.pathogenType
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Epitools.css";
 import "./style.css";
 
@@ -9,15 +9,19 @@ import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 import SelectionHOT from "../handsontable/SelectionHOT.js";
 import SplitPane from "react-split-pane";
 //import UploadScreen from "../uploadScreen/uploadScreen"
-import Slider from "@mui/material/Slider";
 import Box from '@mui/material/Box';
 import ReactLoading from "react-loading";
-//import DatePicker from "react-datepicker";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import TableUpload from "./TableUpload.js";
 
 function Epitools(props) {
   //====================================================================================================( set variables )
+  // destructure props
+  const pathogenTypeList = props.pathogenTypeList
+  const searchParams = props.searchParams
+  const setSearchParams = props.setSearchParams
+
   // phylocanvas
   const [nwk, setNwk] = useState("(A:1)B;")
   const [phylocanvasLeafNames, setPhylocanvasLeafNames] = useState([])
@@ -41,9 +45,7 @@ function Epitools(props) {
   const branchesDataRef = useRef([])
 
   // pathogen lineage
-  const [pathogenDateRangeSliderMax, setPathogenDateRangeSliderMax] = useState(1080)
-  const [pathogenDateRangeSlider, setPathogenDateRangeSlider] = useState([720, pathogenDateRangeSliderMax]);
-  const [pathogenDateRange, setPathogenDateRange] = useState([new Date(new Date() - (pathogenDateRangeSliderMax - pathogenDateRangeSlider[0]) * (1000 * 60 * 60 * 24)).toLocaleDateString("sv-SE"), new Date(new Date() - (pathogenDateRangeSliderMax - pathogenDateRangeSlider[1]) * (1000 * 60 * 60 * 24)).toLocaleDateString("sv-SE")])
+  const [pathogenDateRange, setPathogenDateRange] = useState([new Date("06/01/2019"), new Date()])
   const [pathogenDateRangeForms, setPathogenDateRangeForms] = useState("")
 
   // other
@@ -56,60 +58,85 @@ function Epitools(props) {
   const [metadataForms, setMetadataForms] = useState("")
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
+  //====================================================================================================( callbacks )
+  const formatDate = useCallback((date) => {
+    let newYear = date.toLocaleString("default", { year: "numeric" })
+    let newMonth = date.toLocaleString("default", { month: "2-digit" })
+    let newDay = date.toLocaleString("default", { day: "2-digit" })
+    return newYear + "-" + newMonth + "-" + newDay
+  })
+
+  const formatUTCDate = useCallback((date) => {
+    let newYear = date.toLocaleString("default", { timeZone: "UTC", year: "numeric" })
+    let newMonth = date.toLocaleString("default", { timeZone: "UTC", month: "2-digit" })
+    let newDay = date.toLocaleString("default", { timeZone: "UTC", day: "2-digit" })
+    return new Date(newMonth + "/" + newDay + "/" + newYear)
+  })
+ 
   //====================================================================================================( initialize variables ) 
   useEffect(() => {
     setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
     setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
   }, [])
 
-  // if query parameter is already in address bar on load, but does not match acceptable parameter, load default
   useEffect(() => {
-    if (props.pathogenTypeList && props.pathogenTypeList.length > 1) {
-      if (!props.pathogenTypeList.includes(pathogenType)) {
-        setPathogenType(props.pathogenTypeList[0])
-      }
-    }
-  }, [props.pathogenTypeList])
+    console.log(pathogenDateRange)
+  }, [pathogenDateRange])
 
-  // if query parameter changes, make sure it matches acceptable parameter, then load pathogenType from query parameter
-  useEffect(() => {
-    if (props.searchParams && props.searchParams.get("pathogen")) {
-      //console.log(props.pathogenTypeList, props.searchParams.get("pathogen"))
-      if (props.pathogenTypeList && props.pathogenTypeList.includes(props.searchParams.get("pathogen"))) {
-        setPathogenType(props.searchParams.get("pathogen"))
+  // load pathogen on searchParam change (TODO: TEMPORARY!!! will remove after pathogen dropdown button removed)
+  const loadPathogenFromSearchParamsCallback = useCallback(() => {
+    if (pathogenTypeList) {
+      if (searchParams && searchParams.get("pathogen") && pathogenTypeList.includes(searchParams.get("pathogen"))) {
+        setPathogenType(searchParams.get("pathogen"))
       }
     }
-  }, [props.searchParams])
+  }, [searchParams, pathogenTypeList])
+  useEffect(() => {
+    loadPathogenFromSearchParamsCallback()
+  }, [searchParams, loadPathogenFromSearchParamsCallback])
+
+  // load pathogen from query parameter if exists and in pathogenTypeList, else load default
+  const loadPathogenFromPathogenTypeListCallback = useCallback(() => {
+    if (pathogenTypeList && pathogenTypeList.length > 1) {
+      if (searchParams && searchParams.get("pathogen") && pathogenTypeList.includes(searchParams.get("pathogen"))) {
+        setPathogenType(searchParams.get("pathogen"))
+      } else {
+        if (!pathogenTypeList.includes(pathogenType)) {
+          //console.log("pathogenType:", pathogenType)
+          setPathogenType(pathogenTypeList[0])
+          searchParams.set("pathogen", pathogenTypeList[0])
+          setSearchParams(searchParams)
+        }
+      }
+    }
+  }, [pathogenType, searchParams, setSearchParams, pathogenTypeList])
+  useEffect(() => {
+    loadPathogenFromPathogenTypeListCallback()
+  }, [pathogenTypeList, loadPathogenFromPathogenTypeListCallback])
 
   // import date ranges if applicable and fill pathogen lineage button dropdown on pathogen change
   useEffect(() => {
-    if (props.searchParams) {
-      let sliderMin = pathogenDateRangeSlider[0]
-      let sliderMax = pathogenDateRangeSlider[1]
+    if (searchParams) {
       let dmin = pathogenDateRange[0]
       let dmax = pathogenDateRange[1]
-      if (props.searchParams.get("dmin")) {
-        if ( !isNaN(new Date(props.searchParams.get("dmin"))) ) {
-          dmin = new Date(props.searchParams.get("dmin"))
-          sliderMin = pathogenDateRangeSliderMax + Math.ceil((new Date(props.searchParams.get("dmin")) - new Date()) / 1000 / 60 / 60 / 24) + 1
+      if (searchParams.get("dmin")) {
+        if ( !isNaN(new Date(searchParams.get("dmin"))) ) {
+          dmin = formatUTCDate(new Date(searchParams.get("dmin")))
         } else {
-          console.log("bad min")
-          props.searchParams.set("dmin", pathogenDateRange[0])
-          props.setSearchParams(props.searchParams)
+          //console.log("bad min")
+          searchParams.set("dmin", formatDate(pathogenDateRange[0]))
+          setSearchParams(searchParams)
         }
       }
-      if (props.searchParams.get("dmax")) {
-        if ( !isNaN(new Date(props.searchParams.get("dmax"))) ) {
-          dmax = new Date(props.searchParams.get("dmax"))
-          sliderMax = pathogenDateRangeSliderMax + Math.ceil((new Date(props.searchParams.get("dmax")) - new Date()) / 1000 / 60 / 60 / 24) + 1
+      if (searchParams.get("dmax")) {
+        if ( !isNaN(new Date(searchParams.get("dmax"))) ) {
+          dmax = formatUTCDate(new Date(searchParams.get("dmax")))
         } else {
-          console.log("bad max")
-          props.searchParams.set("dmax", pathogenDateRange[1])
-          props.setSearchParams(props.searchParams)
+          //console.log("bad max")
+          searchParams.set("dmax", formatDate(pathogenDateRange[1]))
+          setSearchParams(searchParams)
         }
       }
-      console.log(sliderMin, sliderMax)
-      setPathogenDateRangeSlider([sliderMin, sliderMax])
       setPathogenDateRange([dmin, dmax])
     }
     setPathogenDateRangeForms("")
@@ -126,7 +153,9 @@ function Epitools(props) {
   }, [phylocanvasLeafNames])
 
   useEffect(() => {
-    console.log(mutationsJson)
+    if (mutationsJson) {
+      console.log(mutationsJson)
+    }
   }, [mutationsJson])
 
   //====================================================================================================( fill metadata buttons )
@@ -155,19 +184,19 @@ function Epitools(props) {
   const reader = useRef(new FileReader())
 
   // get branch names callback
-  const branchNameCallback = (e) => {
+  const branchNameCallback = useCallback((e) => {
     setPhylocanvasLeafNames(e)
-  }
+  }, [setPhylocanvasLeafNames])
 
   // get selection list
-  const exportPhylocanvasSelectionCallback = (e) => {
+  const exportPhylocanvasSelectionCallback = useCallback((e) => {
     //console.log("phylocanvas selection:", e)
     setImportTableSelection(e)
-  }
-  const exportTableSelectionCallback = (e) => {
+  }, [setImportTableSelection])
+  const exportTableSelectionCallback = useCallback((e) => {
     //console.log("table selection:", e)
     setImportPhylocanvasSelection(e)
-  }
+  }, [setImportPhylocanvasSelection])
 
   const calculateBottomPaneHeight = (topPaneHeight) => {
     return elementRef.current?.clientHeight - topPaneHeight
@@ -341,6 +370,7 @@ function Epitools(props) {
         if (data) {
           updatePathogenDateRangeForms(data)
         } else {
+          setPathogenDateRangeForms([])
           console.log("no data")
         }
       })
@@ -454,20 +484,20 @@ function Epitools(props) {
     //console.log(metadataLabels)
   }
 
-  // date range slider for adjusting pathogen buttons
-  const handlePathogenDateRangeSlider = (event: Event, newValue: number | number[]) => {
-    setPathogenDateRangeSlider(newValue);
-    let today = new Date()
-    let date0 = new Date(today - (1080 - pathogenDateRangeSlider[0]) * (1000 * 60 * 60 * 24))
-    let date1 = new Date(today - (1080 - pathogenDateRangeSlider[1]) * (1000 * 60 * 60 * 24))
-    //console.log("DATE====>", new Date().toLocaleDateString("sv-SE"), date0.toLocaleDateString("sv-SE"), date1.toLocaleDateString("sv-SE"))
-    //console.log("DATE=Delts===>", Math.floor((new Date() - date0) / 1000 / 60 / 60 / 24), date0.toLocaleDateString("sv-SE"), date1.toLocaleDateString("sv-SE"))
-    props.searchParams.set("dmin", date0.toLocaleDateString("sv-SE"))
-    props.searchParams.set("dmax", date1.toLocaleDateString("sv-SE"))
+  // date range for adjusting pathogen buttons
+  const handleMinDatePicker = (date) => {
+    props.searchParams.set("dmin", formatDate(date))
     props.setSearchParams(props.searchParams)
-    setPathogenDateRange([date0.toLocaleDateString("sv-SE"), date1.toLocaleDateString("sv-SE")])
-    pathogenDateRangeRequest(pathogenType, pathogenDateRange[0], pathogenDateRange[1])
-  };
+    setPathogenDateRange([date, pathogenDateRange[1]])
+    pathogenDateRangeRequest(pathogenType, date, pathogenDateRange[1])
+  }
+
+  const handleMaxDatePicker = (date) => {
+    props.searchParams.set("dmax", formatDate(date))
+    props.setSearchParams(props.searchParams)
+    setPathogenDateRange([pathogenDateRange[0], date])
+    pathogenDateRangeRequest(pathogenType, pathogenDateRange[0], date)
+  }
 
   // sort array or maps by 'Lineage'
   function sortForms(data) {
@@ -583,28 +613,24 @@ function Epitools(props) {
             </div>
           } />
 
-          {/* start date *}
-          <SvgButton label="Start Date" drop={
-            <div>
-              <DatePicker />
-            </div>
-          } />
-
-          {/* end date *}
-          <SvgButton label="End Date" drop={
-            <div>
-              <DatePicker />
-            </div>
-          } />
-          {*/}
-
           <SvgButton label={"load " + pathogenType + " lineage"} drop={
             <div style={{ display: "flex", flexFlow: "column" }}>
               <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  {new Date(pathogenDateRange[0]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})} .. {new Date(pathogenDateRange[1]).toLocaleDateString('en-us', {year:"numeric", month:"short", day:"numeric"})}
+                <div style={{ display: "flex", flexFlow: "row" }}>
+                  <DatePicker
+                    className="EpitoolsDatePicker"
+                    dateFormat="MMMM d, yyyy"
+                    selected={pathogenDateRange[0]}
+                    onChange={handleMinDatePicker}
+                  />
+                  <div>..</div>
+                  <DatePicker
+                    className="EpitoolsDatePicker"
+                    dateFormat="MMMM d, yyyy"
+                    selected={pathogenDateRange[1]}
+                    onChange={handleMaxDatePicker}
+                  />
                 </div>
-                <Slider min={0} step={1} max={1080} value={pathogenDateRangeSlider} onChange={handlePathogenDateRangeSlider} />
               </Box>
               <div style={{ display: "flex", flexFlow: "column" }}>
                 {pathogenDateRangeForms}

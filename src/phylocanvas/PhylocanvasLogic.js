@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Phylocanvas, { utils } from "phylocanvas";
 
 import scalebar from "phylocanvas-plugin-scalebar";
@@ -17,6 +17,17 @@ Phylocanvas.plugin(stretchOrientation)
 const { getPixelRatio } = utils.canvas;
 
 function PhylocanvasLogic(props) {
+  // destructure props
+  const nwk = props.nwk
+  const lineWidth = props.lineWidth
+  const setGetNwk = props.setGetNwk
+  const setGetCanvas = props.setGetCanvas
+  const exportSelectionCallback = props.exportSelectionCallback
+  const importSelection = props.importSelection
+  const branchNameCallback = props.branchNameCallback
+  const branchesData = props.branchesData
+  const primaryColumn = props.primaryColumn
+  const metadataLabels = props.metadataLabels
 
   useEffect(() => {
     setHW(props.height, widthRef.current)
@@ -60,8 +71,8 @@ function PhylocanvasLogic(props) {
 
   useEffect(() => {
     // set data getters on component load
-    if (props.setGetNwk) {
-      props.setGetNwk(() => () => {
+    if (setGetNwk) {
+      setGetNwk(() => () => {
         // get nwk string
         let treeString = phylocanvas.current.stringRepresentation
         // append leaf labels to nwk string
@@ -76,12 +87,12 @@ function PhylocanvasLogic(props) {
         return treeString
       })
     }
-    if (props.setGetCanvas) {
-      props.setGetCanvas(() => () => {
+    if (setGetCanvas) {
+      setGetCanvas(() => () => {
         return phylocanvas.current.canvas.canvas;
       })
     }
-  }, [])
+  }, [setGetNwk, setGetCanvas])
 
   useEffect(() => {
     function initialSize() {
@@ -92,46 +103,53 @@ function PhylocanvasLogic(props) {
     return () => {
       window.removeEventListener("load", initialSize);
     };
-  }, [heightRef.current])
+  }, [])
 
   // load tree on component load and add listener for click action to export selected ids
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
     phylocanvas.current.addListener("click", () => {
-      props.exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
+      exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
     })
-  }, [])
+  }, [exportSelectionCallback])
 
   // select all branches from handsontable selection import
   useEffect(() => {
     for (let branch in phylocanvas.current.branches) {
-      if (props.importSelection.includes(branch)) {
+      if (importSelection.includes(branch)) {
         phylocanvas.current.branches[branch].selected = true
       } else {
         phylocanvas.current.branches[branch].selected = false
       }
       phylocanvas.current.draw()
     }
-  }, [props.importSelection])
+  }, [importSelection])
 
   // return branch names on nwk change so names can be queried
-  useEffect(() => {
-    props.exportSelectionCallback([])
+  const resetTreeCallback = useCallback(() => {
+    exportSelectionCallback([])
     let oldTree = phylocanvas.current.stringRepresentation
     try {
-      phylocanvas.current.load(props.nwk)
-      phylocanvas.current.setTreeType("rectangular")
-    } catch (error) {
+      phylocanvas.current.load(nwk)
+      phylocanvas.current.setNodeSize(nodeSizeRef.current)
+      phylocanvas.current.setTextSize(textSizeRef.current)
+      phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
+    } catch (err) {
       phylocanvas.current.load(oldTree)
+      console.log(err)
     }
-    phylocanvas.current.setNodeSize(nodeSizeRef.current)
-    phylocanvas.current.setTextSize(textSizeRef.current)
-    phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
-    console.log(phylocanvas.current)
-    if (props.branchNameCallback) {
-      props.branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
+    if (branchNameCallback) {
+      branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
-  }, [props.nwk])
+  }, [nwk, exportSelectionCallback, branchNameCallback])
+  useEffect(() => {
+    resetTreeCallback()
+  }, [nwk, resetTreeCallback])
+  useEffect(() => {
+    if (props.resetTreeBool) {
+      resetTreeCallback()
+    }
+  }, [props.resetTreeBool, resetTreeCallback])
 
   // update and redraw tree when treeType, lineWidth, text/label size changes
   useEffect(() => {
@@ -143,7 +161,10 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.setNodeSize(nodeSizeRef.current)
     phylocanvas.current.setTextSize(textSizeRef.current)
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
-  }, [props.type, props.lineWidth])
+  }, [props.type])
+  useEffect(() => {
+    phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
+  }, [props.lineWidth])
   useEffect(() => {
     setNodeSize(props.nodeSize * getPixelRatio(phylocanvas.current.canvas) / 2)
     phylocanvas.current.setNodeSize(nodeSizeRef.current)
@@ -153,11 +174,11 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.setTextSize(textSizeRef.current)
   }, [props.textSize])
   useEffect(() => {
-    phylocanvas.current.showLabels = props.labels
+    phylocanvas.current.showLabels = props.showLabels
     phylocanvas.current.alignLabels = props.align
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
     phylocanvas.current.draw()
-  }, [props.labels, props.align, props.lineWidth])
+  }, [props.showLabels, props.align, props.lineWidth])
 
   // update and redraw when cluster size/distance changes
   /*
@@ -167,11 +188,11 @@ function PhylocanvasLogic(props) {
   useEffect(() => {
     if (phylocanvas.current.pairwiseOps) {
       phylocanvas.current.pairwiseOps.clusterDistance = props.clusterDistance
-      phylocanvas.current.pairwiseOps.clusterSamples = props.clusterSamples
+      phylocanvas.current.pairwiseOps.clusterSize = props.clusterSize
       phylocanvas.current.pairwiseOps.clusterDraw = true
       phylocanvas.current.draw()
     }
-  }, [props.clusterDistance, props.clusterSamples])
+  }, [props.clusterDistance, props.clusterSize])
 
   // for orientation of phylocanvas stretch, horizontal, vertical, or both
   useEffect(() => {
@@ -179,29 +200,32 @@ function PhylocanvasLogic(props) {
   }, [props.stretchOrientation])
 
   // append metadata to each branch label
-  useEffect(() => {
-    console.log("primary column", props.primaryColumn)
-    console.log(phylocanvas.current.branches)
-    console.log(Object.keys(phylocanvas.current.branches))
-    if (props.branchesData && props.branchesData.length >= 1) {
-      console.log(props.branchesData[0][Object.keys(props.branchesData[0])[props.primaryColumn]])
+  const appendMetadataCallback = useCallback(() => {
+    //console.log("primary column", props.primaryColumn)
+    //console.log(phylocanvas.current.branches)
+    //console.log(Object.keys(phylocanvas.current.branches))
+    if (branchesData && branchesData.length >= 1) {
+      //console.log(props.branchesData[0][Object.keys(branchesData[0])[primaryColumn]])
     }
     if (phylocanvas.current.treeStats) {
-      for (let i in props.branchesData) {
-
-        if (Object.keys(phylocanvas.current.branches).includes(props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]])) {
-          let additionalMetadata = [phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]]["id"]]
-          phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]].clearMetadata()
-          for (let j in props.metadataLabels) {
-            additionalMetadata.push(props.branchesData[i][props.metadataLabels[j]])
-            phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]].appendMetadata(props.branchesData[i][props.metadataLabels[j]])
+      for (let i in branchesData) {
+        if (Object.keys(phylocanvas.current.branches).includes(branchesData[i][Object.keys(branchesData[i])[primaryColumn]])) {
+          let additionalMetadata = [phylocanvas.current.branches[branchesData[i][Object.keys(branchesData[i])[primaryColumn]]]["id"]]
+          phylocanvas.current.branches[branchesData[i][Object.keys(branchesData[i])[primaryColumn]]].clearMetadata()
+          for (let j in metadataLabels) {
+            additionalMetadata.push(branchesData[i][metadataLabels[j]])
+            phylocanvas.current.branches[branchesData[i][Object.keys(branchesData[i])[primaryColumn]]].appendMetadata(branchesData[i][metadataLabels[j]])
           }
-          phylocanvas.current.branches[props.branchesData[i][Object.keys(props.branchesData[i])[props.primaryColumn]]]["label"] = additionalMetadata.join("_")
+          phylocanvas.current.branches[branchesData[i][Object.keys(branchesData[i])[primaryColumn]]]["label"] = additionalMetadata.join("_")
         }
         phylocanvas.current.draw()
       }
     }
-  }, [props.metadataLabels])
+    console.log(phylocanvas.current)
+  }, [metadataLabels, branchesData, primaryColumn])
+  useEffect(() => {
+    appendMetadataCallback()
+  }, [metadataLabels, appendMetadataCallback])
 
   return (
     <div style={{ height: "100%" }}>

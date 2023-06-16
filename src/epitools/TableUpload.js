@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./TableUpload.css";
 
 import SvgButton from "../svgButton/SvgButton.js";
@@ -7,6 +7,10 @@ import Handsontable from '../handsontable/Handsontable.js';
 import 'handsontable/dist/handsontable.full.css';
 
 function TableUpload(props) {
+  // destructure props
+  const fileText = props.fileText
+  const primaryColumn = props.primaryColumn
+  const setPrimaryColumn = props.setPrimaryColumn
 
   const [data, setData] = useState([[]])
   const [header, setHeader] = useState([])
@@ -31,52 +35,64 @@ function TableUpload(props) {
     return newTable
   }
 
-  useEffect(()=> {
-    if (props.fileText) {
-      props.setPrimaryColumn(0)
+  // initialize primaryColumnList, primaryColumn, and primaryColumnLabel on file upload
+  const initializePrimaryColumnCallback = useCallback(() => {
+    if (fileText) {
+      console.log("upload")
+      setPrimaryColumn(0)
       setPrimaryColumnList([])
-      if (props.fileText.length > 0) {
-        setPrimaryColumnList(Object.values(props.fileText[0]).map((v, k) =>
-          <div onClick={() => {props.setPrimaryColumn(k); setPrimaryColumnLabel(headerSwitch ? v : String(k) + ": " + v + " ...")}}>{headerSwitch ? v : String(k) + ": " + v + " ..."}</div>
+      if (fileText.length > 0) {
+        setPrimaryColumnList(Object.values(fileText[0]).map((v, k) =>
+          <div onClick={() => {setPrimaryColumn(k); setPrimaryColumnLabel(headerSwitch ? v : String(k) + ": " + v + " ...")}}>{headerSwitch ? v : String(k) + ": " + v + " ..."}</div>
         ))
       }
-      if (props.fileText && props.fileText.length > 0) {
-        if (props.fileText[0].length >= props.primaryColumn) {
-          setPrimaryColumnLabel(headerSwitch ? props.fileText[0][props.primaryColumn] : String(props.primaryColumn) + ": " + props.fileText[0][props.primaryColumn] + " ...")
+      if (fileText && fileText.length > 0) {
+        if (fileText[0].length >= primaryColumn) {
+          setPrimaryColumnLabel(headerSwitch ? fileText[0][primaryColumn] : String(primaryColumn) + ": " + fileText[0][primaryColumn] + " ...")
         }
       }
     }
-  }, [props.fileText])
+  }, [fileText, headerSwitch, setPrimaryColumn])
+  useEffect(()=> {
+    initializePrimaryColumnCallback()
+  }, [fileText, initializePrimaryColumnCallback])
 
-  useEffect(() => {
+  // TODO: break out callbacks to use both primaryColumn and setPrimaryColumn
+  // update primaryColumnList, primaryColumn, and primaryColumnLabel on headerSwitch change
+  const updatePrimaryColumnCallback = useCallback(() => {
+    console.log("update")
     setPrimaryColumnList([])
-    if (props.fileText.length > 0) {
-      setPrimaryColumnList(Object.values(props.fileText[0]).map((v, k) =>
-        <div onClick={() => {props.setPrimaryColumn(k); setPrimaryColumnLabel(headerSwitch ? v : String(k) + ": " + v + " ...")}}>{headerSwitch ? v : String(k) + ": " + v + " ..."}</div>
+    if (fileText.length > 0) {
+      setPrimaryColumnList(Object.values(fileText[0]).map((v, k) =>
+        <div onClick={() => {setPrimaryColumn(k); setPrimaryColumnLabel(headerSwitch ? v : String(k) + ": " + v + " ...")}}>{headerSwitch ? v : String(k) + ": " + v + " ..."}</div>
       ))
     }
-    if (props.fileText && props.fileText.length > 0) {
-      if (props.fileText[0].length >= props.primaryColumn) {
-        setPrimaryColumnLabel(headerSwitch ? props.fileText[0][props.primaryColumn] : String(props.primaryColumn) + ": " + props.fileText[0][props.primaryColumn] + " ...")
+    if (fileText && fileText.length > 0) {
+      if (fileText[0].length >= primaryColumn) {
+        setPrimaryColumnLabel(headerSwitch ? fileText[0][primaryColumn] : String(primaryColumn) + ": " + fileText[0][primaryColumn] + " ...")
       }
     }
-  }, [headerSwitch])
-
+  }, [fileText, headerSwitch, setPrimaryColumn])
   useEffect(() => {
-    if (props.fileText && props.fileText.length >= 1) {
+    updatePrimaryColumnCallback()
+  }, [headerSwitch, updatePrimaryColumnCallback])
+
+  // reset table header and data on file upload or headerSwitch change
+  useEffect(() => {
+    if (fileText && fileText.length >= 1) {
       if (headerSwitch) {
-        if (props.fileText.length > 0) {
-          setHeader(props.fileText[0])
+        if (fileText.length > 0) {
+          setHeader(fileText[0])
         }
-        if (props.fileText.length > 1) {
-          setData(props.fileText.slice(1))
+        if (fileText.length > 1) {
+          setData(fileText.slice(1))
         }
       } else {
         setHeader(false)
-        setData(props.fileText)
+        setData(fileText)
       }
     }
-  }, [props.fileText, headerSwitch])
+  }, [fileText, headerSwitch])
 
   return (
     <div className="TableUpload" style={{ visibility: props.visibility }}>

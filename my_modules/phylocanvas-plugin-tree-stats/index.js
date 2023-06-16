@@ -135,6 +135,6 @@ export default function plugin(decorate) {
         ctx.stroke(path)
       })
     }
-    console.log(this)
+    //console.log(this)
   });
 }

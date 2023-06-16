@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -6,6 +6,11 @@ import logo from "../tgen-coh.png";
 import "./Nav.css";
 
 function Header(props) {
+  // destructure props
+  const pathogenTypeList = props.pathogenTypeList
+  const searchParams = props.searchParams
+  const setSearchParams = props.setSearchParams
+
   // demo loaded on localhost only
   const [demoNav, setDemoNav] = useState();
   useEffect(() => {
@@ -24,16 +29,18 @@ function Header(props) {
 
   // populates with pathogen types converted to Nav.Dropdown.Items
   const [pathogenDropdown, setPathogenDropdown] = useState();
-  useEffect(() => {
-    if (props.pathogenTypeList && props.pathogenTypeList.length > 1) {
-      props.searchParams.set("pathogen", props.pathogenTypeList[0])
-      props.setSearchParams(props.searchParams)
-      setPathogenDropdown(props.pathogenTypeList.map((v, k) => {return <NavDropdown.Item key={k} onClick={() => {
-        props.searchParams.set("pathogen", v)
-        props.setSearchParams(props.searchParams)
+  const setPathogenDropdownCallback = useCallback(() => {
+    if (pathogenTypeList && pathogenTypeList.length > 1) {
+      setPathogenDropdown(pathogenTypeList.map((v, k) => {return <NavDropdown.Item key={k} onClick={() => {
+        searchParams.set("pathogen", v)
+        setSearchParams(searchParams)
       }}>{v}</NavDropdown.Item>}))
     }
-  }, [props.pathogenTypeList])
+  }, [pathogenTypeList, searchParams, setSearchParams])
+
+  useEffect(() => {
+    setPathogenDropdownCallback()
+  }, [pathogenTypeList, setPathogenDropdownCallback])
 
   // pathogen button
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./Phylocanvas.css";
 
 import SvgButton from "../svgButton/SvgButton.js";
@@ -8,26 +8,53 @@ import PhylocanvasLogic from "./PhylocanvasLogic.js";
 function PhylocanvasView(props) {
   // default configurations
   const [nwk, setNwk] = useState("(A:1)B;");
-  const [type, setType] = useState("rectangular");
-  const [labels, setLabels] = useState(true);
-  const [align, setAlign] = useState(false);
-  const [nodeSize] = useState(12);
-  const [textSize, setTextSize] = useState(24);
-  const [lineWidth, setLineWidth] = useState(2);
-  const [clusterDistance, setClusterDistance] = useState(4);
-  const [clusterSamples, setClusterSamples] = useState(3);
+  const [resetTreeBool, setResetTreeBool] = useState(false)
+
+  const defaultType = "rectangular"
+  const defaultShowLabels = true
+  const defaultAlign = false
+  const defaultNodeSize = 12
+  const defaultTextSize = 24
+  const defaultLineWidth = 2
+  const defaultClusterDistance = 2
+  const defaultClusterSize = 2
+
+  const [type, setType] = useState(defaultType);
+  const [showLabels, setShowLabels] = useState(defaultShowLabels);
+  const [align, setAlign] = useState(defaultAlign);
+  const [nodeSize, setNodeSize] = useState(defaultNodeSize);
+  const [textSize, setTextSize] = useState(defaultTextSize);
+  const [lineWidth, setLineWidth] = useState(defaultLineWidth);
+  const [clusterDistance, setClusterDistance] = useState(defaultClusterDistance);
+  const [clusterSize, setClusterSize] = useState(defaultClusterSize);
+
+  // reset all tree style values
+  useEffect(() => {
+    if (resetTreeBool) {
+      setType(defaultType)
+      setShowLabels(defaultShowLabels)
+      setAlign(defaultAlign)
+      setNodeSize(defaultNodeSize)
+      setTextSize(defaultTextSize)
+      setLineWidth(defaultLineWidth)
+      setClusterDistance(defaultClusterDistance)
+      setClusterSize(defaultClusterSize)
+      setResetTreeBool(false)
+    }
+  }, [resetTreeBool])
 
   // pass nwk to logic component
   useEffect(() => {
     if (props.nwk) {
       setNwk(props.nwk)
     }
+  console.log(type)
   }, [props.nwk])
 
   // stretch orientation for scrollwheel zoom
   const orientationRef = useRef(["both", "horizontal", "vertical"])
   const [stretchOrientation, setStretchOrientation] = useState(orientationRef.current[0])
-  function cycleOrientation() {
+  const cycleOrientation = useCallback(() => {
     if (["radial", "circular", "diagonal"].includes(type)) {
       setStretchOrientation(orientationRef.current[0])
     } else {
@@ -37,12 +64,12 @@ function PhylocanvasView(props) {
         setStretchOrientation(orientationRef.current[orientationRef.current.indexOf(stretchOrientation) + 1])
       }
     }
-  }
+  }, [stretchOrientation, setStretchOrientation, type])
   useEffect(() => {
     if (["radial", "circular", "diagonal"].includes(type)) {
       cycleOrientation()
     }
-  }, [type])
+  }, [type, cycleOrientation])
 
 
   return (
@@ -51,13 +78,13 @@ function PhylocanvasView(props) {
         nwk={nwk}
         height={props.height}
         type={type}
-        labels={labels}
+        showLabels={showLabels}
         align={align}
         nodeSize={nodeSize}
         textSize={textSize}
         lineWidth={lineWidth}
         clusterDistance={clusterDistance}
-        clusterSamples={clusterSamples}
+        clusterSize={clusterSize}
         branchesData={props.branchesData}
         branchNameCallback={props.branchNameCallback}
         metadataLabels={props.metadataLabels}
@@ -67,6 +94,7 @@ function PhylocanvasView(props) {
         setGetCanvas={props.setGetCanvas}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
         primaryColumn={props.primaryColumn}
+        resetTreeBool={resetTreeBool}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0 }}>
         <SvgButton
@@ -77,30 +105,33 @@ function PhylocanvasView(props) {
               <h5>Cluster Detection:</h5>
               <button onClick={() => setClusterDistance(clusterDistance + 1)}>ClusterDistance + 1</button>
               <button onClick={() => setClusterDistance(Math.max(clusterDistance - 1, 1))}>ClusterDistance - 1</button>
-              <button onClick={() => setClusterSamples(clusterSamples + 1)}>ClusterSamples + 1</button>
-              <button onClick={() => setClusterSamples(Math.max(clusterSamples - 1, 1))}>ClusterSamples - 1</button>
-              <h5>Toggle:</h5>
-              <button onClick={() => setLabels(!labels)}>Labels</button>
-              <button onClick={() => setAlign(!align)}>Align</button>
-              <h5>Style:</h5>
-              <button onClick={() => setTextSize(textSize + 1)}>Text Size + 1</button>
-              <button onClick={() => setTextSize(Math.max(textSize - 1, 1))}>Text Size - 1</button>
-              <button onClick={() => setLineWidth(lineWidth + 1)}>Line Width + 1</button>
-              <button onClick={() => setLineWidth(Math.max(lineWidth - 1, 1))}>Line Width - 1</button>
+              <button onClick={() => setClusterSize(clusterSize + 1)}>ClusterSize + 1</button>
+              <button onClick={() => setClusterSize(Math.max(clusterSize - 1, 1))}>ClusterSize - 1</button>
             </div>
           }
         />
         <SvgButton
-          label="tree type"
-          svg="treeRectangular"
+          label="tree options"
+          svg="menuContext"
           dropAlign="right"
           drop={
-            <div>
+            <div style={{ maxHeight: props.height - 100 }}>
+              <h5>Tree Type:</h5>
               <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
               <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />
               <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />
               <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
               <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
+              <h5>Toggle:</h5>
+              <SvgButton onClick={() => setShowLabels(!showLabels)} label="labels" />
+              <SvgButton onClick={() => setAlign(!align)} label="align" />
+              <h5>Style:</h5>
+              <SvgButton onClick={() => setTextSize(textSize + 1)} label="text size + 1" />
+              <SvgButton onClick={() => setTextSize(Math.max(textSize - 1, 1))} label="text size - 1" />
+              <SvgButton onClick={() => setLineWidth(lineWidth + 1)} label="line width + 1" />
+              <SvgButton onClick={() => setLineWidth(Math.max(lineWidth - 1, 1))} label="line width - 1" />
+              <h5>Other:</h5>
+              <SvgButton onClick={() => setResetTreeBool(true)} label="reset tree" />
             </div>
           }
         />

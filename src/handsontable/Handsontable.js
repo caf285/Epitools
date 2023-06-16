@@ -1,5 +1,4 @@
-/* eslint-disable react/no-direct-mutation-state */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.css';
 
@@ -7,14 +6,14 @@ function HandsontableView(props) {
   const hot = useRef();
   const licenseKey = useRef("non-commercial-and-evaluation")
   const containerRef = useRef()
-  const [header, setHeader] = useState(false)
-  const [data, setData] = useState([{}])
   const [height, setHeight] = useState("100%")
   const [width, setWidth] = useState("auto")
   const views = useRef(["readonly"]);
 
   // initialize table
-  useEffect(() => {
+  const initializeTableCallback = useCallback(() => {
+    const data = [{}]
+    const header = false
     hot.current = new Handsontable(containerRef.current, {
       data,
       colHeaders: header,
@@ -23,8 +22,10 @@ function HandsontableView(props) {
       licenseKey: licenseKey.current
     })
     hot.current.render()
-  }, [])
-
+  }, [height, width])
+  useEffect(() => {
+    initializeTableCallback()
+  }, [initializeTableCallback])
   useEffect(() => {
     if (props.height) { setHeight(props.height) }
     if (props.width) { setWidth(props.width) }
