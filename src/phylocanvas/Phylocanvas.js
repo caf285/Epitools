@@ -2,6 +2,9 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./Phylocanvas.css";
 
 import SvgButton from "../svgButton/SvgButton.js";
+import Box from "@mui/material/Box";
+import Slider from '@mui/material/Slider';
+import Switch from "@mui/material/Switch";
 
 import PhylocanvasLogic from "./PhylocanvasLogic.js";
 
@@ -116,22 +119,35 @@ function PhylocanvasView(props) {
           dropAlign="right"
           drop={
             <div style={{ maxHeight: props.height - 100 }}>
+              <h5>Toggle:</h5>
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+                <div>labels: <Switch checked={showLabels} onChange={() => {setShowLabels(!showLabels)}} /></div>
+                <div>align: <Switch checked={align} onChange={() => {setAlign(!align)}} /></div>
+              </Box>
+              <h5>Style:</h5>
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+                <span>text size: <b>{textSize}</b>px</span>
+                <Slider value={textSize} step={2} min={20} max={50} onChange={(event: Event, newValue: number | number[]) => {
+                  if (typeof newValue === 'number') {
+                    setTextSize(newValue);
+                  }
+                }} />
+                <span>line width: <b>{lineWidth}</b>px</span>
+                <Slider value={lineWidth} step={1} min={1} max={10} onChange={(event: Event, newValue: number | number[]) => {
+                  if (typeof newValue === 'number') {
+                    setLineWidth(newValue);
+                  }
+                }} />
+              </Box>
               <h5>Tree Type:</h5>
               <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
               <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />
               <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />
               <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
               <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
-              <h5>Toggle:</h5>
-              <SvgButton onClick={() => setShowLabels(!showLabels)} label="labels" />
-              <SvgButton onClick={() => setAlign(!align)} label="align" />
-              <h5>Style:</h5>
-              <SvgButton onClick={() => setTextSize(textSize + 1)} label="text size + 1" />
-              <SvgButton onClick={() => setTextSize(Math.max(textSize - 1, 1))} label="text size - 1" />
-              <SvgButton onClick={() => setLineWidth(lineWidth + 1)} label="line width + 1" />
-              <SvgButton onClick={() => setLineWidth(Math.max(lineWidth - 1, 1))} label="line width - 1" />
               <h5>Other:</h5>
               <SvgButton onClick={() => setResetTreeBool(true)} label="reset tree" />
+              <div style={{ height: "7px" }} />
             </div>
           }
         />
