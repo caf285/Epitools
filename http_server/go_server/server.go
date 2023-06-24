@@ -57,7 +57,6 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
   }
 
   type gasResultStruct struct {
-    Id string
     Sample string
     Subsample NullString
     External NullString
@@ -89,8 +88,8 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
   }
 
   log.Printf("results")
-  log.Printf("SELECT id, sample, subsample, external, pathogen, lineage, facility, location, collection_date, sequence_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
-  results, err := db.Query("SELECT id, sample, subsample, external, pathogen, lineage, facility, location, collection_date, sequence_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
+  log.Printf("SELECT sample, subsample, external, pathogen, lineage, facility, location, collection_date, sequence_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
+  results, err := db.Query("SELECT sample, subsample, external, pathogen, lineage, facility, location, collection_date, sequence_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
   if err != nil {
     panic(err.Error()) // proper error handling instead of panic in your app
   }
@@ -100,7 +99,7 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
   for results.Next() {
     
     result := gasResultStruct{}
-    err = results.Scan(&result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Facility, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata)
+    err = results.Scan(&result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Facility, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata)
 
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app
@@ -498,7 +497,6 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
   }
 
   type gasResultStruct struct {
-    SequenceId NullString
     SequenceSample NullString
     SequenceReference NullString
     Id string
@@ -534,9 +532,9 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
 
   if request.Key == "value" {
     log.Printf("results")
-    log.Printf("SELECT sequence.id as 'sequenceId', sequence.sample as 'sequenceSample', pathogen.id, pathogen.sample, pathogen.subsample, pathogen.external, pathogen.pathogen, pathogen.lineage, pathogen.facility, pathogen.location, pathogen.collection_date, pathogen.sequence_date, pathogen.additional_metadata FROM epitools.sequence RIGHT JOIN epitools.pathogen on sequence.sample=pathogen.id")
+    log.Printf("SELECT sequence.sample as 'sequenceSample', pathogen.id, pathogen.sample, pathogen.subsample, pathogen.external, pathogen.pathogen, pathogen.lineage, pathogen.facility, pathogen.location, pathogen.collection_date, pathogen.sequence_date, pathogen.additional_metadata FROM epitools.sequence RIGHT JOIN epitools.pathogen on sequence.sample=pathogen.id")
     //results, err := db.Query("SELECT * FROM epitools.pathogen")
-    results, err := db.Query("SELECT sequence.id as 'sequenceId', sequence.sample as 'sequenceSample', sequence.reference as 'sequenceReference', pathogen.id, pathogen.sample, pathogen.subsample, pathogen.external, pathogen.pathogen, pathogen.lineage, pathogen.facility, pathogen.location, pathogen.collection_date, pathogen.sequence_date, pathogen.additional_metadata FROM epitools.sequence RIGHT JOIN epitools.pathogen on sequence.sample=pathogen.id")
+    results, err := db.Query("SELECT sequence.sample as 'sequenceSample', sequence.reference as 'sequenceReference', pathogen.id, pathogen.sample, pathogen.subsample, pathogen.external, pathogen.pathogen, pathogen.lineage, pathogen.facility, pathogen.location, pathogen.collection_date, pathogen.sequence_date, pathogen.additional_metadata FROM epitools.sequence RIGHT JOIN epitools.pathogen on sequence.sample=pathogen.id")
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app
     }
@@ -546,7 +544,7 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
     for results.Next() {
     
       result := gasResultStruct{}
-      err = results.Scan(&result.SequenceId, &result.SequenceSample, &result.SequenceReference, &result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Facility, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata)
+      err = results.Scan(&result.SequenceSample, &result.SequenceReference, &result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Lineage, &result.Facility, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata)
 
       if err != nil {
         panic(err.Error()) // proper error handling instead of panic in your app

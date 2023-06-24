@@ -1,0 +1,29 @@
+.InfoButton {
+  position: relative;
+  width: 20px;
+  z-index: 101;
+}
+
+.InfoButtonButton {
+  position: absolute;
+  right: 0;
+  z-index: 102;
+}
+
+.InfoButtonButton:hover {
+  cursor: default;
+}
+
+.InfoButton:hover .InfoButtonTextBox {
+  display: block;
+}
+
+.InfoButtonTextBox {
+  display: none;
+  background-color: white;
+  width: 300px;
+  line-height: 24px;
+  padding-left: 25px;
+  border-radius: 10px;
+  box-shadow: -1px 1px 4px rgba(0,0,0,0.4);
+}

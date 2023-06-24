@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Epitools.css";
 import "./style.css";
 
+import InfoButton from "../infoButton/InfoButton.js";
 import SvgButton from "../svgButton/SvgButton.js";
 import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 import SelectionHOT from "../handsontable/SelectionHOT.js";
@@ -54,7 +55,7 @@ function Epitools(props) {
   const [tableUploadFormVisibility, setTableUploadFormVisibility] = useState("hidden")
   const [tableUploadFileName, setTableUploadFileName] = useState("")
   const [tableUploadFileText, setTableUploadFileText] = useState("")
-  const [tablePrimaryColumn, setTablePrimaryColumn] = useState(1)
+  const [tablePrimaryColumn, setTablePrimaryColumn] = useState(0)
   const [metadataForms, setMetadataForms] = useState("")
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
 
@@ -146,7 +147,7 @@ function Epitools(props) {
   //====================================================================================================( handle branch selection ) 
   useEffect(() => {
     if (updateTable) {
-      setTablePrimaryColumn(1) // resets to default column on DB data load
+      setTablePrimaryColumn(0) // resets to default column on DB data load
       mysqlRequest(phylocanvasLeafNames) // request data using leaf names and fill table
     }
     setUpdateTable(false)
@@ -170,7 +171,7 @@ function Epitools(props) {
       newMetadataForms = Object.keys(branchesData[0]).map((branch) =>
         <form key={branch} className="appendMetadataForm">
           <label>{branch}</label>
-          <input type="checkbox" onClick={() => appendMetadataHandler()} defaultChecked="" />
+          <input type="checkbox" onClick={() => appendMetadataHandler()} defaultChecked={false} />
         </form>
       )
       appendMetadataHandler()
@@ -194,7 +195,7 @@ function Epitools(props) {
     setImportTableSelection(e)
   }, [setImportTableSelection])
   const exportTableSelectionCallback = useCallback((e) => {
-    //console.log("table selection:", e)
+    console.log("table selection:", e)
     setImportPhylocanvasSelection(e)
   }, [setImportPhylocanvasSelection])
 
@@ -616,6 +617,14 @@ function Epitools(props) {
           <SvgButton label={"load " + pathogenType + " lineage"} drop={
             <div style={{ display: "flex", flexFlow: "column" }}>
               <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
+                <div style={{ display: "flex", flexFlow: "row", paddingRight: "7px" }}>
+                  <h5>Date Range:</h5>
+                  <div style={{ position: "absolute", right: "7px" }}>
+                    <InfoButton
+                      text="select a date range to populate pathogen lineage selection"
+                    />
+                  </div>
+                </div>
                 <div style={{ display: "flex", flexFlow: "row" }}>
                   <DatePicker
                     className="EpitoolsDatePicker"
@@ -630,6 +639,14 @@ function Epitools(props) {
                     selected={pathogenDateRange[1]}
                     onChange={handleMaxDatePicker}
                   />
+                </div>
+                <div style={{ display: "flex", flexFlow: "row", paddingTop: "15px" }}>
+                  <h5>Lineage Selection:</h5>
+                  <div style={{ position: "absolute", right: "7px" }}>
+                    <InfoButton
+                      text="select a lineage to display a tree and table for that lineage"
+                    />
+                  </div>
                 </div>
               </Box>
               <div style={{ display: "flex", flexFlow: "column" }}>

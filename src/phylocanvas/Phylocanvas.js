@@ -140,13 +140,18 @@ function PhylocanvasView(props) {
                 }} />
               </Box>
               <h5>Tree Type:</h5>
-              <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
-              <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />
-              <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />
-              <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
-              <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+                <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
+                <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />
+                <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />
+                <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
+                <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
+              </Box>
+              <div style={{ height: "7px" }} />
               <h5>Other:</h5>
-              <SvgButton onClick={() => setResetTreeBool(true)} label="reset tree" />
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+                <SvgButton onClick={() => setResetTreeBool(true)} label="reset tree" />
+              </Box>
               <div style={{ height: "7px" }} />
             </div>
           }
