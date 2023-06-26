@@ -617,13 +617,11 @@ function Epitools(props) {
           <SvgButton label={"load " + pathogenType + " lineage"} drop={
             <div style={{ display: "flex", flexFlow: "column" }}>
               <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
-                <div style={{ display: "flex", flexFlow: "row", paddingRight: "7px" }}>
+                <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
                   <h5>Date Range:</h5>
-                  <div style={{ position: "absolute", right: "7px" }}>
-                    <InfoButton
-                      text="select a date range to populate pathogen lineage selection"
-                    />
-                  </div>
+                  <InfoButton
+                    text="select a date range to populate pathogen lineage selection"
+                  />
                 </div>
                 <div style={{ display: "flex", flexFlow: "row" }}>
                   <DatePicker
@@ -640,13 +638,11 @@ function Epitools(props) {
                     onChange={handleMaxDatePicker}
                   />
                 </div>
-                <div style={{ display: "flex", flexFlow: "row", paddingTop: "15px" }}>
+                <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between", paddingTop: "15px" }}>
                   <h5>Lineage Selection:</h5>
-                  <div style={{ position: "absolute", right: "7px" }}>
-                    <InfoButton
-                      text="select a lineage to display a tree and table for that lineage"
-                    />
-                  </div>
+                  <InfoButton
+                    text="select a lineage to display a tree and table for that lineage"
+                  />
                 </div>
               </Box>
               <div style={{ display: "flex", flexFlow: "column" }}>
