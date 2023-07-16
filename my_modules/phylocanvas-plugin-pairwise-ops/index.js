@@ -5,68 +5,11 @@ const { getPixelRatio } = utils.canvas;
 const DEFAULTS = {
   active: true,
   pairwiseMatrix: {},
-  clusterActive: true,
-  clusterDraw: true,
   clusterMatrix: [],
-  clusterMaxDistance: 20,
-  clusterDistance: 3,
-  clusterSamples: 3,
+  clusterDistance: 2,
+  clusterSize: 2,
+  buildCluster: () => {}
 };
-
-// OLDER cluster matrix code
-/*
-function walkMatrix(tree, start, node, walked, distance, max) {
-  walked.push(node)
-
-  if (distance >= max) {
-    return
-  }
-  if (node !== start && node.leaf === true) {
-    tree.pairwiseOps.pairwiseMatrix[start.id].push([node.id, distance])
-  }
-  for (let child of node.children) {
-    if (! walked.includes(child)) {
-      let newDistance = distance + child.branchLength
-      newDistance = parseFloat(newDistance.toFixed(10))
-      walkMatrix(tree, start, child, walked, newDistance, max)
-    }
-  }
-  if (node.parent && ! walked.includes(node.parent)) {
-    let newDistance = distance + node.branchLength
-    newDistance = parseFloat(newDistance.toFixed(10))
-    walkMatrix(tree, start, node.parent, walked, newDistance, max)
-  }
-}
-
-function buildPairwiseMatrix() {
-  for (let leaf of this.leaves) {
-    this.pairwiseOps.pairwiseMatrix[leaf.id] = []
-    walkMatrix(this, leaf, leaf, [], 0, this.pairwiseOps.clusterMaxDistance)
-  }
-  //console.log(this.pairwiseOps.pairwiseMatrix)
-}
-*/
-
-/*
-function buildClusterMatrix() {
-  this.pairwiseOps.clusterMatrix = []
-  for (let leaf in this.pairwiseOps.pairwiseMatrix) {
-    let cluster = [leaf]
-    for (let node of this.pairwiseOps.pairwiseMatrix[leaf]) {
-      if (node[1] <= this.pairwiseOps.clusterDistance) {
-        cluster.push(node[0])
-      }
-    }
-    if (cluster.length >= this.pairwiseOps.clusterSamples) {
-      cluster.sort()
-      cluster = JSON.stringify(cluster)
-      if (! this.pairwiseOps.clusterMatrix.includes(cluster)) {
-        this.pairwiseOps.clusterMatrix.push(cluster)
-      }
-    }
-  }
-}
-*/
 
 function walkMatrix(tree, node, path, distance) {
   let newDistance = Array.from(distance)
@@ -103,58 +46,35 @@ function buildPairwiseMatrix() {
       this.pairwiseOps.pairwiseMatrix.leaves[leaf][node] = this.pairwiseOps.pairwiseMatrix.leaves[node][leaf]
     }
   }
-  //console.log(this.pairwiseOps.pairwiseMatrix.leaves)
 }
 
 function buildClusterMatrix() {
+  // build initial clusterMatrix
   this.pairwiseOps.clusterMatrix = []
   for (let leaf in this.pairwiseOps.pairwiseMatrix.leaves) {
-    let cluster = [leaf]
-    for (let pair in this.pairwiseOps.pairwiseMatrix.leaves[leaf]) {
+    this.pairwiseOps.clusterMatrix.push([leaf])
+    for (let pair in this.pairwiseOps.pairwiseMatrix.leaves) {
       if (this.pairwiseOps.pairwiseMatrix.leaves[leaf][pair] <= this.pairwiseOps.clusterDistance) {
-        cluster.push(pair)
-      }
-    }
-    if (cluster.length >= this.pairwiseOps.clusterSamples) {
-      cluster.sort()
-      cluster = JSON.stringify(cluster)
-      if (! this.pairwiseOps.clusterMatrix.includes(cluster)) {
-        this.pairwiseOps.clusterMatrix.push(cluster)
+        this.pairwiseOps.clusterMatrix[this.pairwiseOps.clusterMatrix.length - 1].push(pair)
       }
     }
   }
-}
 
-function colorNode() {
-  for (let leaf of this.leaves) {
-    leaf.setDisplay({
-      colour: this.branchColour,
-    })
-    leaf.label = leaf.id
-  }
-  for (let cluster of this.pairwiseOps.clusterMatrix) {
-    cluster = JSON.parse(cluster)
-    for (let id of cluster) {
-      
-      for (let leaf of this.findLeaves(id)) {
-        leaf.label += "+"
-        leaf.setDisplay({
-          colour: 'red',
-        })
+  // combine arrays with like objects
+  for (let i in this.pairwiseOps.clusterMatrix) {
+    for (let j = 0; j < i; j++) {
+      if (this.pairwiseOps.clusterMatrix[i].filter(x => this.pairwiseOps.clusterMatrix[j].includes(x)).length) {
+        this.pairwiseOps.clusterMatrix[i] = this.pairwiseOps.clusterMatrix[i].concat(this.pairwiseOps.clusterMatrix[j].filter(x => !this.pairwiseOps.clusterMatrix[i].includes(x)))
+        this.pairwiseOps.clusterMatrix[j] = this.pairwiseOps.clusterMatrix[i]
       }
     }
   }
-  this.draw()
-}
 
-function drawClusterInfo() {
-  let label = "Cluster Size: " + String(this.pairwiseOps.clusterSamples) + "; Cluster Distance: " + String(this.pairwiseOps.clusterDistance)
-  let ctx = this.canvas
-  let pixelRatio = getPixelRatio(ctx)
-  ctx.save()
-  ctx.font = `${30 * pixelRatio / 2}px Arial`;
-  ctx.fillText(label, ctx.canvas.width - ctx.measureText(label).width - 75, ctx.canvas.height - 10)
-  ctx.restore()
+  // reduce initial cluster matrix
+  this.pairwiseOps.clusterMatrix = new Set(this.pairwiseOps.clusterMatrix.filter(x => x.length >= this.pairwiseOps.clusterSize).map(x => JSON.stringify(x.sort())))
+  this.pairwiseOps.clusterMatrix = Array.from(this.pairwiseOps.clusterMatrix).map(x => JSON.parse(x)).sort()
+  //console.log(this.pairwiseOps.clusterDistance, this.pairwiseOps.clusterSize)
+  return this.pairwiseOps.clusterMatrix
 }
 
 export default function plugin(decorate) {
@@ -168,20 +88,7 @@ export default function plugin(decorate) {
     delegate.apply(this, args);
     if (this.pairwiseOps.active) {
       buildPairwiseMatrix.apply(this);
-      if (this.pairwiseOps.clusterActive) {
-        this.pairwiseOps.clusterDraw = true;
-      }
+      this.pairwiseOps.buildCluster = () => buildClusterMatrix.apply(this)
     }   
-  });
-  decorate(Tree, 'draw', function (delegate, args) {
-    delegate.apply(this, args);
-    if (this.pairwiseOps.clusterActive) {
-      if (this.pairwiseOps.clusterDraw) {
-        this.pairwiseOps.clusterDraw = false;
-        buildClusterMatrix.apply(this);
-        colorNode.apply(this);
-      }
-      drawClusterInfo.apply(this);
-    }
   });
 }

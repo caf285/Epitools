@@ -19,9 +19,12 @@ const { getPixelRatio } = utils.canvas;
 function PhylocanvasLogic(props) {
   // destructure props
   const nwk = props.nwk
+  const clusterDistance = props.clusterDistance
+  const clusterSize = props.clusterSize
   const lineWidth = props.lineWidth
   const setGetNwk = props.setGetNwk
   const setGetCanvas = props.setGetCanvas
+  const setGetCluster = props.setGetCluster
   const exportSelectionCallback = props.exportSelectionCallback
   const importSelection = props.importSelection
   const branchNameCallback = props.branchNameCallback
@@ -69,8 +72,8 @@ function PhylocanvasLogic(props) {
 
   let typeList = useRef(["radial", "rectangular", "circular", "diagonal", "hierarchical"]);
 
+  // set data getters on component load (fills all callbacks for retrieving dynamic data)
   useEffect(() => {
-    // set data getters on component load
     if (setGetNwk) {
       setGetNwk(() => () => {
         // get nwk string
@@ -94,6 +97,7 @@ function PhylocanvasLogic(props) {
     }
   }, [setGetNwk, setGetCanvas])
 
+  // execute window resize on window load (adjusts phylocanvas canvas size to take up proper window spacing)
   useEffect(() => {
     function initialSize() {
       window.dispatchEvent(new Event('resize'))
@@ -104,6 +108,28 @@ function PhylocanvasLogic(props) {
       window.removeEventListener("load", initialSize);
     };
   }, [])
+
+  // color branches on scheme/group change
+  useEffect(() => {
+    if (phylocanvas.current) {
+      console.log(phylocanvas.current)
+      if (props.colorScheme && props.colorGroup) {
+        // reset all non colored nodes to empty style
+        for (let leaf of Object.keys(phylocanvas.current.branches).filter(branch => phylocanvas.current.branches[branch].leaf == true && ![].concat(...props.colorGroup).includes(branch))) {
+          phylocanvas.current.branches[leaf].labelStyle = {}
+          phylocanvas.current.branches[leaf].leafStyle = {}
+        }
+        for (let i = 0; i < props.colorGroup.length; i++) {
+          for (let j = 0; j < props.colorGroup[i].length; j++) {
+            phylocanvas.current.branches[props.colorGroup[i][j]].labelStyle = { colour: "#" + props.colorScheme[i % props.colorScheme.length] }
+            phylocanvas.current.branches[props.colorGroup[i][j]].leafStyle = { fillStyle: "#" + props.colorScheme[i % props.colorScheme.length] }
+          }
+        }
+        //console.log("phylocanvasColors:", props.colorScheme, props.colorGroup)
+      }
+      phylocanvas.current.draw()
+    }
+  }, [props.colorScheme, props.colorGroup])
 
   // load tree on component load and add listener for click action to export selected ids
   useEffect(() => {
@@ -180,20 +206,6 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.draw()
   }, [props.showLabels, props.align, props.lineWidth])
 
-  // update and redraw when cluster size/distance changes
-  /*
-    TODO: Highlighting clusters is overwritten by appended metadata. Multiple clusters next to eachother are
-    also ambiguous. Update in phylocanvas pairwise ops plugin.
-  */
-  useEffect(() => {
-    if (phylocanvas.current.pairwiseOps) {
-      phylocanvas.current.pairwiseOps.clusterDistance = props.clusterDistance
-      phylocanvas.current.pairwiseOps.clusterSize = props.clusterSize
-      phylocanvas.current.pairwiseOps.clusterDraw = true
-      phylocanvas.current.draw()
-    }
-  }, [props.clusterDistance, props.clusterSize])
-
   // for orientation of phylocanvas stretch, horizontal, vertical, or both
   useEffect(() => {
     phylocanvas.current.stretchOrientation.orientation = props.stretchOrientation
@@ -221,11 +233,24 @@ function PhylocanvasLogic(props) {
         phylocanvas.current.draw()
       }
     }
-    console.log(phylocanvas.current)
+    //console.log(phylocanvas.current)
   }, [metadataLabels, branchesData, primaryColumn])
   useEffect(() => {
     appendMetadataCallback()
   }, [metadataLabels, appendMetadataCallback])
+
+
+  //  update cluster parameters and link pairwiseOps functions to phylocanvas callback
+  useEffect(() => {
+    phylocanvas.current.pairwiseOps.clusterDistance = clusterDistance
+    phylocanvas.current.pairwiseOps.clusterSize = clusterSize
+  }, [clusterDistance, clusterSize])
+
+  useEffect(() => {
+    if (setGetCluster) {
+      setGetCluster(() => () => phylocanvas.current.pairwiseOps.buildCluster)
+    }
+  }, [setGetCluster])
 
   return (
     <div style={{ height: "100%" }}>

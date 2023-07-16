@@ -4,17 +4,24 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Epitools.css";
 import "./style.css";
 
-import InfoButton from "../infoButton/InfoButton.js";
-import SvgButton from "../svgButton/SvgButton.js";
+import SplitPane from "react-split-pane";
 import Phylocanvas from "../phylocanvas/Phylocanvas.js";
 import SelectionHOT from "../handsontable/SelectionHOT.js";
-import SplitPane from "react-split-pane";
-//import UploadScreen from "../uploadScreen/uploadScreen"
-import Box from '@mui/material/Box';
+import TableUpload from "./TableUpload.js";
+import InfoButton from "../infoButton/InfoButton.js";
+import SvgButton from "../svgButton/SvgButton.js";
 import ReactLoading from "react-loading";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import TableUpload from "./TableUpload.js";
+import ColorScheme from "../colorScheme/ColorScheme.js";
+
+// mui
+import Box from '@mui/material/Box';
+import Slider from "@mui/material/Slider";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 
 function Epitools(props) {
   //====================================================================================================( set variables )
@@ -31,6 +38,7 @@ function Epitools(props) {
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [getNwk, setGetNwk] = useState(() => () => {})
   const [getCanvas, setGetCanvas] = useState(() => () => {})
+  const [getCluster, setGetCluster] = useState(() => () => {})
   const [mutationsJson, setMutationsJson] = useState()
   const [updateTable, setUpdateTable] = useState(false)
 
@@ -40,9 +48,14 @@ function Epitools(props) {
   const [importTableSelection, setImportTableSelection] = useState([])
 
   // both
+  const [highlightRadio, setHighlightRadio] = useState("Cluster")
+  const [colorGroup, setColorGroup] = useState([])
+  const [clusterDistance, setClusterDistance] = useState(2)
+  const [clusterSize, setClusterSize] = useState(2)
+  const [highlightList, setHighlightList] = useState([]) // obj used for coloring sample in each group; {group: [sample, ...], ...}
   const [dragCheck, setDragCheck] = useState(false)
   const dragRef = useRef(0)
-  const [branchesData, setBranchesData] = useState([])
+  const [branchesData, setBranchesData] = useState([]) // will be filled with complete table
   const branchesDataRef = useRef([])
 
   // pathogen lineage
@@ -50,6 +63,7 @@ function Epitools(props) {
   const [pathogenDateRangeForms, setPathogenDateRangeForms] = useState("")
 
   // other
+  const [colorScheme, setColorScheme] = useState()
   const [pathogenType, setPathogenType] = useState()
   const [loadingScreenVisibility, setLoadingScreenVisibility] = useState("hidden")
   const [tableUploadFormVisibility, setTableUploadFormVisibility] = useState("hidden")
@@ -81,8 +95,12 @@ function Epitools(props) {
   }, [])
 
   useEffect(() => {
-    console.log(pathogenDateRange)
+    //console.log(pathogenDateRange)
   }, [pathogenDateRange])
+
+  useEffect(() => {
+    //console.log("colorScheme:", colorScheme)
+  }, [colorScheme])
 
   // load pathogen on searchParam change (TODO: TEMPORARY!!! will remove after pathogen dropdown button removed)
   const loadPathogenFromSearchParamsCallback = useCallback(() => {
@@ -191,7 +209,7 @@ function Epitools(props) {
 
   // get selection list
   const exportPhylocanvasSelectionCallback = useCallback((e) => {
-    //console.log("phylocanvas selection:", e)
+    console.log("phylocanvas selection:", e)
     setImportTableSelection(e)
   }, [setImportTableSelection])
   const exportTableSelectionCallback = useCallback((e) => {
@@ -518,6 +536,28 @@ function Epitools(props) {
     setPathogenDateRangeForms(newDateRangeForms)
   };
 
+  // set highlightList on highlightRadio change
+  const handleHighlightRadioChange = useCallback(() => {
+    if (highlightRadio) {
+      //console.log(highlightRadio)
+      if (highlightRadio == "Cluster") {
+        setColorGroup(getCluster())
+      } else if (branchesData && branchesData.length >= 1 && Object.keys(branchesData[0]).includes(highlightRadio)) {
+        let highlightGroup = {}
+        for (let line of branchesData) {
+          if (!Object.keys(highlightGroup).includes(line[highlightRadio])) {
+            highlightGroup[line[highlightRadio]] = []
+          }
+          highlightGroup[line[highlightRadio]].push(Object.values(line)[tablePrimaryColumn])
+        }
+        setColorGroup(Object.values(highlightGroup).sort())
+      }
+    }
+  }, [highlightRadio, branchesData])
+  useEffect(() => {
+    handleHighlightRadioChange()
+  }, [highlightRadio, handleHighlightRadioChange])
+
   // update HOT and Phylocanvas window sizes
   function updateDrag() {
     setHOTHeight(JSON.stringify(calculateBottomPaneHeight(dragRef.current)));
@@ -527,6 +567,11 @@ function Epitools(props) {
   //====================================================================================================( return )
   return (
     <div style={{ position: "relative", height: "100%" }} ref={elementRef}>
+      {/* data components */}
+      <ColorScheme
+        setColorScheme={setColorScheme}
+      />
+
       {/* loading splash screen */}
       <div style={{ visibility: loadingScreenVisibility }}>
         <div style={{ position: "absolute", height: "100%", width: "100%", backgroundColor: "rgba(255, 255, 255, 0.75)", zIndex: "1000" }}></div>
@@ -536,8 +581,8 @@ function Epitools(props) {
           </div>
         </div>
       </div>
-      
-      {/* TODO: fix jonathon upload button */}
+
+      {/* file upload window component */}
       <TableUpload
         primaryColumn={tablePrimaryColumn}
         setPrimaryColumn={setTablePrimaryColumn}
@@ -558,9 +603,11 @@ function Epitools(props) {
 
               {/* append metadata buttons */}
               <SvgButton label="append metadata" drop={
-                <div className="appendMetadataDiv">
-                  {metadataForms}
-                </div>
+                <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+                  <div className="appendMetadataDiv">
+                    {metadataForms}
+                  </div>
+                </Box>
               } />
 
               {/* build new phylocanvas and table from current selection */}
@@ -614,10 +661,50 @@ function Epitools(props) {
             </div>
           } />
 
+          {/*========== highlight selection ==========*/}
+          <SvgButton label="highlight" drop={
+            <FormControl sx={{ paddingLeft: "15px", paddingRight: "15px", width: "100%" }}>
+              <RadioGroup value={highlightRadio} onChange={(e) => {setHighlightRadio(e.target.value)}}>
+                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Cluster" control={<Radio size="small" />} /><h5>Cluster Detection</h5></div>
+                <Box sx={{ paddingLeft: "15px" }}>
+                  <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
+                    <span>cluster distance: <b>{clusterDistance}</b></span>
+                    <InfoButton text="cluster distance description" />
+                  </div>
+                  <Slider value={clusterDistance} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                    if (typeof newValue === "number") {
+                      setClusterDistance(newValue)
+                      if (highlightRadio === "Cluster") {
+                        handleHighlightRadioChange()
+                      }
+                    }
+                  }} />
+                  <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
+                    <span>cluster size: <b>{clusterSize}</b></span>
+                    <InfoButton text="cluster size description" />
+                  </div>
+                  <Slider value={clusterSize} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                    if (typeof newValue === "number") {
+                      setClusterSize(newValue)
+                      if (highlightRadio === "Cluster") {
+                        handleHighlightRadioChange()
+                      }
+                    }
+                  }} />
+                </Box>
+                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Lineage" control={<Radio size="small" />} /><h5>Lineage</h5></div>
+                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Facility" control={<Radio size="small" />} /><h5>Facility</h5></div>
+                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Location" control={<Radio size="small" />} /><h5>Location</h5></div>
+                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Collection_date" control={<Radio size="small" />} /><h5>Collection Date</h5></div>
+              </RadioGroup>
+            </FormControl>
+          } />
+
+          {/*========== pathogenlineage loader ==========*/}
           <SvgButton label={"load " + pathogenType + " lineage"} drop={
             <div style={{ display: "flex", flexFlow: "column" }}>
               <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
-                <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between", alignItems: "baseline" }}>
                   <h5>Date Range:</h5>
                   <InfoButton
                     text="select a date range to populate pathogen lineage selection"
@@ -638,16 +725,19 @@ function Epitools(props) {
                     onChange={handleMaxDatePicker}
                   />
                 </div>
-                <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between", paddingTop: "15px" }}>
+                <hr/>
+                <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between", alignItems: "baseline" }}>
                   <h5>Lineage Selection:</h5>
                   <InfoButton
                     text="select a lineage to display a tree and table for that lineage"
                   />
                 </div>
               </Box>
-              <div style={{ display: "flex", flexFlow: "column" }}>
-                {pathogenDateRangeForms}
-              </div>
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+                <div style={{ display: "flex", flexFlow: "column" }}>
+                  {pathogenDateRangeForms}
+                </div>
+              </Box>
             </div>
           } />
 
@@ -672,6 +762,8 @@ function Epitools(props) {
         <Phylocanvas
           nwk={nwk}
           height={phyloHeight}
+          clusterSize={clusterSize}
+          clusterDistance={clusterDistance}
           branchNameCallback={branchNameCallback}
           branchesData={branchesData}
           metadataLabels={metadataLabels}
@@ -679,7 +771,10 @@ function Epitools(props) {
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
           setGetNwk={setGetNwk}
           setGetCanvas={setGetCanvas}
+          setGetCluster={setGetCluster}
           primaryColumn={tablePrimaryColumn}
+          colorScheme={colorScheme}
+          colorGroup={colorGroup}
         />
 
         {/* handsontable component */}
@@ -692,6 +787,8 @@ function Epitools(props) {
             importSelection={importTableSelection}
             exportTableSelectionCallback={exportTableSelectionCallback}
             primaryColumn={tablePrimaryColumn}
+            colorScheme={colorScheme}
+            colorGroup={colorGroup}
           />
 
         </div>

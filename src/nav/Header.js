@@ -48,13 +48,15 @@ function Header(props) {
     <div className="Nav-header">
       <Navbar sticky="top" bg="light" variant="light">
         <Navbar.Brand href="/epitools/home/">
-          <img
-            src={logo}
-            height="50"
-            className="d-inline-block align-center mr-3"
-            alt="Epitools Logo"
-          />{" "}
-          One Health Genomic Epi Tools
+          <div style={{ display: "flex", flexFlow: "row" }}>
+            <img
+              src={logo}
+              height="50"
+              className="d-inline-block align-center mr-3"
+              alt="Epitools Logo"
+            />{" "}
+            <span>One Health Genomic Epi Tools</span>
+          </div>
         </Navbar.Brand>
         <Nav className="ml-auto">
           <Nav.Link href="/epitools/home/">Home</Nav.Link>

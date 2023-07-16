@@ -19,8 +19,6 @@ function PhylocanvasView(props) {
   const defaultNodeSize = 12
   const defaultTextSize = 24
   const defaultLineWidth = 2
-  const defaultClusterDistance = 2
-  const defaultClusterSize = 2
 
   const [type, setType] = useState(defaultType);
   const [showLabels, setShowLabels] = useState(defaultShowLabels);
@@ -28,8 +26,6 @@ function PhylocanvasView(props) {
   const [nodeSize, setNodeSize] = useState(defaultNodeSize);
   const [textSize, setTextSize] = useState(defaultTextSize);
   const [lineWidth, setLineWidth] = useState(defaultLineWidth);
-  const [clusterDistance, setClusterDistance] = useState(defaultClusterDistance);
-  const [clusterSize, setClusterSize] = useState(defaultClusterSize);
 
   // reset all tree style values
   useEffect(() => {
@@ -40,8 +36,6 @@ function PhylocanvasView(props) {
       setNodeSize(defaultNodeSize)
       setTextSize(defaultTextSize)
       setLineWidth(defaultLineWidth)
-      setClusterDistance(defaultClusterDistance)
-      setClusterSize(defaultClusterSize)
       setResetTreeBool(false)
     }
   }, [resetTreeBool])
@@ -86,8 +80,8 @@ function PhylocanvasView(props) {
         nodeSize={nodeSize}
         textSize={textSize}
         lineWidth={lineWidth}
-        clusterDistance={clusterDistance}
-        clusterSize={clusterSize}
+        clusterDistance={props.clusterDistance}
+        clusterSize={props.clusterSize}
         branchesData={props.branchesData}
         branchNameCallback={props.branchNameCallback}
         metadataLabels={props.metadataLabels}
@@ -95,24 +89,14 @@ function PhylocanvasView(props) {
         importSelection={props.importSelection}
         setGetNwk={props.setGetNwk}
         setGetCanvas={props.setGetCanvas}
+        setGetCluster={props.setGetCluster}
         exportSelectionCallback={props.exportPhylocanvasSelectionCallback}
         primaryColumn={props.primaryColumn}
+        colorScheme={props.colorScheme}
+        colorGroup={props.colorGroup}
         resetTreeBool={resetTreeBool}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0 }}>
-        <SvgButton
-          label="cluster"
-          dropAlign="right"
-          drop={
-            <div style={{ display: "flex", flexFlow: "column" }}>
-              <h5>Cluster Detection:</h5>
-              <button onClick={() => setClusterDistance(clusterDistance + 1)}>ClusterDistance + 1</button>
-              <button onClick={() => setClusterDistance(Math.max(clusterDistance - 1, 1))}>ClusterDistance - 1</button>
-              <button onClick={() => setClusterSize(clusterSize + 1)}>ClusterSize + 1</button>
-              <button onClick={() => setClusterSize(Math.max(clusterSize - 1, 1))}>ClusterSize - 1</button>
-            </div>
-          }
-        />
         <SvgButton
           label="tree options"
           svg="menuContext"
@@ -124,21 +108,23 @@ function PhylocanvasView(props) {
                 <div>labels: <Switch checked={showLabels} onChange={() => {setShowLabels(!showLabels)}} /></div>
                 <div>align: <Switch checked={align} onChange={() => {setAlign(!align)}} /></div>
               </Box>
+              <hr/>
               <h5>Style:</h5>
               <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
                 <span>text size: <b>{textSize}</b>px</span>
-                <Slider value={textSize} step={2} min={20} max={50} onChange={(event: Event, newValue: number | number[]) => {
+                <Slider value={textSize} step={2} min={20} max={50} size="small" onChange={(event: Event, newValue: number | number[]) => {
                   if (typeof newValue === 'number') {
                     setTextSize(newValue);
                   }
                 }} />
                 <span>line width: <b>{lineWidth}</b>px</span>
-                <Slider value={lineWidth} step={1} min={1} max={10} onChange={(event: Event, newValue: number | number[]) => {
+                <Slider value={lineWidth} step={1} min={1} max={10} size="small" onChange={(event: Event, newValue: number | number[]) => {
                   if (typeof newValue === 'number') {
                     setLineWidth(newValue);
                   }
                 }} />
               </Box>
+              <hr/>
               <h5>Tree Type:</h5>
               <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
                 <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
@@ -147,7 +133,7 @@ function PhylocanvasView(props) {
                 <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
                 <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
               </Box>
-              <div style={{ height: "7px" }} />
+              <hr/>
               <h5>Other:</h5>
               <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
                 <SvgButton onClick={() => setResetTreeBool(true)} label="reset tree" />

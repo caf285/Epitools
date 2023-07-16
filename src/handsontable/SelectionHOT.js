@@ -1,224 +1,129 @@
-/* eslint-disable react/no-direct-mutation-state */
 import React, { useState, useRef, useEffect } from "react";
 import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.css';
-import './style.css'
-
-// Check if value is in sData
-const checkSdata = (value, sdata) => {
-    //console.log("Checking for:", value)
-    //console.log("in:", sdata)
-    for (let i = 0; i < sdata?.length; i++) {
-        if (sdata[i] === value) {
-            return true
-        }
-    }
-    return false
-}
 
 function SelectionHOT(props) {
-    const containerRef = useRef();
-    const hot = useRef();
-    const licenseKey = useRef("non-commercial-and-evaluation")
-    //const [header, setHeader] = useState(false)
-    const [data, setData] = useState([{}])
-    const [sdata, setSdata] = useState([])
-    //const [height, setHeight] = useState("props.height")
-    const [width, setWidth] = useState("auto")
-    const views = useRef(["readonly"]);
-    var NameColumn = -1
+  const containerRef = useRef();
+  const hot = useRef();
+  const licenseKey = useRef("non-commercial-and-evaluation")
+  //const [header, setHeader] = useState(false)
+  const [data, setData] = useState([{}])
+  const [sdata, setSdata] = useState([])
+  //const [height, setHeight] = useState("props.height")
+  const [width, setWidth] = useState("auto")
+  const views = useRef(["readonly"]);
 
+  const importSelection = props.importSelection
+  const primaryColumn = props.primaryColumn
 
-/*    //console.log("%c HOT: ", "color: teal", hot)
-
-    useEffect(() => {
-        //console.log("%c sdata: ", "color: pink", sdata);
-        //checkSdata(0, sdata);
-        setNameColumn();
-        // eslint-disable-next-line
-    }, [sdata, checkSdata])
-*/
-    // initialize table
-    // eslint-disable-next-line
-    useEffect(() => {
-        //console.log("initial hot")
-        hot.current = new Handsontable(containerRef.current, {
-            data,
-            //colHeaders: header,
-            height: props.height,
-            width: width,
-            licenseKey: licenseKey.current,
-            columnSorting: true,
-            filters: true,
-            dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
-        })
-        hot.current.render()
-        //console.log("hot:", hot)
-        // eslint-disable-next-line
-    }, [])
-
-    // Highlighting-------------------------
-    useEffect(() => {
-        hot.current.updateSettings({
-            afterOnCellMouseDown: (event, coords, TD) => {
-                //console.log("CORDS____: ", coords)
-                var row = coords.row
-                // var column = coords.column
-                if (row < 0) {
-                    return
-                }
-                // If set to `false` (default): when cell selection is outside the viewport,
-                // Handsontable scrolls the viewport to cell selection's end corner.
-                // If set to `true`: when cell selection is outside the viewport,
-                // Handsontable doesn't scroll to cell selection's end corner.
-
-                //console.log("Row: ", row)
-                //console.log("Column: ", column)
-                //console.log("sdata: ", sdata);
-                if (!checkSdata(hot.current.getDataAtCell(row, 1), sdata)) {
-                    setSdata(psdata => [...psdata, hot.current.getDataAtCell(row, props.primaryColumn)])
-                    // set color
-                    for (let i = 0; i < hot.current.countCols(); i++) {
-                        hot.current.setCellMeta(row, i, 'className', 'MyRow')
-                    }
-                } else {
-                    setSdata(sdata.filter(function (v) {
-                        return v !== hot.current.getDataAtCell(row, props.primaryColumn)
-                    }))
-                    for (let i = 0; i < hot.current.countCols(); i++) {
-                        hot.current.setCellMeta(row, i, 'className', '')
-                    }
-
-                }
-                hot.current.render()
-            },
-        })
+  // initialize table
+  useEffect(() => {
+    hot.current = new Handsontable(containerRef.current, {
+      data,
+      height: props.height,
+      width: width,
+      licenseKey: licenseKey.current,
+      columnSorting: true,
+      filters: true,
+      dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
     })
+    hot.current.render()
+  }, [])
 
-    // Export Table Selection Callback
-    useEffect(() => {
-        //console.log("Exporting: ", sdata)
-        // TODO: this probably will not work and will have the wrong version of sdata
-        props.exportTableSelectionCallback(sdata)
-        //console.log("%c FINDING COLUMN: ", "color: pink", props.importSelection)
-        setNameColumn()
-        // eslint-disable-next-line
-    }, [sdata])
-
-    useEffect(() => {
-        //if (props.height) { setHeight(props.height) }
-        if (props.width) { setWidth(props.width) }
-    }, [props.height, props.width])
-
-    //update sdata and table based on new phylo imported data.
-    useEffect(() => {
-
-        // cycle through importSelection
-        //console.log("%c Got new pylo import: ", "color: pink", props.importSelection)
-        setNameColumn()
-
-        for (var k = 0; k < hot.current.countRows(); k++) {
-
-            // if on the list, highlight,
-            //console.log("%c Is this on the list? ", 'color: brown', hot.current.getDataAtCell(k, NameColumn), props.importSelection)
-            if (isInImport(hot.current.getDataAtCell(k, NameColumn), props.importSelection)) {
-                if (!hot.current.getCellMeta(k, 0).className || hot.current.getCellMeta(k, 0).className === '') {
-                  for (let i = 0; i < hot.current.countCols(); i++) {
-                      hot.current.setCellMeta(k, i, 'className', 'MyRow')
-                  }
-                }
-                //console.log("%c Highlighting:  ", 'color: blue', hot.current.getDataAtCell(k, NameColumn))
-            } else {
-                // if not on the list clear highlight
-                if (hot.current.getCellMeta(k, 0).className === 'MyRow') {
-                  for (var j = 0; j < hot.current.countCols(); j++) {
-                      hot.current.setCellMeta(k, j, 'className', '')
-                  }
-                }
-                //console.log("%c Clearing Highlighting:  ", 'color: red', hot.current.getDataAtCell(k, NameColumn))
-            }
-
-            //hot.current.render()
-
-        }
-        // make sdata the new list.
-        setSdata(props.importSelection)
-        // eslint-disable-next-line
-    }, [props.importSelection])
-
-    // set data
-    useEffect(() => {
-        if (containerRef.current && props.data && props.data.length) {
-            setData(props.data)
-            //setHeader(Object.keys(props.data[0]))
-            hot.current.updateSettings({
-                colHeaders: Object.keys(props.data[0]),
-            })
-            hot.current.updateData(props.data)
-            hot.current.getPlugin('Filters').clearConditions();
-            hot.current.getPlugin('Filters').filter();
-            hot.current.render();
-        }
-    }, [props.data])
-
-    useEffect(() => {
-        hot.current.updateSettings({ height: props.height })
-    }, [props.height])
-
-    // set view type (default: 'readonly')
-    useEffect(() => {
-        if (props.view && views.current.includes(props.view)) {
-            if (props.view === "readonly") {
-                //console.log("readonly active")
-                hot.current.updateSettings({
-                    readOnly: false, // make table cells read-only
-                    contextMenu: false, // disable context menu to change things
-                    disableVisualSelection: true, // prevent user from visually selecting
-                    manualColumnResize: false, // prevent dragging to resize columns
-                    manualRowResize: false, // prevent dragging to resize rows
-                    comments: false // prevent editing of comments
-                })
-            }
-        }
-    }, [props.view])
-
-
-    // Check if value is within imp
-    const isInImport = (val, imp) => {
-        for (let i = 0; i < imp.length; i++) {
-            if (imp[i] === val) {
-                return true
-            }
-
-        }
-        return false
+  // ==================================================( Highlighting )
+  // custom renderer for per cell formatting
+  Handsontable.renderers.registerRenderer('customStylesRenderer', (instance, td, row, col, prop, value, cellProperties) => {
+    Handsontable.renderers.getRenderer('text')(instance, td, row, col, prop, value, cellProperties);
+    //console.log(instance, td, row, col, prop, value, cellProperties)
+    if (sdata.includes(hot.current.getDataAtCell(row, primaryColumn))) {
+      td.style.backgroundColor = "#d2e8fa";
     }
-
-    // Set which column is the name column
-    const setNameColumn = () => {
-        var temp = locateColumn("Sample")
-        //console.log("Setting Name column to : ", temp)
-        NameColumn = temp
-    }
-
-    // Find a column with a specific name
-    const locateColumn = (column) => {
-        if (hot.current) {
-            for (let i = 0; i < hot.current.countCols(); i++) {
-                if (column === hot.current.getColHeader(i))
-                    return i
-            }
+    if (props.colorScheme && props.colorGroup) {
+      for (let i in props.colorGroup) {
+        if (props.colorGroup[i].includes(hot.current.getDataAtCell(row, primaryColumn))) {
+          td.style.color = "#" + props.colorScheme[i % props.colorScheme.length]
         }
-
-        return -1
+      }
     }
+  });
 
+  // intercept and handle per cell clicks
+  useEffect(() => {
+    hot.current.updateSettings({
+      afterOnCellMouseDown: (event, coords, td) => {
+        if (!sdata.includes(hot.current.getDataAtCell(coords.row, primaryColumn))) {
+          setSdata(sdata.concat(hot.current.getDataAtCell(coords.row, primaryColumn)))
+        } else {
+          setSdata(sdata.filter(x => x !== hot.current.getDataAtCell(coords.row, props.primaryColumn)))
+        }
+      }
+    })
+  })
 
-    return (
-      <div style={{ position: "relative", height: "100%" }}>
-        <div ref={containerRef} style={{ zIndex: "1" }}></div>
-      </div>
-    )
+  // handle colorscheme/group
+  useEffect(() => {
+    if (props.colorScheme && props.colorGroup) {
+      console.log("handsonTableColors:", props.colorScheme, props.colorGroup)
+    }   
+  }, [props.colorScheme, props.colorGroup])
+
+  // Export Table Selection Callback
+  useEffect(() => {
+    props.exportTableSelectionCallback(sdata)
+  }, [sdata])
+
+  useEffect(() => {
+    //if (props.height) { setHeight(props.height) }
+    if (props.width) { setWidth(props.width) }
+  }, [props.height, props.width])
+
+  //update sdata and table based on new phylo imported data.
+  useEffect(() => {
+    setSdata(importSelection)
+  }, [importSelection])
+
+  // set data
+  useEffect(() => {
+    if (containerRef.current && props.data && props.data.length) {
+      setData(props.data)
+      hot.current.updateSettings({
+        data: props.data,
+        colHeaders: Object.keys(props.data[0]),
+        cells(row, col) {
+          return {renderer: "customStylesRenderer"}
+        } 
+      })
+      hot.current.getPlugin('Filters').clearConditions();
+      hot.current.getPlugin('Filters').filter();
+      hot.current.render();
+    }
+  }, [props.data])
+
+  useEffect(() => {
+    hot.current.updateSettings({ height: props.height })
+  }, [props.height])
+
+  // set view type (default: 'readonly')
+  useEffect(() => {
+    if (props.view && views.current.includes(props.view)) {
+      if (props.view === "readonly") {
+        hot.current.updateSettings({
+          readOnly: false, // make table cells read-only
+          contextMenu: false, // disable context menu to change things
+          disableVisualSelection: true, // prevent user from visually selecting
+          manualColumnResize: false, // prevent dragging to resize columns
+          manualRowResize: false, // prevent dragging to resize rows
+          comments: false // prevent editing of comments
+        })
+      }
+    }
+  }, [props.view])
+
+  return (
+    <div style={{ position: "relative", height: "100%" }}>
+      <div ref={containerRef} style={{ zIndex: "1" }}></div>
+    </div>
+  )
 }
 
 export default SelectionHOT;
