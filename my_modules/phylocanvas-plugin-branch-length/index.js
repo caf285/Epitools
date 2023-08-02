@@ -13,7 +13,6 @@ function drawBranchLength() {
   const canvas = ctx.canvas;
   const pixelRatio = getPixelRatio(ctx);
   const textSize = this.textSize * this.zoom
-
   ctx.save();
 
   ctx.font = `${textSize}px ${this.font}`;

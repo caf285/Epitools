@@ -4,6 +4,7 @@ from os.path import exists
 import mysql.connector
 import json
 from datetime import datetime
+import sys
 
 def read(file):
   f = open(file, encoding='utf-8-sig')
@@ -24,7 +25,13 @@ def openCursor(db):
   return db.cursor()
 
 def main():
-  uploadHash = json.loads(read("epitools_pathogen_upload.json"))
+  if list(filter(lambda x: x.lower() in ["--stdin", "-s"], sys.argv)):
+    uploadHash = []
+    for line in sys.stdin:
+      uploadHash.append(line)
+    uploadHash = json.loads("\n".join(uploadHash))
+  else:
+    uploadHash = json.loads(read("epitools_pathogen_upload.json"))
 
   # open cursor
   db = openDB()
@@ -41,7 +48,7 @@ def main():
     print("".join(str(tuple(["%s"] * len(columns))).split("'")))
     if table == "pathogen":
       # EXECUTE
-      
+
       sql = "INSERT INTO " + table + " (" + ", ".join(columns) + ") VALUES" + "".join(str(tuple(["%s"] * len(columns))).split("'"))
       for line in list(map(lambda x: tuple(x), uploadHash["new"])):
         print(line)
@@ -50,11 +57,11 @@ def main():
       #cursor.executemany(sql, list(map(lambda x: tuple(x), uploadHash["new"])))
       db.commit()
 
-      sql = "UPDATE " + table + " SET " + ", ".join(list(map(lambda x: x + " = %s", columns[1:]))) + " WHERE sample = %s"
-      for line in list(map(lambda x: tuple(x[1:] + [""] + [x[0]]), uploadHash["update"])):
+      sql = "UPDATE " + table + " SET " + ", ".join(list(map(lambda x: x + " = %s", columns[1:-1]))) + " WHERE sample = %s"
+      for line in list(map(lambda x: tuple(x[1:] + [x[0]]), uploadHash["update"])):
         print(line)
       print(sql)
-      cursor.executemany(sql, list(map(lambda x: tuple(x[1:] + [""] + [x[0]]), uploadHash["update"])))
+      cursor.executemany(sql, list(map(lambda x: tuple(x[1:] + [x[0]]), uploadHash["update"])))
       #cursor.executemany(sql, list(map(lambda x: tuple(x[1:] + [x[0]]), uploadHash["update"])))
       db.commit()
       '''

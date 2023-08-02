@@ -442,10 +442,10 @@ func emmHandler(w http.ResponseWriter, r *http.Request) {
 
   // db results
   log.Printf("results")
-  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE sequence IS NOT NULL AND lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
-  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE sequence IS NOT NULL AND lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
-  //log.Printf("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
-  //results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE (lineage='" + request.Lineage + "' OR lineage LIKE '" + request.Lineage + ".%')")
+  //log.Printf("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND sequence IS NOT NULL")
+  //results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND sequence IS NOT NULL")
+  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
+  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE lineage='" + request.Lineage + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
   if err != nil {
     panic(err.Error()) // proper error handling instead of panic in your app
   }
@@ -474,7 +474,7 @@ func emmHandler(w http.ResponseWriter, r *http.Request) {
     for sequenceResults.Next() {
       sequenceResults.Scan(&sequence)
     }
-    if (len(sequence) > 0) { // only add sequence if query returns one
+    if len(sequence) > 0 {
       fasta = append(fasta, ">" + name + "\n" + string(sequence) + "\n")
     }
 
@@ -591,9 +591,10 @@ func dateRangeHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("date2:", request.Date2)
 
   log.Printf("results")
-  log.Printf("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id AND sequence IS NOT NULL) GROUP BY lineage")
-  //results, err := db.Query("SELECT * FROM epitools.pathogen")
-  results, err := db.Query("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id AND sequence IS NOT NULL) GROUP BY lineage")
+  //log.Printf("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) AND LENGTH(sequence)>0 GROUP BY lineage")
+  //results, err := db.Query("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) AND LENGTH(sequence)>0 GROUP BY lineage")
+  log.Printf("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) GROUP BY lineage")
+  results, err := db.Query("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) GROUP BY lineage")
   if err != nil {
     panic(err.Error()) // proper error handling instead of panic in your app
   }

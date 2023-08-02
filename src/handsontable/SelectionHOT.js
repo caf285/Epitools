@@ -35,10 +35,10 @@ function SelectionHOT(props) {
   Handsontable.renderers.registerRenderer('customStylesRenderer', (instance, td, row, col, prop, value, cellProperties) => {
     Handsontable.renderers.getRenderer('text')(instance, td, row, col, prop, value, cellProperties);
     //console.log(instance, td, row, col, prop, value, cellProperties)
-    if (sdata.includes(hot.current.getDataAtCell(row, primaryColumn))) {
+    if (sdata.includes(hot.current.getDataAtCell(row, primaryColumn))) { // selection
       td.style.backgroundColor = "#d2e8fa";
     }
-    if (props.colorScheme && props.colorGroup) {
+    if (props.colorScheme && props.colorGroup) { // highlighting
       for (let i in props.colorGroup) {
         if (props.colorGroup[i].includes(hot.current.getDataAtCell(row, primaryColumn))) {
           td.style.color = "#" + props.colorScheme[i % props.colorScheme.length]

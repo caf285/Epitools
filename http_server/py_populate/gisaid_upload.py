@@ -41,7 +41,7 @@ def main():
     print("".join(str(tuple(["%s"] * len(columns))).split("'")))
     if table == "pathogen":
       # EXECUTE
-      
+ 
       sql = "INSERT INTO " + table + " (" + ", ".join(columns) + ") VALUES" + "".join(str(tuple(["%s"] * len(columns))).split("'"))
       uploadList = []
       for i in range(len(uploadHash["new"])):
@@ -51,12 +51,12 @@ def main():
           cursor.executemany(sql, uploadList)
           uploadList = []
 
-      sql = "UPDATE " + table + " SET " + ", ".join(list(map(lambda x: x + " = %s", columns[1:]))) + " WHERE sample = %s"
+      sql = "UPDATE " + table + " SET " + ", ".join(list(map(lambda x: x + " = %s", columns[1:-1]))) + " WHERE sample = %s"
       uploadList = []
       for i in range(len(uploadHash["update"])):
-        uploadList.append(tuple(uploadHash["update"][i]))
+        uploadList.append(uploadHash["update"][i][1:-1] + [uploadHash["update"][i][0]])
         print(uploadList[-1], "\n")
-        if i % 10 == 0 or i >= len(uploadHash["new"]) - 1:
+        if i % 10 == 0 or i >= len(uploadHash["update"]) - 1:
           cursor.executemany(sql, uploadList)
           uploadList = []
 

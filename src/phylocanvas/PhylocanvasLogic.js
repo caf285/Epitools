@@ -3,12 +3,14 @@ import Phylocanvas, { utils } from "phylocanvas";
 
 import scalebar from "phylocanvas-plugin-scalebar";
 import branchLength from "phylocanvas-plugin-branch-length";
+import enhancedBranchLabels from "phylocanvas-plugin-enhanced-branch-labels";
 import root from "phylocanvas-plugin-root";
 import pairwiseOps from "phylocanvas-plugin-pairwise-ops";
 import treeStats from "phylocanvas-plugin-tree-stats";
 import stretchOrientation from "phylocanvas-plugin-stretch-orientation";
 Phylocanvas.plugin(scalebar)
 Phylocanvas.plugin(branchLength)
+Phylocanvas.plugin(enhancedBranchLabels)
 Phylocanvas.plugin(root)
 Phylocanvas.plugin(pairwiseOps)
 Phylocanvas.plugin(treeStats)
@@ -140,13 +142,37 @@ function PhylocanvasLogic(props) {
   }, [exportSelectionCallback])
 
   // select all branches from handsontable selection import
+  const checkSelectionCallback = useCallback((branches) => {
+    if (branches && branches.length > 0) {
+      let branchParents = []
+      for (let branch of branches) {
+        if (phylocanvas.current.branches[branch].selected) {
+          if (phylocanvas.current.branches[branch].parent) {
+            branchParents.push(phylocanvas.current.branches[branch].parent.id)
+          }
+        } else if (phylocanvas.current.branches[branch].children.length === phylocanvas.current.branches[branch].children.filter(child => child.selected).length) {
+          phylocanvas.current.branches[branch].selected = true
+          if (phylocanvas.current.branches[branch].parent) {
+            branchParents.push(phylocanvas.current.branches[branch].parent.id)
+          }
+        }
+      }
+      checkSelectionCallback(branchParents)
+    }
+  }, [])
+
   useEffect(() => {
+    let branchParents = []
     for (let branch in phylocanvas.current.branches) {
       if (importSelection.includes(branch)) {
         phylocanvas.current.branches[branch].selected = true
+        branchParents.push(phylocanvas.current.branches[branch].parent.id)
       } else {
         phylocanvas.current.branches[branch].selected = false
       }
+    }
+    checkSelectionCallback(branchParents)
+    if (phylocanvas.current.maxBranchLength > 0) {
       phylocanvas.current.draw()
     }
   }, [importSelection])

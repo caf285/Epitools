@@ -1,9 +1,10 @@
 #!/usr/bin/python3
-import os
+
 from os.path import exists
 import mysql.connector
 import json
 from datetime import datetime
+import sys
 
 def read(file):
   f = open(file, encoding='utf-8-sig')
@@ -24,45 +25,28 @@ def openCursor(db):
   return db.cursor()
 
 def main():
-  ### open json
-  for uploadFile in list(filter(lambda x: "emm" in x, os.listdir("/var/www/pathogen-intelligence.tgen.org/epitools/http_server/py_populate"))):
-    uploadHash = json.loads(read(uploadFile))
-    print(uploadFile)
+  print("reading sequence file")
+  if list(filter(lambda x: x.lower() in ["--stdin", "-s"], sys.argv)):
+    uploadHash = []
+    for line in sys.stdin:
+      uploadHash.append(line)
+    uploadHash = json.loads("\n".join(uploadHash))
+  else:
+    uploadHash = json.loads(read("epitools_sequences.json"))
 
-    ### open cursor
-    db = openDB()
-    cursor = openCursor(db)
+  # open cursor
+  db = openDB()
+  cursor = openCursor(db)
 
-    ### get sequences list
-    cursor.execute("DESCRIBE sequence")
-    sequenceHeader = list(map(lambda x: x[0], cursor.fetchall()))[1:]
-    cursor.execute("SELECT sequence.sample, sequence.reference, pathogen.id, pathogen.sample FROM epitools.sequence RIGHT JOIN epitools.pathogen ON sequence.sample = pathogen.id")
-    sequenceList = cursor.fetchall()
-    sequenceHash = {}
-    for line in sequenceList:
-      sequenceHash[line[-1]] = line
+  sql = "UPDATE epitools.pathogen SET sequence = %s WHERE sample = %s"
+  count = 1
+  total = len(uploadHash.keys())
+  for sample in uploadHash:
+    print("updating", count, "of", total, sample)
+    cursor.execute(sql, (uploadHash[sample], sample))
+    count += 1
 
-    for line in uploadHash:
-      data = []
-      #print(line, uploadHash[line])
-      if line in sequenceHash and not sequenceHash[line][0]:
-        print(len(uploadHash[line]["sequence"]))
-        data.append((sequenceHash[line][2], uploadHash[line]["reference"], uploadHash[line]["sequence"]))
-
-      sql = "INSERT INTO epitools.sequence (sample, reference, sequence) VALUES (%s, %s, %s)"
-      cursor.executemany(sql, data)
-      db.commit()
-
-
-
-'''
-      sql = "INSERT INTO " + table + " (" + ", ".join(columns) + ") VALUES" + "".join(str(tuple(["%s"] * len(columns))).split("'"))
-      for line in list(map(lambda x: tuple(x), uploadHash["new"])):
-        print(line)
-      print(sql)
-      cursor.executemany(sql, list(map(lambda x: tuple(x), uploadHash["new"])))
-      #db.commit()
-'''
+    db.commit()
 
 if __name__ == "__main__":
   main()

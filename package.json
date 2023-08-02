@@ -30,6 +30,7 @@
     "papaparse": "^5.3.2",
     "phylocanvas": "^2.8.1",
     "phylocanvas-plugin-branch-length": "file:my_modules/phylocanvas-plugin-branch-length",
+    "phylocanvas-plugin-enhanced-branch-labels": "file:my_modules/phylocanvas-plugin-enhanced-branch-labels",
     "phylocanvas-plugin-pairwise-ops": "file:my_modules/phylocanvas-plugin-pairwise-ops",
     "phylocanvas-plugin-root": "file:my_modules/phylocanvas-plugin-root",
     "phylocanvas-plugin-scalebar": "file:my_modules/phylocanvas-plugin-scalebar",

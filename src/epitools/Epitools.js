@@ -157,9 +157,9 @@ function Epitools(props) {
         }
       }
       setPathogenDateRange([dmin, dmax])
+      setPathogenDateRangeForms("")
+      pathogenDateRangeRequest(pathogenType, dmin, dmax) // fill pathogen Lineage buttons on load
     }
-    setPathogenDateRangeForms("")
-    pathogenDateRangeRequest(pathogenType, pathogenDateRange[0], pathogenDateRange[1]) // fill pathogen Lineage buttons on load
   }, [pathogenType])
 
   //====================================================================================================( handle branch selection ) 
@@ -379,21 +379,21 @@ function Epitools(props) {
         date2: date2,
       })
     })
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status + " " + response.statusText);
-        }
-        return response.json()
-      })
-      .then(data => {
-        if (data) {
-          updatePathogenDateRangeForms(data)
-        } else {
-          setPathogenDateRangeForms([])
-          console.log("no data")
-        }
-      })
-      .catch(ERR => window.alert(ERR))
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status + " " + response.statusText);
+      }
+      return response.json()
+    })
+    .then((data) => {
+      if (data) {
+        updatePathogenDateRangeForms(data, date1, date2)
+      } else {
+        setPathogenDateRangeForms([])
+        console.log("no data")
+      }
+    })
+    .catch(ERR => window.alert(ERR))
   }
 
   //====================================================================================================( import/export )
@@ -524,13 +524,13 @@ function Epitools(props) {
     return data
   }
 
-  function updatePathogenDateRangeForms(data) {
+  function updatePathogenDateRangeForms(data, date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
     let newDateRangeForms = []
     if (data) {
       data = sortForms(data)
       newDateRangeForms = data.filter(x => x.Count >= 4 && x.Lineage).map((v, k) => {return <button key={k} onClick={() => {
         setUpdateTable(true)
-        pathogenLineageRequest(v["Lineage"], "emm")
+        pathogenLineageRequest(v["Lineage"], "emm", date1, date2)
       }}>{v["Lineage"]} ({v["Count"]})</button>})
     }
     setPathogenDateRangeForms(newDateRangeForms)
@@ -669,7 +669,7 @@ function Epitools(props) {
                 <Box sx={{ paddingLeft: "15px" }}>
                   <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
                     <span>cluster distance: <b>{clusterDistance}</b></span>
-                    <InfoButton text="cluster distance description" />
+                    <InfoButton text="cluster distance sets a maximum snp distance between samples to be considered a cluster" />
                   </div>
                   <Slider value={clusterDistance} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
                     if (typeof newValue === "number") {
@@ -681,7 +681,7 @@ function Epitools(props) {
                   }} />
                   <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
                     <span>cluster size: <b>{clusterSize}</b></span>
-                    <InfoButton text="cluster size description" />
+                    <InfoButton text="cluster size sets the minimum amount of samples in a group to be considered a cluster" />
                   </div>
                   <Slider value={clusterSize} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
                     if (typeof newValue === "number") {
