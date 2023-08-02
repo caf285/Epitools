@@ -137,6 +137,7 @@ function PhylocanvasLogic(props) {
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree("phylocanvas")
     phylocanvas.current.addListener("click", () => {
+      checkSelectionCallback(phylocanvas.current.leaves.map(leaf => leaf.id))
       exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
     })
   }, [exportSelectionCallback])
@@ -146,35 +147,32 @@ function PhylocanvasLogic(props) {
     if (branches && branches.length > 0) {
       let branchParents = []
       for (let branch of branches) {
-        if (phylocanvas.current.branches[branch].selected) {
-          if (phylocanvas.current.branches[branch].parent) {
-            branchParents.push(phylocanvas.current.branches[branch].parent.id)
-          }
-        } else if (phylocanvas.current.branches[branch].children.length === phylocanvas.current.branches[branch].children.filter(child => child.selected).length) {
-          phylocanvas.current.branches[branch].selected = true
-          if (phylocanvas.current.branches[branch].parent) {
-            branchParents.push(phylocanvas.current.branches[branch].parent.id)
+        if (phylocanvas.current.branches[branch].parent) {
+          branchParents.push(phylocanvas.current.branches[branch].parent.id)
+        }
+        if (phylocanvas.current.branches[branch].children.length > 0) {
+          phylocanvas.current.branches[branch].selected = false
+          if (phylocanvas.current.branches[branch].children.filter(child => !child.selected).length === 0) {
+            phylocanvas.current.branches[branch].selected = true
           }
         }
       }
       checkSelectionCallback(branchParents)
     }
+    if (phylocanvas.current.maxBranchLength > 0) {
+      phylocanvas.current.draw()
+    }
   }, [])
 
   useEffect(() => {
-    let branchParents = []
     for (let branch in phylocanvas.current.branches) {
       if (importSelection.includes(branch)) {
         phylocanvas.current.branches[branch].selected = true
-        branchParents.push(phylocanvas.current.branches[branch].parent.id)
       } else {
         phylocanvas.current.branches[branch].selected = false
       }
     }
-    checkSelectionCallback(branchParents)
-    if (phylocanvas.current.maxBranchLength > 0) {
-      phylocanvas.current.draw()
-    }
+    checkSelectionCallback(phylocanvas.current.leaves.map(leaf => leaf.id))
   }, [importSelection])
 
   // return branch names on nwk change so names can be queried

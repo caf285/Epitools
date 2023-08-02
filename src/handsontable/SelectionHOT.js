@@ -35,10 +35,14 @@ function SelectionHOT(props) {
   Handsontable.renderers.registerRenderer('customStylesRenderer', (instance, td, row, col, prop, value, cellProperties) => {
     Handsontable.renderers.getRenderer('text')(instance, td, row, col, prop, value, cellProperties);
     //console.log(instance, td, row, col, prop, value, cellProperties)
-    if (sdata.includes(hot.current.getDataAtCell(row, primaryColumn))) { // selection
+
+    // handle selection
+    if (sdata.includes(hot.current.getDataAtCell(row, primaryColumn))) {
       td.style.backgroundColor = "#d2e8fa";
     }
-    if (props.colorScheme && props.colorGroup) { // highlighting
+
+    // handle highlighting
+    if (props.colorScheme && props.colorGroup) {
       for (let i in props.colorGroup) {
         if (props.colorGroup[i].includes(hot.current.getDataAtCell(row, primaryColumn))) {
           td.style.color = "#" + props.colorScheme[i % props.colorScheme.length]
@@ -52,8 +56,10 @@ function SelectionHOT(props) {
     hot.current.updateSettings({
       afterOnCellMouseDown: (event, coords, td) => {
         if (!sdata.includes(hot.current.getDataAtCell(coords.row, primaryColumn))) {
+          props.exportTableSelectionCallback(sdata.concat(hot.current.getDataAtCell(coords.row, primaryColumn))) // export selection after click
           setSdata(sdata.concat(hot.current.getDataAtCell(coords.row, primaryColumn)))
         } else {
+          props.exportTableSelectionCallback(sdata.filter(x => x !== hot.current.getDataAtCell(coords.row, props.primaryColumn))) // export selection after click
           setSdata(sdata.filter(x => x !== hot.current.getDataAtCell(coords.row, props.primaryColumn)))
         }
       }
@@ -66,11 +72,6 @@ function SelectionHOT(props) {
       console.log("handsonTableColors:", props.colorScheme, props.colorGroup)
     }   
   }, [props.colorScheme, props.colorGroup])
-
-  // Export Table Selection Callback
-  useEffect(() => {
-    props.exportTableSelectionCallback(sdata)
-  }, [sdata])
 
   useEffect(() => {
     //if (props.height) { setHeight(props.height) }
