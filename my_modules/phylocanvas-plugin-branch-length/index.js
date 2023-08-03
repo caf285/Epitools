@@ -1,4 +1,4 @@
-import { Tree, utils } from 'phylocanvas';
+import { Tree, Branch, utils } from 'phylocanvas';
 
 const { getPixelRatio } = utils.canvas;
 
@@ -27,8 +27,17 @@ function drawBranchLength() {
     branch = this.branches[branch]
     let centerX = (this.offsetx + (branch.startx + branch.centerx) / 2 * this.zoom / pixelRatio) * pixelRatio
     let centerY = (this.offsety + (branch.starty + branch.centery) / 2 * this.zoom / pixelRatio) * pixelRatio
+    let startX = (this.offsetx + branch.startx * this.zoom / pixelRatio) * pixelRatio
+    let startY = (this.offsety + branch.starty * this.zoom / pixelRatio) * pixelRatio
     let x = (this.offsetx + branch.centerx * this.zoom / pixelRatio) * pixelRatio
     let y = (this.offsety + branch.centery * this.zoom / pixelRatio) * pixelRatio
+
+    // draw node arcs
+    ctx.beginPath()
+    ctx.arc(startX, startY, this.lineWidth + 2, 0, 2 * Math.PI)
+    ctx.fill()
+
+    // draw branch lengths
     if (this.treeType == "rectangular") {
       ctx.textAlign = "center"
       ctx.fillText(branch.branchLength, centerX, y)

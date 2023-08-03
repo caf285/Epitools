@@ -26,7 +26,7 @@ function appendClicked(x, y) {
     return null;
   }
 
-  if (this.leaf) {
+  if (this.tree.showLabels && this.leaf) {
     const tree = this.tree
     const ctx = this.canvas;
     const canvas = ctx.canvas;
