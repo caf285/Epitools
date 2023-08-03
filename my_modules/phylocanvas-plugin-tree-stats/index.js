@@ -101,8 +101,9 @@ function drag(event) {
     if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
       this.root.cascadeFlag('hovered', false);
       nd.hovered = true;
+      this.containerElement.style.cursor = 'pointer';
+      this.draw()
       if (nd.leaf) {
-        this.draw()
         let windowText = [nd.id]
         for (let data of nd.getMetadata()) {
           windowText.push(data)
@@ -138,7 +139,6 @@ function drag(event) {
         }
         ctx.restore()
       }    
-      this.containerElement.style.cursor = 'pointer';
     } else {
       this.root.cascadeFlag('hovered', false);
       if (this.shiftKeyDrag && e.shiftKey) {
