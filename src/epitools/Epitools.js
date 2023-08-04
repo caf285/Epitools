@@ -43,7 +43,6 @@ function Epitools(props) {
   const [updateTable, setUpdateTable] = useState(false)
 
   // handsontable
-  const [hotHeight, setHOTHeight] = useState(["300"])
   const elementRef = useRef(null);
   const [importTableSelection, setImportTableSelection] = useState([])
 
@@ -53,8 +52,6 @@ function Epitools(props) {
   const [clusterDistance, setClusterDistance] = useState(2)
   const [clusterSize, setClusterSize] = useState(2)
   const [highlightList, setHighlightList] = useState([]) // obj used for coloring sample in each group; {group: [sample, ...], ...}
-  const [dragCheck, setDragCheck] = useState(false)
-  const dragRef = useRef(0)
   const [branchesData, setBranchesData] = useState([]) // will be filled with complete table
   const branchesDataRef = useRef([])
 
@@ -89,11 +86,6 @@ function Epitools(props) {
   })
  
   //====================================================================================================( initialize variables ) 
-  useEffect(() => {
-    setHOTHeight(JSON.stringify(Math.floor(elementRef.current?.clientHeight / 2)))
-    setPhyloHeight(Math.floor(elementRef.current?.clientHeight / 2))
-  }, [])
-
   useEffect(() => {
     //console.log(pathogenDateRange)
   }, [pathogenDateRange])
@@ -558,12 +550,6 @@ function Epitools(props) {
     handleHighlightRadioChange()
   }, [highlightRadio, handleHighlightRadioChange])
 
-  // update HOT and Phylocanvas window sizes
-  function updateDrag() {
-    setHOTHeight(JSON.stringify(calculateBottomPaneHeight(dragRef.current)));
-    setPhyloHeight(dragRef.current);
-  }
-
   //====================================================================================================( return )
   return (
     <div style={{ position: "relative", height: "100%" }} ref={elementRef}>
@@ -745,16 +731,9 @@ function Epitools(props) {
       </div>
 
       {/* split pane drag */}
-      <SplitPane split="horizontal" defaultSize={"50%"} onChange={
+      <SplitPane split="horizontal" defaultSize={"50%"} style={{overflow: "hidden"}} pane1Style={{zIndex: 1, minHeight: "10%", maxHeight: "90%" }} pane2Style={{zIndex: 0, overflow: "hidden"}}  minSize={50} onDragFinished={
         (drag) => {
-          dragRef.current = drag
-          if (!dragCheck) {
-            setDragCheck(true)
-            setTimeout(function() {
-              setDragCheck(false)
-              updateDrag()
-            }, 10);
-          }
+          setPhyloHeight(drag);
         }
       }>
 
@@ -778,20 +757,17 @@ function Epitools(props) {
         />
 
         {/* handsontable component */}
-        <div>
-          <SelectionHOT
-            label="Metadata:"
-            data={branchesData}
-            view="readonly"
-            height={hotHeight}
-            importSelection={importTableSelection}
-            exportTableSelectionCallback={exportTableSelectionCallback}
-            primaryColumn={tablePrimaryColumn}
-            colorScheme={colorScheme}
-            colorGroup={colorGroup}
-          />
+        <SelectionHOT
+          label="Metadata:"
+          data={branchesData}
+          view="readonly"
+          importSelection={importTableSelection}
+          exportTableSelectionCallback={exportTableSelectionCallback}
+          primaryColumn={tablePrimaryColumn}
+          colorScheme={colorScheme}
+          colorGroup={colorGroup}
+        />
 
-        </div>
       </SplitPane>
     </div >
   )

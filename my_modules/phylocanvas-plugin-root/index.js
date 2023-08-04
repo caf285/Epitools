@@ -22,9 +22,9 @@ function drawRoot() {
   cxt.beginPath();
   cxt.moveTo(x, y);
   if (this.treeType == "rectangular" || this.treeType == "diagonal") {
-    cxt.lineTo(x - 100 * this.zoom, y);
+    cxt.lineTo(x - 50 * this.zoom, y);
   } else if (this.treeType == "hierarchical") {
-    cxt.lineTo(x, y - 100 * this.zoom);
+    cxt.lineTo(x, y - 50 * this.zoom);
   }
   cxt.stroke();
   cxt.closePath();

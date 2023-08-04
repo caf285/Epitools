@@ -1,11 +1,11 @@
-import { Tree, treeTypes, utils } from 'phylocanvas';
+import { Tree, Branch, treeTypes, utils } from 'phylocanvas';
 
 const DEFAULTS = {
   active: true,
   orientation: "both"
 };
 
-function properZoom() {
+function scroll(event) {
   const { stretchOrientation } = this;
 
   if (this.disableZoom || 'wheelDelta' in event && event.wheelDelta === 0) {
@@ -56,6 +56,15 @@ function properZoom() {
   }
 }
 
+function setFontSize(ystep) {
+  this.canvas.font = this.textSize + 'pt ' + this.font
+}
+
+function getLabelSize() {
+  this.canvas.font = this.getFontString();
+  return this.canvas.measureText(this.getLabel()).width;
+}
+
 export default function plugin(decorate) {
   decorate(this, 'createTree', (delegate, args) => {
     const tree = delegate(...args);
@@ -64,9 +73,24 @@ export default function plugin(decorate) {
     return tree;
   });
   decorate(Tree, 'scroll', function (delegate, args) {
-    //delegate.apply(this, args); // comment out to completely override scroll
     if (this.stretchOrientation.active) {
-      properZoom.apply(this);
+      scroll.apply(this, args);
+    } else {
+      delegate.apply(this, args);
     }
   });
+  decorate(Tree, 'setFontSize', function (delegate, args) {
+    if (this.stretchOrientation.active) {
+      setFontSize.apply(this, args);
+    } else {
+      delegate.apply(this, args);
+    }
+  });
+  decorate(Branch, 'getLabelSize', function (delegate) {
+    if (this.tree.stretchOrientation.active) {
+      return getLabelSize.apply(this);
+    } else {
+      return delegate.apply(this);
+    }
+  })
 }

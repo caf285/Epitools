@@ -34,45 +34,20 @@ function PhylocanvasLogic(props) {
   const primaryColumn = props.primaryColumn
   const metadataLabels = props.metadataLabels
 
+  const containerRef = useRef()
+  const phylocanvas = useRef();
+  const typeList = useRef(["radial", "rectangular", "circular", "diagonal", "hierarchical"]);
+
   useEffect(() => {
-    setHW(props.height, widthRef.current)
-    window.dispatchEvent(new Event('resize'))
     if (phylocanvas.current) {
-      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
-      phylocanvas.current.setNodeSize(nodeSizeRef.current);
-      phylocanvas.current.setTextSize(textSizeRef.current);
+      phylocanvas.current.resizeToContainer()
+      phylocanvas.current.fitInPanel()
+      phylocanvas.current.draw()
     }
+    //window.dispatchEvent(new Event('resize'))
+    console.log(props.height)
+    console.log(phylocanvas.current)
   }, [props.height])
-
-  let phylocanvas = useRef();
-  let minHeight = 100
-  let minWidth = 100
-
-  // [height, width]
-  let [hw, _setHW] = useState([minHeight, minWidth])
-  let heightRef = useRef(hw[0])
-  let widthRef = useRef(hw[1])
-  let setHW = data => {
-    heightRef.current = data[0]
-    widthRef.current = data[1]
-    _setHW(data)
-  }
-
-  // [nodeSize, textSize, lineWidth]
-  let [textSize, _setTextSize] = useState(1);
-  let textSizeRef = useRef(textSize);
-  let setTextSize = data => {
-    textSizeRef.current = data;
-    _setTextSize(data);
-  }
-  let [nodeSize, _setNodeSize] = useState(1);
-  let nodeSizeRef = useRef(nodeSize);
-  let setNodeSize = data => {
-    nodeSizeRef.current = data;
-    _setNodeSize(data);
-  }
-
-  let typeList = useRef(["radial", "rectangular", "circular", "diagonal", "hierarchical"]);
 
   // set data getters on component load (fills all callbacks for retrieving dynamic data)
   useEffect(() => {
@@ -99,18 +74,6 @@ function PhylocanvasLogic(props) {
     }
   }, [setGetNwk, setGetCanvas])
 
-  // execute window resize on window load (adjusts phylocanvas canvas size to take up proper window spacing)
-  useEffect(() => {
-    function initialSize() {
-      window.dispatchEvent(new Event('resize'))
-      phylocanvas.current.setTreeType(phylocanvas.current.treeType)
-    }
-    window.addEventListener("load", initialSize);
-    return () => {
-      window.removeEventListener("load", initialSize);
-    };
-  }, [])
-
   // color branches on scheme/group change
   useEffect(() => {
     if (phylocanvas.current) {
@@ -135,7 +98,7 @@ function PhylocanvasLogic(props) {
 
   // load tree on component load and add listener for click action to export selected ids
   useEffect(() => {
-    phylocanvas.current = Phylocanvas.createTree("phylocanvas")
+    phylocanvas.current = Phylocanvas.createTree(containerRef.current)
     phylocanvas.current.addListener("click", () => {
       checkSelectionCallback(phylocanvas.current.leaves.map(leaf => leaf.id))
       exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
@@ -181,8 +144,7 @@ function PhylocanvasLogic(props) {
     let oldTree = phylocanvas.current.stringRepresentation
     try {
       phylocanvas.current.load(nwk)
-      phylocanvas.current.setNodeSize(nodeSizeRef.current)
-      phylocanvas.current.setTextSize(textSizeRef.current)
+      phylocanvas.current.setTextSize(props.textSize)
       phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
     } catch (err) {
       phylocanvas.current.load(oldTree)
@@ -208,20 +170,17 @@ function PhylocanvasLogic(props) {
     } else {
       phylocanvas.current.setTreeType("rectangular")
     }
-    phylocanvas.current.setNodeSize(nodeSizeRef.current)
-    phylocanvas.current.setTextSize(textSizeRef.current)
+    phylocanvas.current.setTextSize(props.textSize)
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
   }, [props.type])
   useEffect(() => {
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
   }, [props.lineWidth])
   useEffect(() => {
-    setNodeSize(props.nodeSize * getPixelRatio(phylocanvas.current.canvas) / 2)
-    phylocanvas.current.setNodeSize(nodeSizeRef.current)
+    phylocanvas.current.setNodeSize(props.nodeSize)
   }, [props.nodeSize])
   useEffect(() => {
-    setTextSize(props.textSize * getPixelRatio(phylocanvas.current.canvas) / 2);
-    phylocanvas.current.setTextSize(textSizeRef.current)
+    phylocanvas.current.setTextSize(props.textSize)
   }, [props.textSize])
   useEffect(() => {
     phylocanvas.current.showLabels = props.showLabels
@@ -277,10 +236,7 @@ function PhylocanvasLogic(props) {
   }, [setGetCluster])
 
   return (
-    <div style={{ height: "100%" }}>
-      {/*<div id="phylocanvas" style={{height: heightRef.current + "px", width: "100%", minHeight: minHeight + "px", minWidth: minWidth + "px"}}></div>*/}
-      <div id="phylocanvas" style={{ height: "100%", width: "100%", minHeight: props.height + "px", minWidth: minWidth + "px" }}></div>
-    </div>
+    <div ref={containerRef} style={{ height: "100%", width: "100%" }}></div>
   )
 }
 

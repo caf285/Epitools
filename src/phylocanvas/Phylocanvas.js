@@ -96,13 +96,13 @@ function PhylocanvasView(props) {
         colorGroup={props.colorGroup}
         resetTreeBool={resetTreeBool}
       />
-      <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0 }}>
+      <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0, zIndex: 2 }}>
         <SvgButton
           label="tree options"
           svg="menuContext"
           dropAlign="right"
           drop={
-            <div style={{ maxHeight: props.height - 100 }}>
+            <div style={{ maxHeight: props.height - 60 }}>
               <h5>Toggle:</h5>
               <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
                 <div>labels: <Switch checked={showLabels} onChange={() => {setShowLabels(!showLabels)}} /></div>
@@ -143,7 +143,7 @@ function PhylocanvasView(props) {
           }
         />
       </div>
-      <div style={{ zIndex: "100", position: "absolute", display: "flex", flexFlow:"row", bottom: 0, right: 0 }}>
+      <div style={{ zIndex: 1, position: "absolute", display: "flex", flexFlow:"row", bottom: 0, right: 0 }}>
         <SvgButton
           svg={(type === "hierarchical" && stretchOrientation === "horizontal" ? "vertical" : type === "hierarchical" && stretchOrientation === "vertical" ? "horizontal" : stretchOrientation) + "Scale"}
           onClick={() => cycleOrientation()}

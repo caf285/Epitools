@@ -34,7 +34,7 @@ function drawBranchLength() {
 
     // draw node arcs
     ctx.beginPath()
-    ctx.arc(startX, startY, this.lineWidth + 2, 0, 2 * Math.PI)
+    ctx.arc(startX, startY, Math.min(this.lineWidth + 2, 8), 0, 2 * Math.PI)
     ctx.fill()
 
     // draw branch lengths

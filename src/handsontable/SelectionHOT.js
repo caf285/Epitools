@@ -9,7 +9,7 @@ function SelectionHOT(props) {
   //const [header, setHeader] = useState(false)
   const [data, setData] = useState([{}])
   const [sdata, setSdata] = useState([])
-  //const [height, setHeight] = useState("props.height")
+  const [height, setHeight] = useState("100%")
   const [width, setWidth] = useState("auto")
   const views = useRef(["readonly"]);
 
@@ -20,7 +20,7 @@ function SelectionHOT(props) {
   useEffect(() => {
     hot.current = new Handsontable(containerRef.current, {
       data,
-      height: props.height,
+      height: height,
       width: width,
       licenseKey: licenseKey.current,
       columnSorting: true,
@@ -73,11 +73,6 @@ function SelectionHOT(props) {
     }   
   }, [props.colorScheme, props.colorGroup])
 
-  useEffect(() => {
-    //if (props.height) { setHeight(props.height) }
-    if (props.width) { setWidth(props.width) }
-  }, [props.height, props.width])
-
   //update sdata and table based on new phylo imported data.
   useEffect(() => {
     setSdata(importSelection)
@@ -100,10 +95,6 @@ function SelectionHOT(props) {
     }
   }, [props.data])
 
-  useEffect(() => {
-    hot.current.updateSettings({ height: props.height })
-  }, [props.height])
-
   // set view type (default: 'readonly')
   useEffect(() => {
     if (props.view && views.current.includes(props.view)) {
@@ -121,9 +112,7 @@ function SelectionHOT(props) {
   }, [props.view])
 
   return (
-    <div style={{ position: "relative", height: "100%" }}>
-      <div ref={containerRef} style={{ zIndex: "1" }}></div>
-    </div>
+    <div ref={containerRef}></div>
   )
 }
 

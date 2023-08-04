@@ -160,24 +160,33 @@ export default function plugin(decorate) {
     return tree;
   });
   decorate(Branch, 'clicked', function (delegate, args) {
-    //delegate.apply(this, args);
-    return appendClicked.apply(this, args);
+    if (this.tree.treeStats.active) {
+      return appendClicked.apply(this, args);
+    } else {
+      delegate.apply(this, args);
+    }
   })
   decorate(Tree, 'drag', function (delegate, args) {
-    drag.apply(this, args)
+    if (this.treeStats.active) {
+      drag.apply(this, args)
+    } else {
+      delegate.apply(this, args)
+    }
   })
   decorate(Tree, 'load', function (delegate, args) {
     delegate.apply(this, args);
-    addMetadata.apply(this, args)
-    let ctx = this.canvas
-    if (this.treeStats.debug) {
-      this.addListener('mousemove', (e) => {
-        let path = new Path2D()
-        path.moveTo(0, 0)
-        path.lineTo(e.offsetX * getPixelRatio(ctx), e.offsetY * getPixelRatio(ctx))
-        path.closePath()
-        ctx.stroke(path)
-      })
+    if (this.treeStats.active) {
+      addMetadata.apply(this, args)
+      let ctx = this.canvas
+      if (this.treeStats.debug) {
+        this.addListener('mousemove', (e) => {
+          let path = new Path2D()
+          path.moveTo(0, 0)
+          path.lineTo(e.offsetX * getPixelRatio(ctx), e.offsetY * getPixelRatio(ctx))
+          path.closePath()
+          ctx.stroke(path)
+        })
+      }
     }
     //console.log(this)
   });
