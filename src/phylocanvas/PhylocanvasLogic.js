@@ -10,7 +10,7 @@ import treeStats from "phylocanvas-plugin-tree-stats";
 import stretchOrientation from "phylocanvas-plugin-stretch-orientation";
 Phylocanvas.plugin(scalebar)
 Phylocanvas.plugin(branchLength)
-Phylocanvas.plugin(enhancedBranchLabels)
+//Phylocanvas.plugin(enhancedBranchLabels)
 Phylocanvas.plugin(root)
 Phylocanvas.plugin(pairwiseOps)
 Phylocanvas.plugin(treeStats)
@@ -75,19 +75,21 @@ function PhylocanvasLogic(props) {
   }, [setGetNwk, setGetCanvas])
 
   // color branches on scheme/group change
-  useEffect(() => {
+  // leafStyle only supports ['lineWidth', 'strokeStyle', 'fillStyle']
+  // labelStyle only supports ['colour', 'format', 'textSize', 'font']
+  const colorPhylocanvas = useCallback(() => {
     if (phylocanvas.current) {
       console.log(phylocanvas.current)
       if (props.colorScheme && props.colorGroup) {
         // reset all non colored nodes to empty style
         for (let leaf of Object.keys(phylocanvas.current.branches).filter(branch => phylocanvas.current.branches[branch].leaf == true && ![].concat(...props.colorGroup).includes(branch))) {
-          phylocanvas.current.branches[leaf].labelStyle = {}
-          phylocanvas.current.branches[leaf].leafStyle = {}
+          phylocanvas.current.branches[leaf].setDisplay({ leafStyle: {} })
+          phylocanvas.current.branches[leaf].setDisplay({ labelStyle: {} })
         }
         for (let i = 0; i < props.colorGroup.length; i++) {
           for (let j = 0; j < props.colorGroup[i].length; j++) {
-            phylocanvas.current.branches[props.colorGroup[i][j]].labelStyle = { colour: "#" + props.colorScheme[i % props.colorScheme.length] }
-            phylocanvas.current.branches[props.colorGroup[i][j]].leafStyle = { fillStyle: "#" + props.colorScheme[i % props.colorScheme.length] }
+            phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ leafStyle: { strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length], fillStyle: "#" + props.colorScheme[i % props.colorScheme.length] } })
+            phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: { colour: "#" + props.colorScheme[i % props.colorScheme.length] } })
           }
         }
         //console.log("phylocanvasColors:", props.colorScheme, props.colorGroup)
@@ -95,6 +97,9 @@ function PhylocanvasLogic(props) {
       phylocanvas.current.draw()
     }
   }, [props.colorScheme, props.colorGroup])
+  useEffect(() => {
+    colorPhylocanvas()
+  }, [colorPhylocanvas, props.colorScheme, props.colorGroup])
 
   // load tree on component load and add listener for click action to export selected ids
   useEffect(() => {
@@ -138,30 +143,26 @@ function PhylocanvasLogic(props) {
     checkSelectionCallback(phylocanvas.current.leaves.map(leaf => leaf.id))
   }, [importSelection])
 
-  // return branch names on nwk change so names can be queried
-  const resetTreeCallback = useCallback(() => {
+  useEffect(() => {
+    phylocanvas.current.load(nwk)
     exportSelectionCallback([])
-    let oldTree = phylocanvas.current.stringRepresentation
-    try {
-      phylocanvas.current.load(nwk)
-      phylocanvas.current.setTextSize(props.textSize)
-      phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
-    } catch (err) {
-      phylocanvas.current.load(oldTree)
-      console.log(err)
-    }
     if (branchNameCallback) {
       branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
-  }, [nwk, exportSelectionCallback, branchNameCallback])
-  useEffect(() => {
-    resetTreeCallback()
-  }, [nwk, resetTreeCallback])
-  useEffect(() => {
+  }, [nwk])
+
+  // return branch names on nwk change so names can be queried
+  const resetTreeCallback = useCallback(() => {
     if (props.resetTreeBool) {
-      resetTreeCallback()
+      for (let branch in phylocanvas.current.branches) {
+        phylocanvas.current.branches[branch].selected = false
+      }
+      exportSelectionCallback([])
+      phylocanvas.current.fitInPanel()
+      phylocanvas.current.draw()
+      props.setResetTreeBool(false)
     }
-  }, [props.resetTreeBool, resetTreeCallback])
+  }, [exportSelectionCallback, props.resetTreeBool])
 
   // update and redraw tree when treeType, lineWidth, text/label size changes
   useEffect(() => {
@@ -181,7 +182,10 @@ function PhylocanvasLogic(props) {
   }, [props.nodeSize])
   useEffect(() => {
     phylocanvas.current.setTextSize(props.textSize)
-  }, [props.textSize])
+    if (props.resetTreeBool) {
+      resetTreeCallback()
+    }
+  }, [props.textSize, resetTreeCallback])
   useEffect(() => {
     phylocanvas.current.showLabels = props.showLabels
     phylocanvas.current.alignLabels = props.align

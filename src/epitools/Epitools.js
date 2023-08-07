@@ -47,6 +47,7 @@ function Epitools(props) {
   const [importTableSelection, setImportTableSelection] = useState([])
 
   // both
+  const [sampleSelection, setSampleSelection] = useState([])
   const [highlightRadio, setHighlightRadio] = useState("Cluster")
   const [colorGroup, setColorGroup] = useState([])
   const [clusterDistance, setClusterDistance] = useState(2)
@@ -153,6 +154,14 @@ function Epitools(props) {
       pathogenDateRangeRequest(pathogenType, dmin, dmax) // fill pathogen Lineage buttons on load
     }
   }, [pathogenType])
+
+  // prep sample selection for build from selection button
+  useEffect(() => {
+    setSampleSelection(importPhylocanvasSelection)
+  }, [importPhylocanvasSelection])
+  useEffect(() => {
+    setSampleSelection(importTableSelection)
+  }, [importTableSelection])
 
   //====================================================================================================( handle branch selection ) 
   useEffect(() => {
@@ -599,7 +608,7 @@ function Epitools(props) {
               {/* build new phylocanvas and table from current selection */}
               <SvgButton onClick={() => {
                 setUpdateTable(true)
-                samplesRequest(importPhylocanvasSelection)
+                samplesRequest(sampleSelection)
               }} label="build from selection" />
 
               {/* augments tree with mutations  */}

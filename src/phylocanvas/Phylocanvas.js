@@ -27,20 +27,7 @@ function PhylocanvasView(props) {
   const [textSize, setTextSize] = useState(defaultTextSize);
   const [lineWidth, setLineWidth] = useState(defaultLineWidth);
 
-  // reset all tree style values
-  useEffect(() => {
-    if (resetTreeBool) {
-      setType(defaultType)
-      setShowLabels(defaultShowLabels)
-      setAlign(defaultAlign)
-      setNodeSize(defaultNodeSize)
-      setTextSize(defaultTextSize)
-      setLineWidth(defaultLineWidth)
-      setResetTreeBool(false)
-    }
-  }, [resetTreeBool])
-
-  // pass nwk to logic component
+  // pass nwk to logic component (requires default value and cannot be empty)
   useEffect(() => {
     if (props.nwk) {
       setNwk(props.nwk)
@@ -95,6 +82,7 @@ function PhylocanvasView(props) {
         colorScheme={props.colorScheme}
         colorGroup={props.colorGroup}
         resetTreeBool={resetTreeBool}
+        setResetTreeBool={setResetTreeBool}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0, zIndex: 2 }}>
         <SvgButton
@@ -136,7 +124,15 @@ function PhylocanvasView(props) {
               <hr/>
               <h5>Other:</h5>
               <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
-                <SvgButton onClick={() => setResetTreeBool(true)} label="reset tree" />
+                <SvgButton onClick={() => {
+                  setResetTreeBool(true)
+                  setType(defaultType)
+                  setShowLabels(defaultShowLabels)
+                  setAlign(defaultAlign)
+                  setNodeSize(defaultNodeSize)
+                  setTextSize(defaultTextSize)
+                  setLineWidth(defaultLineWidth)
+                }} label="reset tree" />
               </Box>
               <div style={{ height: "7px" }} />
             </div>
