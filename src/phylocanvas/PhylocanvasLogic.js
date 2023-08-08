@@ -10,7 +10,7 @@ import treeStats from "phylocanvas-plugin-tree-stats";
 import stretchOrientation from "phylocanvas-plugin-stretch-orientation";
 Phylocanvas.plugin(scalebar)
 Phylocanvas.plugin(branchLength)
-//Phylocanvas.plugin(enhancedBranchLabels)
+Phylocanvas.plugin(enhancedBranchLabels)
 Phylocanvas.plugin(root)
 Phylocanvas.plugin(pairwiseOps)
 Phylocanvas.plugin(treeStats)
@@ -185,6 +185,7 @@ function PhylocanvasLogic(props) {
     if (props.resetTreeBool) {
       resetTreeCallback()
     }
+    phylocanvas.current.draw()
   }, [props.textSize, resetTreeCallback])
   useEffect(() => {
     phylocanvas.current.showLabels = props.showLabels
