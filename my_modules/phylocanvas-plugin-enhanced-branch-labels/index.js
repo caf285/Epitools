@@ -11,9 +11,12 @@ function drawPreLabel() {
   if (this.selected) {
     let ctx = this.canvas
     ctx.save()
-    ctx.fillStyle = "black"
     ctx.font = this.getFontString()
-    let radius = this.getTextSize() * 0.75
+    ctx.fillStyle = "black"
+    ctx.strokeStyle = this.tree.selectedColour
+
+    let labelRadius = this.getTextSize() * 0.75
+    let scaledRadius = Math.sqrt(Math.pow(this.getRadius() * Math.sqrt(2), 2) / Math.PI)
     let label = this.getLabel();
     this.labelWidth = ctx.measureText(label).width;
     let labelWidth = this.labelWidth * 1
@@ -26,26 +29,26 @@ function drawPreLabel() {
       this.tree.maxLabelLength[this.tree.treeType] = this.labelWidth;
     }
 
-
-    let x = (this.tree.baseNodeSize * 2) - 2 + radius / 2
+    let x = this.getRadius() + scaledRadius + labelRadius
     if (this.tree.alignLabels) {
       x += Math.abs(this.tree.labelAlign.getLabelOffset(this));
     } else if (this.isHighlighted) {
-      x += this.getHighlightSize() / 2
+      x += -scaledRadius + this.getHighlightRadius()
     }
+
+
     if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
-      this.canvas.rotate(Angles.HALF);
+      ctx.rotate(Angles.HALF);
       x = -x - labelWidth
     }
     let fx = x + labelWidth
-    x += radius / 2
-    fx = Math.max(x, fx - radius / 2)
+    //x += labelRadius
+    //fx = Math.max(x, fx - labelRadius)
 
     // stroke && fill
-    ctx.strokeStyle = this.tree.selectedColour
     ctx.beginPath()
-    ctx.arc(x, 0, radius, 1/2 * Math.PI, 3/2 *Math.PI)
-    ctx.arc(fx, 0, radius, 3/2 * Math.PI, 1/2 * Math.PI)
+    ctx.arc(x, 0, labelRadius, 1/2 * Math.PI, 3/2 *Math.PI)
+    ctx.arc(fx, 0, labelRadius, 3/2 * Math.PI, 1/2 * Math.PI)
     ctx.closePath()
     ctx.stroke()
 
@@ -63,9 +66,12 @@ function drawLabel() {
   }
   let ctx = this.canvas
   ctx.save()
-  ctx.fillStyle = this.labelStyle.colour || "black"
   ctx.font = this.getFontString();
-  let radius = this.getTextSize()
+  ctx.fillStyle = this.labelStyle.colour || "black"
+  ctx.strokeStyle = this.tree.selectedColour
+
+  let labelRadius = this.getTextSize() * 0.75
+  let scaledRadius = Math.sqrt(Math.pow(this.getRadius() * Math.sqrt(2), 2) / Math.PI)
   let label = this.getLabel();
   this.labelWidth = ctx.measureText(label).width;
   let labelWidth = this.labelWidth * 1
@@ -78,24 +84,21 @@ function drawLabel() {
     this.tree.maxLabelLength[this.tree.treeType] = this.labelWidth;
   }
 
-  let x = (this.tree.baseNodeSize * 2) - 2 + radius / 2
+  let x = this.getRadius() + scaledRadius + labelRadius
   if (this.tree.alignLabels) {
     x += Math.abs(this.tree.labelAlign.getLabelOffset(this));
   } else if (this.isHighlighted) {
-    x += this.getHighlightSize() / 2
+    x += -scaledRadius + this.getHighlightRadius()
   }
+
+
   if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
     ctx.rotate(Angles.HALF);
     x = -x - labelWidth
   }
-  if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
-    x += radius / 2 * 0.25
-  } else {
-    x -= radius / 2 * 0.25
-  }
 
   // stroke && fill
-  ctx.fillText(label, x, radius / 2);
+  ctx.fillText(label, x, labelRadius / 0.75 / 2);
 
   // Rotate canvas back to original position
   if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
