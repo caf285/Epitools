@@ -88,8 +88,21 @@ function PhylocanvasLogic(props) {
         }
         for (let i = 0; i < props.colorGroup.length; i++) {
           for (let j = 0; j < props.colorGroup[i].length; j++) {
-            phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ leafStyle: { strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length], fillStyle: "#" + props.colorScheme[i % props.colorScheme.length] } })
-            phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: { colour: "#" + props.colorScheme[i % props.colorScheme.length] } })
+            phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ leafStyle: { strokeStyle: "#000", fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb } })
+            if (props.colorScheme[i % props.colorScheme.length].hsp > 175) {
+              // light text
+              phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: {
+                strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
+                fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
+                textShadow: true
+              }})
+            } else {
+              // dark text
+              phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: {
+                strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
+                fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb
+              }})
+            }
           }
         }
         //console.log("phylocanvasColors:", props.colorScheme, props.colorGroup)

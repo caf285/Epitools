@@ -7,6 +7,22 @@ const DEFAULTS = {
   active: true,
 };
 
+function getLeafStyle() {
+  let leafStyle2 = this.leafStyle,
+    strokeStyle = leafStyle2.strokeStyle,
+    fillStyle = leafStyle2.fillStyle;
+  let zoom = this.tree.zoom;
+
+  // uses a caching object to reduce garbage
+  let leafStyle = {}
+  leafStyle.strokeStyle = this.getColour(strokeStyle);
+  leafStyle.fillStyle = fillStyle || this.colour || "black";
+  leafStyle.lineWidth = leafStyle2.lineWidth || this.tree.lineWidth
+  leafStyle.lineWidth /= zoom
+
+  return leafStyle;
+}
+
 function drawPreLabel() {
   if (this.selected) {
     let ctx = this.canvas
@@ -15,7 +31,7 @@ function drawPreLabel() {
     ctx.fillStyle = "black"
     ctx.strokeStyle = this.tree.selectedColour
 
-    let labelRadius = this.getTextSize() * 0.75
+    let labelRadius = this.getTextSize() * 0.65
     let scaledRadius = Math.sqrt(Math.pow(this.getRadius() * Math.sqrt(2), 2) / Math.PI)
     let label = this.getLabel();
     this.labelWidth = ctx.measureText(label).width;
@@ -67,10 +83,9 @@ function drawLabel() {
   let ctx = this.canvas
   ctx.save()
   ctx.font = this.getFontString();
-  ctx.fillStyle = this.labelStyle.colour || "black"
-  ctx.strokeStyle = this.tree.selectedColour
+  ctx.strokeStyle = this.labelStyle.strokeStyle || "black"
 
-  let labelRadius = this.getTextSize() * 0.75
+  let labelRadius = this.getTextSize() * 0.65
   let scaledRadius = Math.sqrt(Math.pow(this.getRadius() * Math.sqrt(2), 2) / Math.PI)
   let label = this.getLabel();
   this.labelWidth = ctx.measureText(label).width;
@@ -98,7 +113,14 @@ function drawLabel() {
   }
 
   // stroke && fill
-  ctx.fillText(label, x, labelRadius / 0.75 / 2);
+  if (this.labelStyle.textShadow) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.3)"
+    ctx.fillText(label, x - 1, labelRadius / 0.65 / 2 - 1);
+    ctx.fillText(label, x - 1, labelRadius / 0.65 / 2);
+    ctx.fillText(label, x, labelRadius / 0.65 / 2);
+  }
+  ctx.fillStyle = this.labelStyle.fillStyle || "black"
+  ctx.fillText(label, x, labelRadius / 0.65 / 2 - 1);
 
   // Rotate canvas back to original position
   if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
@@ -123,6 +145,13 @@ export default function plugin(decorate) {
     return tree;
   });
   // completes after drawLabelConnector and nodeRender
+  decorate(Branch, 'getLeafStyle', function (delegate, args) {
+    if (this.tree.enhancedBranchLabels.active) {
+      return getLeafStyle.apply(this);
+    } else {
+      return delegate.apply(this, args);
+    }
+  });
   decorate(Branch, 'drawLabel', function (delegate, args) {
     if (this.tree.enhancedBranchLabels.active) {
       drawPreLabel.apply(this);

@@ -32,7 +32,7 @@ function SelectionHOT(props) {
 
   // ==================================================( Highlighting )
   // custom renderer for per cell formatting
-  Handsontable.renderers.registerRenderer('customStylesRenderer', (instance, td, row, col, prop, value, cellProperties) => {
+  Handsontable.renderers.registerRenderer('customCellRenderer', (instance, td, row, col, prop, value, cellProperties) => {
     Handsontable.renderers.getRenderer('text')(instance, td, row, col, prop, value, cellProperties);
     //console.log(instance, td, row, col, prop, value, cellProperties)
 
@@ -45,7 +45,14 @@ function SelectionHOT(props) {
     if (props.colorScheme && props.colorGroup) {
       for (let i in props.colorGroup) {
         if (props.colorGroup[i].includes(hot.current.getDataAtCell(row, primaryColumn))) {
-          td.style.color = "#" + props.colorScheme[i % props.colorScheme.length]
+          td.style.color = "#" + props.colorScheme[i % props.colorScheme.length].rgb
+          if (props.colorScheme[i % props.colorScheme.length].hsp > 175) {
+            // light text
+            td.style.textShadow = "-1px 0px 0px rgba(0,0,0,.3), -1px 1px 0px rgba(0,0,0,.3), 0px 1px 0px rgba(0,0,0,.3)"
+          } else {
+            // dark text
+            td.style.textShadow = "-1px 1px 1px #FFF"
+          }
         }
       }
     }
@@ -86,8 +93,8 @@ function SelectionHOT(props) {
         data: props.data,
         colHeaders: Object.keys(props.data[0]),
         cells(row, col) {
-          return {renderer: "customStylesRenderer"}
-        } 
+          return {renderer: "customCellRenderer"}
+        }
       })
       hot.current.getPlugin('Filters').clearConditions();
       hot.current.getPlugin('Filters').filter();
