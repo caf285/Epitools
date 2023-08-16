@@ -8,22 +8,22 @@ import Footer from "./nav/Footer.js";
 import RequestPathogenList from "./requests/RequestPathogenList";
 
 function App() {
-  const [pathogenTypeList, setPathogenTypeList] = useState();
+  const [pathogenList, setPathogenList] = useState();
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <div className="App">
       {/* upon header load, immediately get a list of pathogen types from the DB */}
       <RequestPathogenList
-        setPathogenTypeList = {setPathogenTypeList}
+        setPathogenList = {setPathogenList}
       />
       <Header
-        pathogenTypeList = {pathogenTypeList}
+        pathogenList = {pathogenList}
         searchParams = {searchParams}
         setSearchParams = {setSearchParams}
       />
       <Body
-        pathogenTypeList = {pathogenTypeList}
+        pathogenList = {pathogenList}
         searchParams = {searchParams}
         setSearchParams = {setSearchParams}
       />

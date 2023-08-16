@@ -27,13 +27,30 @@ function PhylocanvasView(props) {
   const [textSize, setTextSize] = useState(defaultTextSize);
   const [lineWidth, setLineWidth] = useState(defaultLineWidth);
 
+  const maxHistory = 10
+  const [historyList, setHistoryList] = useState([]);
+
   // pass nwk to logic component (requires default value and cannot be empty)
   useEffect(() => {
     if (props.nwk) {
       setNwk(props.nwk)
     }
-  console.log(type)
   }, [props.nwk])
+
+  // push new PhylocanvasHistory object to history
+  const addHistory = useCallback((image, nwk) => {
+    if (props.historyLabel) {
+      setHistoryList(
+        [
+          <div className="historyComponent" onClick={() => {props.setUpdateTable(true); props.setHistoryLabel(props.historyLabel); setNwk(nwk)}}>
+            <div>{props.historyLabel}</div>
+            <img src={image} height="100" width="300"></img>
+          </div> 
+  
+        ].concat(historyList).slice(0, maxHistory)
+      )
+    }
+  })
 
   // stretch orientation for scrollwheel zoom
   const orientationRef = useRef(["both", "horizontal", "vertical"])
@@ -83,61 +100,63 @@ function PhylocanvasView(props) {
         colorGroup={props.colorGroup}
         resetTreeBool={resetTreeBool}
         setResetTreeBool={setResetTreeBool}
+        addHistory={addHistory}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0, zIndex: 2 }}>
-        <SvgButton
-          label="tree options"
-          svg="menuContext"
-          dropAlign="right"
-          drop={
-            <div style={{ maxHeight: props.height - 60 }}>
-              <h5>Toggle:</h5>
-              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
-                <div>labels: <Switch checked={showLabels} onChange={() => {setShowLabels(!showLabels)}} /></div>
-                <div>align: <Switch checked={align} onChange={() => {setAlign(!align)}} /></div>
-              </Box>
-              <hr/>
-              <h5>Style:</h5>
-              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
-                <span>text size: <b>{textSize}</b>px</span>
-                <Slider value={textSize} step={2} min={20} max={50} size="small" onChange={(event: Event, newValue: number | number[]) => {
-                  if (typeof newValue === 'number') {
-                    setTextSize(newValue);
-                  }
-                }} />
-                <span>line width: <b>{lineWidth}</b>px</span>
-                <Slider value={lineWidth} step={1} min={1} max={10} size="small" onChange={(event: Event, newValue: number | number[]) => {
-                  if (typeof newValue === 'number') {
-                    setLineWidth(newValue);
-                  }
-                }} />
-              </Box>
-              <hr/>
-              <h5>Tree Type:</h5>
-              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
-                <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
-                <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />
-                <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />
-                <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
-                <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
-              </Box>
-              <hr/>
-              <h5>Other:</h5>
-              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
-                <SvgButton onClick={() => {
-                  setResetTreeBool(true)
-                  setType(defaultType)
-                  setShowLabels(defaultShowLabels)
-                  setAlign(defaultAlign)
-                  setNodeSize(defaultNodeSize)
-                  setTextSize(defaultTextSize)
-                  setLineWidth(defaultLineWidth)
-                }} label="reset tree" />
-              </Box>
-              <div style={{ height: "7px" }} />
-            </div>
-          }
-        />
+        <SvgButton label="history" dropAlign="right" drop={
+          <div style={{ maxHeight: props.height - 60 }}>
+            {historyList}
+            <div style={{ height: "10px" }} />
+          </div>
+        } />
+        <SvgButton label="tree options" svg="menuContext" dropAlign="right" drop={
+          <div style={{ maxHeight: props.height - 60 }}>
+            <h5>Toggle:</h5>
+            <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+              <div>labels: <Switch checked={showLabels} onChange={() => {setShowLabels(!showLabels)}} /></div>
+              <div>align: <Switch checked={align} onChange={() => {setAlign(!align)}} /></div>
+            </Box>
+            <hr/>
+            <h5>Style:</h5>
+            <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+              <span>text size: <b>{textSize}</b>px</span>
+              <Slider value={textSize} step={2} min={20} max={50} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                if (typeof newValue === 'number') {
+                  setTextSize(newValue);
+                }
+              }} />
+              <span>line width: <b>{lineWidth}</b>px</span>
+              <Slider value={lineWidth} step={1} min={1} max={10} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                if (typeof newValue === 'number') {
+                  setLineWidth(newValue);
+                }
+              }} />
+            </Box>
+            <hr/>
+            <h5>Tree Type:</h5>
+            <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+              <SvgButton key="radial" onClick={() => setType("radial")} svg="treeRadial" label="radial" />
+              <SvgButton key="rect" onClick={() => setType("rectangular")} svg="treeRectangular" label="rectangular" />
+              <SvgButton key="cir" onClick={() => setType("circular")} svg="treeCircular" label="circular" />
+              <SvgButton key="diag" onClick={() => setType("diagonal")} svg="treeDiagonal" label="diagonal" />
+              <SvgButton key="hier" onClick={() => setType("hierarchical")} svg="treeHierarchical" label="hierarchical" />
+            </Box>
+            <hr/>
+            <h5>Other:</h5>
+            <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+              <SvgButton onClick={() => {
+                setResetTreeBool(true)
+                setType(defaultType)
+                setShowLabels(defaultShowLabels)
+                setAlign(defaultAlign)
+                setNodeSize(defaultNodeSize)
+                setTextSize(defaultTextSize)
+                setLineWidth(defaultLineWidth)
+              }} label="reset tree" />
+            </Box>
+            <div style={{ height: "7px" }} />
+          </div>
+        } />
       </div>
       <div style={{ zIndex: 1, position: "absolute", display: "flex", flexFlow:"row", bottom: 0, right: 0 }}>
         <SvgButton

@@ -7,7 +7,7 @@ import "./Nav.css";
 
 function Header(props) {
   // destructure props
-  const pathogenTypeList = props.pathogenTypeList
+  const pathogenList = props.pathogenList
   const searchParams = props.searchParams
   const setSearchParams = props.setSearchParams
 
@@ -30,17 +30,17 @@ function Header(props) {
   // populates with pathogen types converted to Nav.Dropdown.Items
   const [pathogenDropdown, setPathogenDropdown] = useState();
   const setPathogenDropdownCallback = useCallback(() => {
-    if (pathogenTypeList && pathogenTypeList.length > 1) {
-      setPathogenDropdown(pathogenTypeList.map((v, k) => {return <NavDropdown.Item key={k} onClick={() => {
+    if (pathogenList && pathogenList.length > 1) {
+      setPathogenDropdown(pathogenList.map((v, k) => {return <NavDropdown.Item key={k} onClick={() => {
         searchParams.set("pathogen", v)
         setSearchParams(searchParams)
       }}>{v}</NavDropdown.Item>}))
     }
-  }, [pathogenTypeList, searchParams, setSearchParams])
+  }, [pathogenList, searchParams, setSearchParams])
 
   useEffect(() => {
     setPathogenDropdownCallback()
-  }, [pathogenTypeList, setPathogenDropdownCallback])
+  }, [pathogenList, setPathogenDropdownCallback])
 
   // pathogen button
 

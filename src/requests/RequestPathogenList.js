@@ -2,12 +2,12 @@ import React, { useRef, useEffect } from "react";
 
 function RequestPathogenList(props) {
   const host = useRef("https://pathogen-intelligence.tgen.org/go_epitools/")
-  const setPathogenTypeList = props.setPathogenTypeList
+  const setPathogenList = props.setPathogenList
 
   // get complete list of all pathogens
   useEffect(() => {
     (async (key = "value", url = "pathogen_list") => {
-      if (setPathogenTypeList) {
+      if (setPathogenList) {
         await fetch(host.current + url, {
           method: 'POST',
           mode: 'cors',
@@ -23,13 +23,13 @@ function RequestPathogenList(props) {
         })
         .then(data => {
           if (data) {
-            setPathogenTypeList(data)
+            setPathogenList(data)
           }
         })
         .catch(ERR => window.alert(ERR + ": pathogen_list failed"))
       }
     })()
-  }, [setPathogenTypeList])
+  }, [setPathogenList])
 
   return (
     <div></div>

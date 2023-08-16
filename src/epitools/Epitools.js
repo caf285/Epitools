@@ -1,4 +1,4 @@
-// TODO: hook up props.pathogenTypeList and props.searchParams ... replace props.pathogenType
+// TODO: hook up props.pathogenList and props.searchParams ... replace props.pathogen
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Epitools.css";
@@ -26,7 +26,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 function Epitools(props) {
   //====================================================================================================( set variables )
   // destructure props
-  const pathogenTypeList = props.pathogenTypeList
+  const pathogenList = props.pathogenList
   const searchParams = props.searchParams
   const setSearchParams = props.setSearchParams
 
@@ -41,6 +41,7 @@ function Epitools(props) {
   const [getCluster, setGetCluster] = useState(() => () => {})
   const [mutationsJson, setMutationsJson] = useState()
   const [updateTable, setUpdateTable] = useState(false)
+  const [historyLabel, setHistoryLabel] = useState("")
 
   // handsontable
   const elementRef = useRef(null);
@@ -55,6 +56,10 @@ function Epitools(props) {
   const [highlightList, setHighlightList] = useState([]) // obj used for coloring sample in each group; {group: [sample, ...], ...}
   const [branchesData, setBranchesData] = useState([]) // will be filled with complete table
   const branchesDataRef = useRef([])
+  const [pathogen, setPathogen] = useState()
+  const [pathogenType, setPathogenType] = useState();
+  const [pathogenTypeDisplay, setPathogenTypeDisplay] = useState("none");
+  const [queryType, setQueryType] = useState("lineage");
 
   // pathogen lineage
   const [pathogenDateRange, setPathogenDateRange] = useState([new Date("06/01/2019"), new Date()])
@@ -62,7 +67,6 @@ function Epitools(props) {
 
   // other
   const [colorScheme, setColorScheme] = useState()
-  const [pathogenType, setPathogenType] = useState()
   const [loadingScreenVisibility, setLoadingScreenVisibility] = useState("hidden")
   const [tableUploadFormVisibility, setTableUploadFormVisibility] = useState("hidden")
   const [tableUploadFileName, setTableUploadFileName] = useState("")
@@ -97,34 +101,48 @@ function Epitools(props) {
 
   // load pathogen on searchParam change (TODO: TEMPORARY!!! will remove after pathogen dropdown button removed)
   const loadPathogenFromSearchParamsCallback = useCallback(() => {
-    if (pathogenTypeList) {
-      if (searchParams && searchParams.get("pathogen") && pathogenTypeList.includes(searchParams.get("pathogen"))) {
-        setPathogenType(searchParams.get("pathogen"))
+    if (pathogenList) {
+      if (searchParams && searchParams.get("pathogen") && pathogenList.includes(searchParams.get("pathogen"))) {
+        setPathogen(searchParams.get("pathogen"))
+      }
+      if (searchParams && searchParams.get("samples")) {
+        setUpdateTable(true)
+        samplesRequest(searchParams.get("samples").split(",").map(sample => sample.toUpperCase()))
+        searchParams.delete("samples")
+        setSearchParams(searchParams)
       }
     }
-  }, [searchParams, pathogenTypeList])
+  }, [searchParams, pathogenList])
   useEffect(() => {
     loadPathogenFromSearchParamsCallback()
   }, [searchParams, loadPathogenFromSearchParamsCallback])
 
-  // load pathogen from query parameter if exists and in pathogenTypeList, else load default
-  const loadPathogenFromPathogenTypeListCallback = useCallback(() => {
-    if (pathogenTypeList && pathogenTypeList.length > 1) {
-      if (searchParams && searchParams.get("pathogen") && pathogenTypeList.includes(searchParams.get("pathogen"))) {
-        setPathogenType(searchParams.get("pathogen"))
+  // load pathogen from query parameter if exists and in pathogenList, else load default
+  const loadPathogenFromPathogenListCallback = useCallback(() => {
+    if (pathogenList && pathogenList.length > 1) {
+      if (searchParams && searchParams.get("pathogen") && pathogenList.includes(searchParams.get("pathogen"))) {
+        setPathogen(searchParams.get("pathogen"))
       } else {
-        if (!pathogenTypeList.includes(pathogenType)) {
-          //console.log("pathogenType:", pathogenType)
-          setPathogenType(pathogenTypeList[0])
-          searchParams.set("pathogen", pathogenTypeList[0])
+        if (!pathogenList.includes(pathogen)) {
+          //console.log("pathogen:", pathogen)
+          setPathogen(pathogenList[0])
+          searchParams.set("pathogen", pathogenList[0])
           setSearchParams(searchParams)
         }
       }
     }
-  }, [pathogenType, searchParams, setSearchParams, pathogenTypeList])
+  }, [pathogen, searchParams, setSearchParams, pathogenList])
   useEffect(() => {
-    loadPathogenFromPathogenTypeListCallback()
-  }, [pathogenTypeList, loadPathogenFromPathogenTypeListCallback])
+    loadPathogenFromPathogenListCallback()
+  }, [pathogenList, loadPathogenFromPathogenListCallback])
+
+  useEffect(() => {
+    if (pathogenType && pathogenType === "virus") {
+      setPathogenTypeDisplay("block")
+    } else {
+      setPathogenTypeDisplay("none")
+    }
+  }, [pathogenType])
 
   // import date ranges if applicable and fill pathogen lineage button dropdown on pathogen change
   useEffect(() => {
@@ -151,9 +169,13 @@ function Epitools(props) {
       }
       setPathogenDateRange([dmin, dmax])
       setPathogenDateRangeForms("")
-      pathogenDateRangeRequest(pathogenType, dmin, dmax) // fill pathogen Lineage buttons on load
+      setQueryType("lineage")
+      if (pathogen) {
+        pathogenDateRangeRequest(pathogen, "lineage", dmin, dmax) // fill pathogen Lineage buttons on load
+        pathogenTypeRequest(pathogen)
+      }
     }
-  }, [pathogenType])
+  }, [pathogen])
 
   // prep sample selection for build from selection button
   useEffect(() => {
@@ -223,6 +245,36 @@ function Epitools(props) {
   }
 
   //====================================================================================================( database queries )
+  // database query type request
+  async function pathogenTypeRequest(pathogen) {
+    await fetch(host.current + "pathogenType", {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        pathogen: pathogen,
+      })
+    })
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status + " " + response.statusText);
+      }
+      return response.json()
+    })
+    .then(data => {
+      console.log("data", data)
+      if (data.includes("virus")) {
+        setPathogenType("virus")
+      } else {
+        setPathogenType("")
+      }
+    })
+    .catch(ERR => {
+      setPathogenType("")
+      window.alert("No pathogen type returned: " + ERR)
+    })
+  }
+
+
   // database query post request
   async function mysqlRequest(data = "") {
     //console.log("requestData:", data)
@@ -248,7 +300,9 @@ function Epitools(props) {
         for (let i in data) {
           if (data[i]?.Additional_metadata) {
             let branchObj = JSON.parse(data[i]["Additional_metadata"])
-            data[i] = Object.assign(data[i], branchObj)
+            for (let [k, v] of Object.entries(branchObj)) {
+              data[i]["(" + k + ")"] = v
+            }
           }
           delete data[i].Additional_metadata
         }
@@ -281,14 +335,15 @@ function Epitools(props) {
   }
 
   // pathogen lineage request
-  async function pathogenLineageRequest(data = "", url = "lineage", date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
+  async function pathogenLineageRequest(queryType=queryType, data="", date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
     //console.log("data", data)
     setLoadingScreenVisibility("visible")
-    await fetch(host.current + url, {
+    await fetch(host.current + "query_type", {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
-        lineage: data,
+        queryType: queryType,
+        data: data,
         date1: date1,
         date2: date2,
       })
@@ -369,13 +424,14 @@ function Epitools(props) {
   }
 
   // pathogen date range query
-  async function pathogenDateRangeRequest(pathogen, date1, date2, url = "dateRange") {
+  async function pathogenDateRangeRequest(pathogen, queryType, date1, date2, url = "dateRange") {
     //console.log(pathogen, date1, date2)
     await fetch(host.current + url, {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
         pathogen: pathogen,
+        queryType: queryType,
         date1: date1,
         date2: date2,
       })
@@ -388,7 +444,7 @@ function Epitools(props) {
     })
     .then((data) => {
       if (data) {
-        updatePathogenDateRangeForms(data, date1, date2)
+        updatePathogenDateRangeForms(data, queryType, date1, date2)
       } else {
         setPathogenDateRangeForms([])
         console.log("no data")
@@ -509,33 +565,55 @@ function Epitools(props) {
     props.searchParams.set("dmin", formatDate(date))
     props.setSearchParams(props.searchParams)
     setPathogenDateRange([date, pathogenDateRange[1]])
-    pathogenDateRangeRequest(pathogenType, date, pathogenDateRange[1])
+    pathogenDateRangeRequest(pathogen, queryType, date, pathogenDateRange[1])
   }
 
   const handleMaxDatePicker = (date) => {
     props.searchParams.set("dmax", formatDate(date))
     props.setSearchParams(props.searchParams)
     setPathogenDateRange([pathogenDateRange[0], date])
-    pathogenDateRangeRequest(pathogenType, pathogenDateRange[0], date)
+    pathogenDateRangeRequest(pathogen, queryType, pathogenDateRange[0], date)
   }
 
   // sort array or maps by 'Lineage'
   function sortForms(data) {
-    data = data.sort((a, b) => {return a.Lineage > b.Lineage})
+    data = data.sort((a, b) => {return a.QueryType > b.QueryType})
     return data
   }
 
-  function updatePathogenDateRangeForms(data, date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
+  function updatePathogenDateRangeForms(data, queryType, date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
     let newDateRangeForms = []
     if (data) {
       data = sortForms(data)
-      newDateRangeForms = data.filter(x => x.Count >= 4 && x.Lineage).map((v, k) => {return <button key={k} onClick={() => {
+      newDateRangeForms = data.filter(x => x.Count >= 4 && x.QueryType).map((v, k) => {return <button key={k} onClick={() => {
         setUpdateTable(true)
-        pathogenLineageRequest(v["Lineage"], "emm", date1, date2)
-      }}>{v["Lineage"]} ({v["Count"]})</button>})
+        setHistoryLabel(queryType + ": " + v["QueryType"] + ", count: " + v["Count"])
+        pathogenLineageRequest(queryType, v["QueryType"], date1, date2)
+      }}>{v["QueryType"]} ({v["Count"]})</button>})
     }
     setPathogenDateRangeForms(newDateRangeForms)
   };
+
+  function handleCopyLink(samples = false) {
+    let href = window.location.origin + window.location.pathname
+    let search = []
+    searchParams.forEach((v, k) => {if (k !== "samples") {search.push(k + "=" + v)}})
+    if (samples) {
+      search.push("samples=" + samples)
+    }
+    href += "?" + search.map(v => v.split(" ").join("+")).join("&")
+    if (window.location.hostname === "localhost" || window.location.protocol === "http:") {
+      alert("Cannot copy to 'navigator.clipboard' with unsecure http: " + href)
+    } else {
+      navigator.clipboard.writeText(href)
+      alert("Copied link to clipboard: " + href)
+    }
+  }
+
+  function handleQueryTypeChange(newQueryType) {
+    setQueryType(newQueryType)
+    pathogenDateRangeRequest(pathogen, newQueryType, pathogenDateRange[0], pathogenDateRange[1])
+  }
 
   // set highlightList on highlightRadio change
   const handleHighlightRadioChange = useCallback(() => {
@@ -650,6 +728,10 @@ function Epitools(props) {
                       downloadText(exportText.join("\n"), "export.tsv", "text")
                     }}
                   />
+                  <br />
+                  <div>Link Export:</div>
+                  <SvgButton label="Copy Link" onClick={() => {handleCopyLink()}} />
+                  <SvgButton label="Copy Link with Sample Names" onClick={() => {handleCopyLink(branchesData.map(sample => sample.Sample).join(","))}} />
                 </div>
               } />
 
@@ -696,13 +778,13 @@ function Epitools(props) {
           } />
 
           {/*========== pathogenlineage loader ==========*/}
-          <SvgButton label={"load " + pathogenType + " lineage"} drop={
+          <SvgButton label={"load " + (pathogen ? pathogen : "pathogen") + " " + (queryType ? queryType : "query type")} drop={
             <div style={{ display: "flex", flexFlow: "column" }}>
               <Box sx={{ paddingLeft: "7px", paddingRight: "7px" }}>
                 <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between", alignItems: "baseline" }}>
                   <h5>Date Range:</h5>
                   <InfoButton
-                    text="select a date range to populate pathogen lineage selection"
+                    text={"select a date range to populate " + (pathogen ? pathogen : "pathogen") + " " + (queryType ? queryType : "query type") + " selection"}
                   />
                 </div>
                 <div style={{ display: "flex", flexFlow: "row" }}>
@@ -720,11 +802,27 @@ function Epitools(props) {
                     onChange={handleMaxDatePicker}
                   />
                 </div>
+                <div style={{ display: pathogenTypeDisplay }}>
+                  <hr/>
+                  <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between", alignItems: "baseline" }}>
+                    <h5>Query Type Selection:</h5>
+                    <InfoButton
+                      text={"select a query type to populate selection list"}
+                    />
+                  </div>
+                  <SvgButton label={queryType} drop={
+                    <div>
+                      <SvgButton label="lineage" onClick={() => handleQueryTypeChange("lineage")} />
+                      <SvgButton label="facility" onClick={() => handleQueryTypeChange("facility")} />
+                      <SvgButton label="location" onClick={() => handleQueryTypeChange("location")} />
+                    </div>
+                  } />
+                </div>
                 <hr/>
                 <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <h5>Lineage Selection:</h5>
+                  <h5>{(queryType ? queryType.charAt(0).toUpperCase().concat(queryType.slice(1)) : "Query Type") + " Selection:"}</h5>
                   <InfoButton
-                    text="select a lineage to display a tree and table for that lineage"
+                    text={"select a " + (queryType ? queryType : "query type") + " to display a tree and table for that " + (queryType ? queryType : "query type")}
                   />
                 </div>
               </Box>
@@ -749,6 +847,8 @@ function Epitools(props) {
        {/* phylocanvas component */}
         <Phylocanvas
           nwk={nwk}
+          setNwk={setNwk}
+          setUpdateTable={setUpdateTable}
           height={phyloHeight}
           clusterSize={clusterSize}
           clusterDistance={clusterDistance}
@@ -758,6 +858,9 @@ function Epitools(props) {
           importSelection={importPhylocanvasSelection}
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
           setGetNwk={setGetNwk}
+          canvas={getCanvas()}
+          historyLabel={historyLabel}
+          setHistoryLabel={setHistoryLabel}
           setGetCanvas={setGetCanvas}
           setGetCluster={setGetCluster}
           primaryColumn={tablePrimaryColumn}

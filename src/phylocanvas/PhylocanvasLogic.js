@@ -162,6 +162,9 @@ function PhylocanvasLogic(props) {
     if (branchNameCallback) {
       branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
+    console.log(phylocanvas.current.canvas.canvas)
+    let img = phylocanvas.current.canvas.canvas.toDataURL("image/png")
+    props.addHistory(img, nwk)
   }, [nwk])
 
   // return branch names on nwk change so names can be queried

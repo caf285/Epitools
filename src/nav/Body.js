@@ -27,7 +27,7 @@ function Body(props) {
         <Routes>
           <Route exact path="/home" element={
             <Epitools
-              pathogenTypeList = {props.pathogenTypeList}
+              pathogenList = {props.pathogenList}
               searchParams = {props.searchParams}
               setSearchParams = {props.setSearchParams}
             />
