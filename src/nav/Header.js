@@ -55,7 +55,7 @@ function Header(props) {
               className="d-inline-block align-center mr-3"
               alt="Epitools Logo"
             />{" "}
-            <span>One Health Genomic Epi Tools</span>
+            <span>One Health Genomic Epitools</span>
           </div>
         </Navbar.Brand>
         <Nav className="ml-auto">

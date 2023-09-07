@@ -52,9 +52,9 @@ function SvgButton(props) {
   function getIcon() {
     if (props.svg) {
       return (
-          <SvgIcon sx={{height: 17, width: 17}}>
-            <path stroke="dimgray" fill="dimgray" strokeWidth="2" d={svg}></path>
-          </SvgIcon>
+        <SvgIcon sx={{height: 17, width: 17}}>
+          <path stroke="dimgray" fill="dimgray" strokeWidth="2" d={svg}></path>
+        </SvgIcon>
       )
     }
     return undefined;
@@ -63,7 +63,7 @@ function SvgButton(props) {
   if (props.svg && !props.label && !props.drop) {
     return (
       <div className="SvgButton">
-        <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{width: "25px", height: "24px", backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
+        <IconButton centerRipple={false} size="small" onClick={props.onClick} sx={{zIndex: props.zIndex ? props.zIndex : "100", width: "25px", height: "24px", backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee"}}}>
           <SvgIcon sx={{height: 17, width: 17}}>
             <path stroke="dimgray" fill="dimgray" strokeWidth="2" d={svg}></path>
           </SvgIcon>
@@ -85,7 +85,7 @@ function SvgButton(props) {
           label={label ? label : undefined}
           deleteIcon=<ArrowDropDownIcon />
           onDelete={getDrop()}
-          sx={{zIndex: "100", backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee", cursor: "pointer"}}}
+          sx={{zIndex: props.zIndex ? props.zIndex : "100", backgroundColor: "#ddd", boxShadow: "-1px 1px 1px rgba(0, 0, 0, .5)", "&:hover": {boxShadow: "-1px 1px 2px rgba(0, 0, 0, .7)", backgroundColor: "#eee", cursor: "pointer"}}}
           icon={getIcon()}
           clickable
           disableRipple={false}

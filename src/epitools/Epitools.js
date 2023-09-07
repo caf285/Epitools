@@ -50,9 +50,17 @@ function Epitools(props) {
   // both
   const [sampleSelection, setSampleSelection] = useState([])
   const [highlightRadio, setHighlightRadio] = useState("Cluster")
+  const [additionalHighlight, setAdditionalHighlight] = useState("")
+  const [additionalHighlightForms, setAdditionalHighlightForms] = useState([])
   const [colorGroup, setColorGroup] = useState([])
   const [clusterDistance, setClusterDistance] = useState(2)
   const [clusterSize, setClusterSize] = useState(2)
+  const [highlightDateGranularity, setHighlightDateGranularity] = useState(0)
+  const highlightDateGranularityRef = useRef(0)
+  function _setHighlightDateGranularity(newValue) {
+    highlightDateGranularityRef.current = newValue
+    setHighlightDateGranularity(newValue)
+  }
   const [highlightList, setHighlightList] = useState([]) // obj used for coloring sample in each group; {group: [sample, ...], ...}
   const [branchesData, setBranchesData] = useState([]) // will be filled with complete table
   const branchesDataRef = useRef([])
@@ -201,12 +209,10 @@ function Epitools(props) {
   }, [mutationsJson])
 
   //====================================================================================================( fill metadata buttons )
-  useEffect(() => {
-    //console.log("branchesData", branchesData)
-    branchesDataRef.current = branchesData
+  const fillMetadataForms = useCallback(() => {
     let appendMetadataDiv = document.getElementsByClassName("appendMetadataDiv")
     while (appendMetadataDiv.firstChild) {appendMetadataDiv.removeChild(appendMetadataDiv.firstChild)}
-    var newMetadataForms = []
+    let newMetadataForms = []
     if (branchesData && branchesData.length >= 1) {
       //console.log("branchesData", branchesData)
       newMetadataForms = Object.keys(branchesData[0]).map((branch) =>
@@ -219,6 +225,25 @@ function Epitools(props) {
     }
     setMetadataForms(newMetadataForms)
   }, [branchesData])
+
+  const fillAdditionalHighlights = useCallback(() => {
+    let newAdditionalHighlightForms = []
+    if (branchesData && branchesData.length >= 1) {
+      setAdditionalHighlight(Object.keys(branchesData[0])[0])
+      newAdditionalHighlightForms = Object.keys(branchesData[0]).map(col => {
+        return <button key={col} onClick={() => {
+          setAdditionalHighlight(col)
+        }}>{col}</button>
+      })
+      setAdditionalHighlightForms(newAdditionalHighlightForms)
+    }
+  }, [branchesData])
+
+  useEffect(() => {
+    branchesDataRef.current = branchesData
+    fillMetadataForms()
+    fillAdditionalHighlights()
+  }, [branchesData, fillMetadataForms, fillAdditionalHighlights])
 
   // TODO: cleanup
   const treeInput = useRef(null)
@@ -335,13 +360,14 @@ function Epitools(props) {
   }
 
   // pathogen lineage request
-  async function pathogenLineageRequest(queryType=queryType, data="", date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
+  async function pathogenLineageRequest(pathogen=pathogen, queryType=queryType, data="", date1=pathogenDateRange[0], date2=pathogenDateRange[1]) {
     //console.log("data", data)
     setLoadingScreenVisibility("visible")
     await fetch(host.current + "query_type", {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
+        pathogen: pathogen,
         queryType: queryType,
         data: data,
         date1: date1,
@@ -444,6 +470,7 @@ function Epitools(props) {
     })
     .then((data) => {
       if (data) {
+        console.log("data:", data)
         updatePathogenDateRangeForms(data, queryType, date1, date2)
       } else {
         setPathogenDateRangeForms([])
@@ -588,7 +615,7 @@ function Epitools(props) {
       newDateRangeForms = data.filter(x => x.Count >= 4 && x.QueryType).map((v, k) => {return <button key={k} onClick={() => {
         setUpdateTable(true)
         setHistoryLabel(queryType + ": " + v["QueryType"] + ", count: " + v["Count"])
-        pathogenLineageRequest(queryType, v["QueryType"], date1, date2)
+        pathogenLineageRequest(pathogen, queryType, v["QueryType"], date1, date2)
       }}>{v["QueryType"]} ({v["Count"]})</button>})
     }
     setPathogenDateRangeForms(newDateRangeForms)
@@ -624,10 +651,18 @@ function Epitools(props) {
       } else if (branchesData && branchesData.length >= 1 && Object.keys(branchesData[0]).includes(highlightRadio)) {
         let highlightGroup = {}
         for (let line of branchesData) {
-          if (!Object.keys(highlightGroup).includes(line[highlightRadio])) {
-            highlightGroup[line[highlightRadio]] = []
+          if (highlightRadio === "Collection_date") {
+            let highlightDate = line[highlightRadio].split("-").slice(0, highlightDateGranularityRef.current + 1).join("-")
+            if (!Object.keys(highlightGroup).includes(highlightDate)) {
+              highlightGroup[highlightDate] = []
+            }
+            highlightGroup[highlightDate].push(Object.values(line)[tablePrimaryColumn])
+          } else {
+            if (!Object.keys(highlightGroup).includes(line[highlightRadio])) {
+              highlightGroup[line[highlightRadio]] = []
+            }
+            highlightGroup[line[highlightRadio]].push(Object.values(line)[tablePrimaryColumn])
           }
-          highlightGroup[line[highlightRadio]].push(Object.values(line)[tablePrimaryColumn])
         }
         setColorGroup(Object.values(highlightGroup).sort())
       }
@@ -745,7 +780,7 @@ function Epitools(props) {
                 <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Cluster" control={<Radio size="small" />} /><h5>Cluster Detection</h5></div>
                 <Box sx={{ paddingLeft: "15px" }}>
                   <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
-                    <span>cluster distance: <b>{clusterDistance}</b></span>
+                    <span>cluster distance {"<="} <b>{clusterDistance}</b> SNPs</span>
                     <InfoButton text="cluster distance sets a maximum snp distance between samples to be considered a cluster" />
                   </div>
                   <Slider value={clusterDistance} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
@@ -757,7 +792,7 @@ function Epitools(props) {
                     }
                   }} />
                   <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
-                    <span>cluster size: <b>{clusterSize}</b></span>
+                    <span>cluster size {">="} <b>{clusterSize}</b> samples</span>
                     <InfoButton text="cluster size sets the minimum amount of samples in a group to be considered a cluster" />
                   </div>
                   <Slider value={clusterSize} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
@@ -771,8 +806,28 @@ function Epitools(props) {
                 </Box>
                 <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Lineage" control={<Radio size="small" />} /><h5>Lineage</h5></div>
                 <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Facility" control={<Radio size="small" />} /><h5>Facility</h5></div>
-                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Location" control={<Radio size="small" />} /><h5>Location</h5></div>
+                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Geographic_location" control={<Radio size="small" />} /><h5>Geographic Location</h5></div>
                 <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Collection_date" control={<Radio size="small" />} /><h5>Collection Date</h5></div>
+                <Box sx={{ paddingLeft: "15px" }}>
+                 <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
+                    <span>date highlight: <b>{["year", "month", "day"][highlightDateGranularity]}</b></span>
+                    <InfoButton text="collection date granularity highlights based on year, month, or day" />
+                  </div>
+                  <Slider value={highlightDateGranularity} min={0} max={2} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                    if (typeof newValue === "number") {
+                      _setHighlightDateGranularity(newValue)
+                      if (highlightRadio === "Collection_date") {
+                        handleHighlightRadioChange()
+                      }
+                    }
+                  }} /> 
+                </Box>
+                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value={additionalHighlight} control={<Radio size="small" />} /><h5>{additionalHighlight}</h5></div>
+                <Box sx={{ paddingLeft: "15px" }}>
+                  <SvgButton label={additionalHighlight} drop={
+                    <div>{additionalHighlightForms}</div> 
+                  } />
+                </Box>
               </RadioGroup>
             </FormControl>
           } />
@@ -810,11 +865,11 @@ function Epitools(props) {
                       text={"select a query type to populate selection list"}
                     />
                   </div>
-                  <SvgButton label={queryType} drop={
+                  <SvgButton zIndex={"0"} label={queryType} drop={
                     <div>
                       <SvgButton label="lineage" onClick={() => handleQueryTypeChange("lineage")} />
                       <SvgButton label="facility" onClick={() => handleQueryTypeChange("facility")} />
-                      <SvgButton label="location" onClick={() => handleQueryTypeChange("location")} />
+                      <SvgButton label="geographic_location" onClick={() => handleQueryTypeChange("geographic_location")} />
                     </div>
                   } />
                 </div>

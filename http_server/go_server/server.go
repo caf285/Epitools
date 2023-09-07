@@ -64,9 +64,8 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
     Type NullString
     Lineage NullString
     Facility NullString
-    Location NullString
+    Geographic_location NullString
     Collection_date NullString
-    Sequence_date NullString
     Additional_metadata NullString
   }
 
@@ -89,8 +88,8 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
   }
 
   log.Printf("results")
-  log.Printf("SELECT sample, subsample, external, pathogen, type, lineage, facility, location, collection_date, sequence_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
-  results, err := db.Query("SELECT sample, subsample, external, pathogen, type, lineage, facility, location, collection_date, sequence_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
+  log.Printf("SELECT sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
+  results, err := db.Query("SELECT sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata FROM epitools.pathogen WHERE sample IN ('" + strings.Join(request.Query, "','") + "')")
   if err != nil {
     panic(err.Error()) // proper error handling instead of panic in your app
   }
@@ -100,7 +99,7 @@ func mysqlHandler(w http.ResponseWriter, r *http.Request) {
   for results.Next() {
     
     result := gasResultStruct{}
-    err = results.Scan(&result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Type, &result.Lineage, &result.Facility, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata)
+    err = results.Scan(&result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Type, &result.Lineage, &result.Facility, &result.Geographic_location, &result.Collection_date, &result.Additional_metadata)
 
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app
@@ -391,6 +390,7 @@ func mutationsHandler(w http.ResponseWriter, r *http.Request) {
 func queryTypeHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("queryType requested ...")
   type requestBodyStruct struct {
+    Pathogen string
     QueryType string
     Data string
     Date1 string
@@ -421,8 +421,8 @@ func queryTypeHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("results")
   //log.Printf("SELECT id, sample FROM epitools.pathogen WHERE " + request.QueryType + "='" + request.Data + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND sequence IS NOT NULL")
   //results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE " + request.QueryType + "='" + request.Data + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND sequence IS NOT NULL")
-  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE " + request.QueryType + "='" + request.Data + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
-  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE " + request.QueryType + "='" + request.Data + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
+  log.Printf("SELECT id, sample FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND " + request.QueryType + "='" + request.Data + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
+  results, err := db.Query("SELECT id, sample FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND " + request.QueryType + "='" + request.Data + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "'")
   if err != nil {
     panic(err.Error()) // proper error handling instead of panic in your app
   }
@@ -482,9 +482,8 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
     Type NullString
     Lineage NullString
     Facility NullString
-    Location NullString
+    Geographic_location NullString
     Collection_date NullString
-    Sequence_date NullString
     Additional_metadata NullString
     Sequence NullString
   }
@@ -509,9 +508,9 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
 
   if request.Key == "value" {
     log.Printf("results")
-    log.Printf("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, location, collection_date, sequence_date, additional_metadata, IF (sequence IS NOT NULL, TRUE, FALSE) as sequence FROM epitools.pathogen")
+    log.Printf("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata, IF (sequence IS NOT NULL, TRUE, FALSE) as sequence FROM epitools.pathogen")
     //results, err := db.Query("SELECT * FROM epitools.pathogen")
-    results, err := db.Query("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, location, collection_date, sequence_date, additional_metadata, IF (sequence IS NOT NULL, TRUE, FALSE) as sequence FROM epitools.pathogen;")
+    results, err := db.Query("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata, IF (sequence IS NOT NULL, TRUE, FALSE) as sequence FROM epitools.pathogen;")
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app
     }
@@ -521,7 +520,7 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
     for results.Next() {
     
       result := gasResultStruct{}
-      err = results.Scan(&result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Type, &result.Lineage, &result.Facility, &result.Location, &result.Collection_date, &result.Sequence_date, &result.Additional_metadata, &result.Sequence)
+      err = results.Scan(&result.Id, &result.Sample, &result.Subsample, &result.External, &result.Pathogen, &result.Type, &result.Lineage, &result.Facility, &result.Geographic_location, &result.Collection_date, &result.Additional_metadata, &result.Sequence)
 
       if err != nil {
         panic(err.Error()) // proper error handling instead of panic in your app
@@ -572,8 +571,8 @@ func dateRangeHandler(w http.ResponseWriter, r *http.Request) {
   log.Printf("results")
   //log.Printf("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) AND LENGTH(sequence)>0 GROUP BY lineage")
   //results, err := db.Query("SELECT lineage, count(lineage) AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) AND LENGTH(sequence)>0 GROUP BY lineage")
-  log.Printf("SELECT " + request.QueryType + ", count(" + request.QueryType + ") AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) GROUP BY " + request.QueryType)
-  results, err := db.Query("SELECT " + request.QueryType + ", count(" + request.QueryType + ") AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' AND id IN (SELECT id FROM epitools.pathogen WHERE id=epitools.pathogen.id) GROUP BY " + request.QueryType)
+  log.Printf("SELECT " + request.QueryType + ", count(" + request.QueryType + ") AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' GROUP BY " + request.QueryType)
+  results, err := db.Query("SELECT " + request.QueryType + ", count(" + request.QueryType + ") AS 'count' FROM epitools.pathogen WHERE pathogen='" + request.Pathogen + "' AND collection_date BETWEEN '" + request.Date1 + "' AND '" + request.Date2 + "' GROUP BY " + request.QueryType)
   if err != nil {
     panic(err.Error()) // proper error handling instead of panic in your app
   }
