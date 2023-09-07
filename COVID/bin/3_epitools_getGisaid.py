@@ -84,16 +84,27 @@ def main():
   for seq in err:
     gisaidHash.pop(seq)
 
+  locationHash = {"apache": "apache", "coshice": "cochise", "coconino": "coconino", "gila": "gila", "graham": "graham", "greenlee": "greenlee", "la paz": "la paz", "maricopa": "maricopa", "mohave": "mohave", "navajo": "navajo", "pima": "pima", "pinal": "pinal", "santa cruz": "santa cruz", "yavapai": "yavapai", "yuma": "yuma", "phoenix": "maricopa", "san luis": "yuma", "tuscon": "pima"}
+
   ### get new/updated metadata
   uploadHash = {"new": [], "update": []}
+  count = 0
   for sample in gisaidHash:
     uploadSample = sample
     uploadSubsample = gisaidHash[sample]["meta"][gisaidHeader.index("Virus name")]
     uploadExternal = gisaidHash[sample]["meta"][gisaidHeader.index("Accession ID")]
     uploadPathogen = "SARS-CoV-2"
+    uploadType = "virus"
     uploadLineage = gisaidHash[sample]["meta"][gisaidHeader.index("Pango lineage")]
     uploadFacility = gisaidHash[sample]["meta"][gisaidHeader.index("Additional location information")]
-    uploadLocation = gisaidHash[sample]["meta"][gisaidHeader.index("Location")]
+    uploadLocation = gisaidHash[sample]["meta"][gisaidHeader.index("Location")].split("/")[-1].strip().lower()
+    uploadLocationBool = False
+    for location in locationHash.keys():
+      if location in uploadLocation:
+        uploadLocationBool = True
+        uploadLocation = locationHash[location].title()
+    if uploadLocationBool == False:
+      uploadLocation = ""
     try:
       uploadCollectionDate = datetime.strptime(gisaidHash[sample]["meta"][gisaidHeader.index("Collection date")], "%Y-%m-%d")
     except:
@@ -102,17 +113,18 @@ def main():
       except:
         uploadCollectionDate = datetime.strptime(gisaidHash[sample]["meta"][gisaidHeader.index("Collection date")], "%Y")
         #print(gisaidHash[sample]["meta"][gisaidHeader.index("Collection date")], datetime.strptime(gisaidHash[sample]["meta"][gisaidHeader.index("Collection date")], "%Y"))
-    uploadSequenceDate = uploadCollectionDate
+    uploadSequenceDate = ""
     uploadAdditionalMetadata = {}
-    uploadSequence = None
     for head in gisaidHeader:
       if gisaidHash[sample]["meta"][gisaidHeader.index(head)]:
         uploadAdditionalMetadata[head] = gisaidHash[sample]["meta"][gisaidHeader.index(head)]
-    uploadObj = list(map(lambda x: x if x else None, [uploadSample, uploadSubsample, uploadExternal, uploadPathogen, uploadLineage, uploadFacility, uploadLocation, str(uploadCollectionDate), str(uploadSequenceDate), json.dumps(uploadAdditionalMetadata), uploadSequence]))
+    uploadObj = list(map(lambda x: x if x else None, [uploadSample, uploadSubsample, uploadExternal, uploadPathogen, uploadType, uploadLineage, uploadFacility, uploadLocation, str(uploadCollectionDate), str(uploadSequenceDate), json.dumps(uploadAdditionalMetadata)]))
     if sample not in dbHash:
-      print(uploadObj)
-      uploadHash["new"].append(uploadObj)
+      pass
+      #print(uploadObj)
+      #uploadHash["new"].append(uploadObj)
     else:
+      #print(uploadObj)
       uploadHash["update"].append(uploadObj)
   print("... file written to " + wd + "gisaid_upload.json")
   write(wd + "gisaid_upload.json", json.dumps(uploadHash))

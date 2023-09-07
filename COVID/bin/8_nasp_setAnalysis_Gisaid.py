@@ -110,13 +110,8 @@ def main():
   lineageHash = {}
 
   # TODO: build lineageHash
-  if allSamples:
-    for sample in list(filter(lambda x: gisaidHash[x]["meta"][gisaidHeader.index("Pango lineage")], gisaidHash)):
-      if gisaidHash[sample]["meta"][gisaidHeader.index("Pango lineage")] not in lineageHash:
-        lineageHash[gisaidHash[sample]["meta"][gisaidHeader.index("Pango lineage")]] = []
-      lineageHash[gisaidHash[sample]["meta"][gisaidHeader.index("Pango lineage")]].append(sample)
-  else:
-    for sample in list(filter(lambda x: gisaidHash[x]["meta"][gisaidHeader.index("Pango lineage")] and x not in dbHash, gisaidHash)):
+  for sample in list(filter(lambda x: gisaidHash[x]["meta"][gisaidHeader.index("Pango lineage")], gisaidHash)):
+    if allSamples or sample not in dbHash or dbHash[sample][dbHeader.index("Sequence")] == "0":
       if gisaidHash[sample]["meta"][gisaidHeader.index("Pango lineage")] not in lineageHash:
         lineageHash[gisaidHash[sample]["meta"][gisaidHeader.index("Pango lineage")]] = []
       lineageHash[gisaidHash[sample]["meta"][gisaidHeader.index("Pango lineage")]].append(sample)

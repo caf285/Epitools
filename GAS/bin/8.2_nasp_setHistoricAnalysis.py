@@ -34,12 +34,15 @@ def main():
   #print(wd, pd)
 
   ### open and hash google sheet
-  google = json.load(open(wd + "googleSheets_allGas_Master.json"))
+  google = json.load(open(wd + "googleSheets_allGas_Historic.json"))
+  googleHeader = google.pop(0)
   googleHeader = google.pop(0)
   googleHash = {}
   for line in google:
-    if re.findall("TG\d+", line[googleHeader.index("original_sample_id")].upper()):
-      googleHash[re.findall("TG\d+", line[googleHeader.index("original_sample_id")].upper())[0]] = line
+    if re.findall("TG\d+", line[googleHeader.index("Isolate Barcode")].upper()):
+      googleHash[re.findall("TG\d+", line[googleHeader.index("Isolate Barcode")].upper())[0]] = line
+    if re.findall("TG\d+", line[googleHeader.index("DNA \nBarcode")].upper()):
+      googleHash[re.findall("TG\d+", line[googleHeader.index("DNA \nBarcode")].upper())[0]] = line
 
   ### open and hash db
   db = json.load(open(wd + "epitools_pathogen.json"))
@@ -48,9 +51,12 @@ def main():
   for line in db:
     if line["Sample"]:
       dbHash[line["Sample"]] = list(line.values())
+  #for sample in list(filter(lambda x: dbHash[x][dbHeader.index("Pathogen")] == "Group A Strep" and x not in googleHash.keys(), dbHash.keys())):
+  #  print(sample, dbHash[sample])
+  #print(len(list(filter(lambda x: dbHash[x][dbHeader.index("Pathogen")] == "Group A Strep" and x not in googleHash.keys(), dbHash.keys()))))
 
   ### open readPairs
-  rpHash = json.load(open(wd + "readPairs_locations.json"))
+  rpHash = json.load(open(wd + "readPairs_historic_locations.json"))
 
   ### get all reference files
   references = os.listdir(pd + "templates/assemblies")
@@ -62,11 +68,11 @@ def main():
   ### get samples per emm-type
   emmHash = {}
   for sample in list(filter(lambda x: re.findall("emm\d+", googleHash[x][googleHeader.index("emm-type")]) and x in rpHash, googleHash)):
-    if googleHash[sample][googleHeader.index("emm-type")] not in emmHash:
-      emmHash[googleHash[sample][googleHeader.index("emm-type")]] = []
-    emmHash[googleHash[sample][googleHeader.index("emm-type")]].append(sample)
+    if "-a" in sys.argv or "--all" in sys.argv or dbHash[sample][dbHeader.index("Sequence")] == "0":
+      if googleHash[sample][googleHeader.index("emm-type")] not in emmHash:
+        emmHash[googleHash[sample][googleHeader.index("emm-type")]] = []
+      emmHash[googleHash[sample][googleHeader.index("emm-type")]].append(sample)
 
-  # TODO: only run samples with no sequences in the DB || allow user to force emm-types
   ### symlink all samples and fill template
   emm = False
   for emm in emmHash:
@@ -118,8 +124,9 @@ def main():
 
   if emm:
     for emm in emmHash:
-      print("... submitting slurm run for " + emm + " in " + pd + "analysis/" + str(datetime.date.today()) + "/NASP/" + emm)
-      subprocess.Popen("module purge; module load nasp slurm; nasp --config " + pd + "analysis/" + str(datetime.date.today()) + "/NASP/" + emm + "/" + emm + "-config.xml", universal_newlines=True, shell=True, stdout=subprocess.PIPE).stdout.read()
+      if list(filter(lambda x: emm + "_" in x, references)):
+        print("... submitting slurm run for " + emm + " in " + pd + "analysis/" + str(datetime.date.today()) + "/NASP/" + emm)
+        subprocess.Popen("module purge; module load nasp slurm; nasp --config " + pd + "analysis/" + str(datetime.date.today()) + "/NASP/" + emm + "/" + emm + "-config.xml", universal_newlines=True, shell=True, stdout=subprocess.PIPE).stdout.read()
 
 if __name__ == '__main__':
     main()

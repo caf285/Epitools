@@ -75,13 +75,8 @@ def main():
   ### get samples per lineage
   lineageHash = {}
 
-  if allSamples:
-    for sample in list(filter(lambda x: googleHash[x][googleHeader.index("pangolin_lineage")] and x in rpHash, googleHash)):
-      if googleHash[sample][googleHeader.index("pangolin_lineage")] not in lineageHash:
-        lineageHash[googleHash[sample][googleHeader.index("pangolin_lineage")]] = []
-      lineageHash[googleHash[sample][googleHeader.index("pangolin_lineage")]].append(sample)
-  else:
-    for sample in list(filter(lambda x: googleHash[x][googleHeader.index("pangolin_lineage")] and x in rpHash and x not in dbHash, googleHash)):
+  for sample in list(filter(lambda x: googleHash[x][googleHeader.index("pangolin_lineage")] and x in rpHash, googleHash)):
+    if allSamples or sample not in dbHash or dbHash[sample][dbHeader.index("Sequence")] == "0":
       if googleHash[sample][googleHeader.index("pangolin_lineage")] not in lineageHash:
         lineageHash[googleHash[sample][googleHeader.index("pangolin_lineage")]] = []
       lineageHash[googleHash[sample][googleHeader.index("pangolin_lineage")]].append(sample)
@@ -117,8 +112,7 @@ def main():
     configFiles = "\n".join(configFiles)
     configOut = "\n".join([config[0] + configRunName + config[1] + configOutputFolder + config[2] + configReferenceName + config[3] + configReferencePath + config[4], configFiles, config[5]])
     write(pd + "analysis/" + str(datetime.date.today()) + "/NASP/" + lineage + "/" + lineage + "-config.xml", configOut)
-    if len(list(filter(lambda x: x not in dbHash, lineageHash[lineage]))):
-      print("... NASP files for " + str(len(list(filter(lambda x: x not in dbHash, lineageHash[lineage])))) + " samples written to " + pd + "analysis/" + str(datetime.date.today()) + "/NASP/" + lineage)
+    print("... NASP files for " + str(len(lineageHash[lineage])) + " samples written to " + pd + "analysis/" + str(datetime.date.today()) + "/NASP/" + lineage)
 
   if lineage:
     print("\nBASH script to run NASP in " + pd + "analysis/" + str(datetime.date.today()) + "/NASP/ ...\n") 

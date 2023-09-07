@@ -27,12 +27,13 @@ def main():
   pd = os.path.abspath(os.path.join(wd, os.pardir)) + "/" # parent directory
 
   ### open and hash google sheet
-  google = json.load(open(wd + "googleSheets_allGas_Master.json"))
+  google = json.load(open(wd + "googleSheets_allGas_Historic.json"))
+  googleHeader = google.pop(0)
   googleHeader = google.pop(0)
   googleHash = {}
   for line in google:
-    if re.findall("TG\d+", line[googleHeader.index("original_sample_id")].upper()):
-      googleHash[re.findall("TG\d+", line[googleHeader.index("original_sample_id")].upper())[0]] = line
+    if re.findall("TG\d+", line[googleHeader.index("Isolate Barcode")].upper()):
+      googleHash[re.findall("TG\d+", line[googleHeader.index("Isolate Barcode")].upper())[0]] = line
 
   ### open and hash db
   db = json.load(open(wd + "epitools_pathogen.json"))
@@ -42,18 +43,21 @@ def main():
     if line["Sample"]:
       dbHash[line["Sample"]] = list(line.values())
 
+  ### open and hash read pairs
+  rpHash = json.load(open(wd + "readPairs_historic_locations.json"))
+
   #==================================================( Upload Missing Data to DB )
   ### get ['Sample', 'Subsample', 'External', 'Pathogen', 'Lineage', 'Facility', 'Location', 'Collection_date', 'Sequence_date', 'Reference', 'Additional_metadata'] from google sheet
   uploadHash = {"new": [], "update": []}
-  for sample in googleHash:
-    uploadSample = googleHash[sample][googleHeader.index("original_sample_id")]
-    uploadSubsample = googleHash[sample][googleHeader.index("subsample_ID")]
-    uploadExternal = googleHash[sample][googleHeader.index("external_id")]
+  for sample in list(filter(lambda x: x in rpHash, googleHash)):
+    uploadSample = googleHash[sample][googleHeader.index("Isolate Barcode")]
+    uploadSubsample = googleHash[sample][googleHeader.index("DNA \nBarcode")]
+    uploadExternal = googleHash[sample][googleHeader.index("DNA \nBarcode")]
     uploadPathogen = "Group A Strep"
     uploadType = "bacteria"
     uploadLineage = googleHash[sample][googleHeader.index("emm-type")]
-    uploadFacility = googleHash[sample][googleHeader.index("Original facility source")]
-    uploadLocation = googleHash[sample][googleHeader.index("County")]
+    uploadFacility = googleHash[sample][googleHeader.index("Original\nfacility source")]
+    uploadLocation = googleHash[sample][googleHeader.index("City")]
     try:
       uploadCollectionDate = datetime.strptime(googleHash[sample][googleHeader.index("Date collected from patient")].split(" ")[0].split(",")[0].strip(), "%m/%d/%Y")
     except:

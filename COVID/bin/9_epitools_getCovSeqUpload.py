@@ -38,7 +38,7 @@ def main():
   masterFiles = []
   for line in sys.argv[1:]:
     masterFiles += subprocess.Popen("find " + line + " -iname master.tsv", universal_newlines=True, shell=True, stdout=subprocess.PIPE).stdout.read().split("\n")
-  sequencesHash = {"new": {}, "update": {}}
+  sequencesHash = {}
   for masterFile in masterFiles:
     if os.path.exists(masterFile):
       master = read(masterFile).split("\n")
@@ -48,19 +48,14 @@ def main():
       masterHeader[1] = "cov"
       for i in range(2,len(masterHeader)):
         sample = masterHeader[i]
-        if sample not in dbHash:
-          sequencesHash["new"][sample] = []
+        if sample in dbHash:
+          sequencesHash[sample] = []
           for line in master:
-            sequencesHash["new"][sample].append(line[i])
-          sequencesHash["new"][sample] = "".join(sequencesHash["new"][sample])
-        else:
-          sequencesHash["update"][sample] = []
-          for line in master:
-            sequencesHash["update"][sample].append(line[i])
-          sequencesHash["update"][sample] = "".join(sequencesHash["update"][sample])
+            sequencesHash[sample].append(line[i])
+          sequencesHash[sample] = "".join(sequencesHash[sample])
 
-  write(wd + "cov_epitools_sequences_upload.json", json.dumps(sequencesHash))
-  print("... epitools.sequences upload JSON package written to " + wd + "cov_epitools_sequences_upload.json")
+  write(wd + "gisaid_sequences.json", json.dumps(sequencesHash))
+  print("... epitools.sequences upload JSON package written to " + wd + "gisaid_sequences.json")
 
 
   #==================================================( Upload Missing Data to DB )

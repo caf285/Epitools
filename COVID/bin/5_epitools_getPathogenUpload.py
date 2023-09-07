@@ -45,6 +45,8 @@ def main():
       dbHash[line["Sample"]] = list(line.values())
 
   #==================================================( Upload Missing Data to DB )
+  locationHash = {"apache": "apache", "coshice": "cochise", "coconino": "coconino", "gila": "gila", "graham": "graham", "greenlee": "greenlee", "la paz": "la paz", "maricopa": "maricopa", "mohave": "mohave", "navajo": "navajo", "pima": "pima", "pinal": "pinal", "santa cruz": "santa cruz", "yavapai": "yavapai", "yuma": "yuma", "phoenix": "maricopa", "san luis": "yuma", "tuscon": "pima"}
+
   ### get ['Sample', 'Subsample', 'External', 'Pathogen', 'Lineage', 'Facility', 'Location', 'Collection_date', 'Sequence_date', 'Reference', 'Additional_metadata'] from google sheet
   uploadHash = {"new": [], "update": []}
   for sample in googleHash:
@@ -52,9 +54,17 @@ def main():
     uploadSubsample = googleHash[sample][googleHeader.index("sample_id(tg#)")]
     uploadExternal = googleHash[sample][googleHeader.index("gisaid_epi_isl")]
     uploadPathogen = "SARS-CoV-2"
+    uploadType = "virus"
     uploadLineage = googleHash[sample][googleHeader.index("pangolin_lineage")]
     uploadFacility = googleHash[sample][googleHeader.index("institution")]
     uploadLocation = googleHash[sample][googleHeader.index("county")]
+    uploadLocationBool = False
+    for location in locationHash.keys():
+      if location in uploadLocation:
+        uploadLocationBool = True
+        uploadLocation = locationHash[location].title()
+    if uploadLocationBool == False:
+      uploadLocation = ""
     try:
       uploadCollectionDate = datetime.strptime(googleHash[sample][googleHeader.index("collection_date")].split(" ")[0].split(",")[0].strip(), "%Y-%m-%d")
     except:
@@ -75,9 +85,10 @@ def main():
     for head in googleHeader:
       if googleHash[sample][googleHeader.index(head)]:
         uploadAdditionalMetadata[head] = googleHash[sample][googleHeader.index(head)]
-    uploadObj = list(map(lambda x: x if x else None, [uploadSample, uploadSubsample, uploadExternal, uploadPathogen, uploadLineage, uploadFacility, uploadLocation, str(uploadCollectionDate), str(uploadSequenceDate), json.dumps(uploadAdditionalMetadata)]))
+    uploadObj = list(map(lambda x: x if x else None, [uploadSample, uploadSubsample, uploadExternal, uploadPathogen, uploadType, uploadLineage, uploadFacility, uploadLocation, str(uploadCollectionDate), str(uploadSequenceDate), json.dumps(uploadAdditionalMetadata)]))
     if sample not in dbHash:
-      uploadHash["new"].append(uploadObj)
+      pass
+      #uploadHash["new"].append(uploadObj)
     else:
       uploadHash["update"].append(uploadObj)
 
