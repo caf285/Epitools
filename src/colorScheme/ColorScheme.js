@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import ColorScheme from "color-scheme";
 import "./ColorScheme.css";
 
-var scheme = new ColorScheme;
+var scheme = new ColorScheme();
 scheme.from_hue(250)
       .scheme('analogic')
       .add_complement(true)
@@ -13,8 +13,10 @@ scheme.from_hue(250)
 var colors = scheme.colors();
 
 function ColorSchemeView(props) {
-  useEffect(() => {
-   // colors = ["4285f4", "ea4335", "fbbc04", "34a853"].concat(colors)
+  const setColorScheme = props.setColorScheme
+
+  const setParentColorScheme = useCallback(() => {
+    // colors = ["4285f4", "ea4335", "fbbc04", "34a853"].concat(colors)
     colors = ["C62828", "5C6BC0", "43A047", "FFEB3B", "BA68C8", "00838F", "8D6E63", "607D8B"]
     let altColors = colors
     let scale = 90
@@ -47,14 +49,17 @@ function ColorSchemeView(props) {
           hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b))
       if (50 < hsp && hsp < 230) {
         newColorScheme.push({rgb: rgb, hsp: hsp})
-        console.log(rgb, r,g,b,hsp)
+        //console.log(rgb, r,g,b,hsp)
       }
     }
-    if (props.setColorScheme) {
-      props.setColorScheme(newColorScheme)
+    if (setColorScheme) {
+      setColorScheme(newColorScheme)
     }
-    
-  }, [])
+  }, [setColorScheme])
+
+  useEffect(() => {
+    setParentColorScheme()
+  }, [setParentColorScheme])
 
   return null;
 }

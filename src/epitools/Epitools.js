@@ -18,6 +18,7 @@ import ColorScheme from "../colorScheme/ColorScheme.js";
 // mui
 import Box from '@mui/material/Box';
 import Slider from "@mui/material/Slider";
+import Switch from "@mui/material/Switch";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
@@ -38,10 +39,9 @@ function Epitools(props) {
   const [importPhylocanvasSelection, setImportPhylocanvasSelection] = useState([])
   const [getNwk, setGetNwk] = useState(() => () => {})
   const [getCanvas, setGetCanvas] = useState(() => () => {})
-  const [getCluster, setGetCluster] = useState(() => () => {})
+  const [getCluster, setGetCluster] = useState(() => () => {return []})
   const [mutationsJson, setMutationsJson] = useState()
   const [updateTable, setUpdateTable] = useState(false)
-  const [historyLabel, setHistoryLabel] = useState("")
 
   // handsontable
   const elementRef = useRef(null);
@@ -53,6 +53,7 @@ function Epitools(props) {
   const [additionalHighlight, setAdditionalHighlight] = useState("")
   const [additionalHighlightForms, setAdditionalHighlightForms] = useState([])
   const [colorGroup, setColorGroup] = useState([])
+  const [colorContext, setColorContext] = useState([])
   const [clusterDistance, setClusterDistance] = useState(2)
   const [clusterSize, setClusterSize] = useState(2)
   const [highlightDateGranularity, setHighlightDateGranularity] = useState(0)
@@ -68,6 +69,12 @@ function Epitools(props) {
   const [pathogenType, setPathogenType] = useState();
   const [pathogenTypeDisplay, setPathogenTypeDisplay] = useState("none");
   const [queryType, setQueryType] = useState("lineage");
+  const maxHistory = 10
+  const [historyLabel, setHistoryLabel] = useState("")
+  const [historyList, setHistoryList] = useState([]);
+  const uploadFasta = useRef("")
+  const [showLegend, setShowLegend] = useState(true)
+  const [legendTextSize, setLegendTextSize] = useState(10)
 
   // pathogen lineage
   const [pathogenDateRange, setPathogenDateRange] = useState([new Date("06/01/2019"), new Date()])
@@ -233,6 +240,7 @@ function Epitools(props) {
       newAdditionalHighlightForms = Object.keys(branchesData[0]).map(col => {
         return <button key={col} onClick={() => {
           setAdditionalHighlight(col)
+          setHighlightRadio(col)
         }}>{col}</button>
       })
       setAdditionalHighlightForms(newAdditionalHighlightForms)
@@ -257,11 +265,11 @@ function Epitools(props) {
 
   // get selection list
   const exportPhylocanvasSelectionCallback = useCallback((e) => {
-    console.log("phylocanvas selection:", e)
+    //console.log("phylocanvas selection:", e)
     setImportTableSelection(e)
   }, [setImportTableSelection])
   const exportTableSelectionCallback = useCallback((e) => {
-    console.log("table selection:", e)
+    //console.log("table selection:", e)
     setImportPhylocanvasSelection(e)
   }, [setImportPhylocanvasSelection])
 
@@ -286,7 +294,7 @@ function Epitools(props) {
       return response.json()
     })
     .then(data => {
-      console.log("data", data)
+      //console.log("data", data)
       if (data.includes("virus")) {
         setPathogenType("virus")
       } else {
@@ -298,7 +306,6 @@ function Epitools(props) {
       window.alert("No pathogen type returned: " + ERR)
     })
   }
-
 
   // database query post request
   async function mysqlRequest(data = "") {
@@ -355,6 +362,7 @@ function Epitools(props) {
         }
         return response.text()
       })
+      // uploadFasta = new fasta
       .then(data => setNwk(data))
       .catch(ERR => window.alert(ERR))
   }
@@ -383,6 +391,7 @@ function Epitools(props) {
       })
       .then(data => {
         if (data) {
+          uploadFasta.current = ""
           setNwk(data)
         } else {
           console.log("no data")
@@ -441,6 +450,7 @@ function Epitools(props) {
       })
       .then(data => {
         if (data) {
+          // uploadFasta = new fasta
           setNwk(data)
         } else {
           console.log("no data")
@@ -470,7 +480,7 @@ function Epitools(props) {
     })
     .then((data) => {
       if (data) {
-        console.log("data:", data)
+        //console.log("data:", data)
         updatePathogenDateRangeForms(data, queryType, date1, date2)
       } else {
         setPathogenDateRangeForms([])
@@ -489,10 +499,12 @@ function Epitools(props) {
       // if NWK
       if (file.name.toLowerCase().endsWith(".nwk")) {
         setNwk(reader.current.result)
+        uploadFasta.current = ""
       }
       // if FASTA
       else if (file.name.toLowerCase().endsWith(".fasta")) {
         let fasta = reader.current.result
+        uploadFasta.current = fasta
         neighborJoinRequest(fasta);
       }
 
@@ -515,6 +527,7 @@ function Epitools(props) {
           fasta.push(fastaObj[header[i]].join(""))
         }
         fasta = fasta.join("\n")
+        uploadFasta.current = fasta
         neighborJoinRequest(fasta);
       }
     }
@@ -647,30 +660,58 @@ function Epitools(props) {
     if (highlightRadio) {
       //console.log(highlightRadio)
       if (highlightRadio == "Cluster") {
-        setColorGroup(getCluster())
+        let cluster = getCluster()
+        //console.log("cluster", cluster)
+        if (getCluster()) {
+          setColorGroup(getCluster())
+          setColorContext(Object.keys(getCluster()).map((key) => {return "group_" + key}))
+        }
       } else if (branchesData && branchesData.length >= 1 && Object.keys(branchesData[0]).includes(highlightRadio)) {
         let highlightGroup = {}
         for (let line of branchesData) {
           if (highlightRadio === "Collection_date") {
-            let highlightDate = line[highlightRadio].split("-").slice(0, highlightDateGranularityRef.current + 1).join("-")
-            if (!Object.keys(highlightGroup).includes(highlightDate)) {
-              highlightGroup[highlightDate] = []
+            if (line[highlightRadio] !== undefined) {
+              let highlightDate = line[highlightRadio].split("-").slice(0, highlightDateGranularityRef.current + 1).join("-")
+              if (!Object.keys(highlightGroup).includes(highlightDate)) {
+                highlightGroup[highlightDate] = []
+              }
+              highlightGroup[highlightDate].push(Object.values(line)[tablePrimaryColumn])
             }
-            highlightGroup[highlightDate].push(Object.values(line)[tablePrimaryColumn])
           } else {
             if (!Object.keys(highlightGroup).includes(line[highlightRadio])) {
               highlightGroup[line[highlightRadio]] = []
             }
-            highlightGroup[line[highlightRadio]].push(Object.values(line)[tablePrimaryColumn])
+            if (Object.values(line)[tablePrimaryColumn] !== undefined) {
+              highlightGroup[line[highlightRadio]].push(Object.values(line)[tablePrimaryColumn])
+            }
           }
         }
-        setColorGroup(Object.values(highlightGroup).sort())
+        setColorGroup(Object.values(highlightGroup))
+        setColorContext(Object.keys(highlightGroup))
+      } else {
+        setColorGroup([])
+        setColorContext([])
       }
     }
-  }, [highlightRadio, branchesData])
+  }, [highlightRadio, highlightDateGranularity, branchesData])
   useEffect(() => {
     handleHighlightRadioChange()
   }, [highlightRadio, handleHighlightRadioChange])
+
+  // push new PhylocanvasHistory object to history
+  const addHistory = useCallback((image, nwk) => {
+    if (historyLabel) {
+      setHistoryList(
+        [   
+          <div className="historyComponent" onClick={() => {setUpdateTable(true); setHistoryLabel(historyLabel); setNwk(nwk)}}>
+            <div>{historyLabel}</div>
+            <img src={image} height="100" width="300"></img>
+          </div> 
+  
+        ].concat(historyList).slice(0, maxHistory)
+      )   
+    }   
+  })
 
   //====================================================================================================( return )
   return (
@@ -774,62 +815,75 @@ function Epitools(props) {
           } />
 
           {/*========== highlight selection ==========*/}
+          
           <SvgButton label="highlight" drop={
-            <FormControl sx={{ paddingLeft: "15px", paddingRight: "15px", width: "100%" }}>
-              <RadioGroup value={highlightRadio} onChange={(e) => {setHighlightRadio(e.target.value)}}>
-                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Cluster" control={<Radio size="small" />} /><h5>Cluster Detection</h5></div>
-                <Box sx={{ paddingLeft: "15px" }}>
-                  <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
-                    <span>cluster distance {"<="} <b>{clusterDistance}</b> SNPs</span>
-                    <InfoButton text="cluster distance sets a maximum snp distance between samples to be considered a cluster" />
-                  </div>
-                  <Slider value={clusterDistance} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
-                    if (typeof newValue === "number") {
-                      setClusterDistance(newValue)
-                      if (highlightRadio === "Cluster") {
-                        handleHighlightRadioChange()
+            <div>
+              <h5>Legend:</h5>
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
+                <div>toggle display: <Switch checked={showLegend} onChange={() => {setShowLegend(!showLegend)}} /></div>
+              </Box>
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}> 
+                <span>text size: <b>{legendTextSize}</b>px</span>
+                <Slider value={legendTextSize} min={5} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                  if (typeof newValue === 'number') {
+                    setLegendTextSize(newValue);
+                  }   
+                }} />
+              </Box>
+              <hr/>
+              <h5>Highlight Selection:</h5>
+              <FormControl sx={{ paddingLeft: "15px", paddingRight: "15px", width: "100%" }}>
+                <RadioGroup value={highlightRadio} onChange={(e) => {setHighlightRadio(e.target.value)}}>
+                  <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Cluster" control={<Radio size="small" />} /><h6>Cluster Detection</h6></div>
+                  <Box sx={{ paddingLeft: "15px" }}>
+                    <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
+                      <span>cluster distance {"<="} <b>{clusterDistance}</b> SNPs</span>
+                      <InfoButton text="cluster distance sets a maximum snp distance between samples to be considered a cluster" />
+                    </div>
+                    <Slider value={clusterDistance} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                      if (typeof newValue === "number") {
+                        setClusterDistance(newValue)
+                        if (highlightRadio === "Cluster") {
+                          handleHighlightRadioChange()
+                        }
                       }
-                    }
-                  }} />
-                  <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
-                    <span>cluster size {">="} <b>{clusterSize}</b> samples</span>
-                    <InfoButton text="cluster size sets the minimum amount of samples in a group to be considered a cluster" />
-                  </div>
-                  <Slider value={clusterSize} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
-                    if (typeof newValue === "number") {
-                      setClusterSize(newValue)
-                      if (highlightRadio === "Cluster") {
-                        handleHighlightRadioChange()
+                    }} />
+                    <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
+                      <span>cluster size {">="} <b>{clusterSize}</b> samples</span>
+                      <InfoButton text="cluster size sets the minimum amount of samples in a group to be considered a cluster" />
+                    </div>
+                    <Slider value={clusterSize} min={1} max={20} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                      if (typeof newValue === "number") {
+                        setClusterSize(newValue)
+                        if (highlightRadio === "Cluster") {
+                          handleHighlightRadioChange()
+                        }
                       }
-                    }
-                  }} />
-                </Box>
-                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Lineage" control={<Radio size="small" />} /><h5>Lineage</h5></div>
-                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Facility" control={<Radio size="small" />} /><h5>Facility</h5></div>
-                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Geographic_location" control={<Radio size="small" />} /><h5>Geographic Location</h5></div>
-                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Collection_date" control={<Radio size="small" />} /><h5>Collection Date</h5></div>
-                <Box sx={{ paddingLeft: "15px" }}>
-                 <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
-                    <span>date highlight: <b>{["year", "month", "day"][highlightDateGranularity]}</b></span>
-                    <InfoButton text="collection date granularity highlights based on year, month, or day" />
-                  </div>
-                  <Slider value={highlightDateGranularity} min={0} max={2} size="small" onChange={(event: Event, newValue: number | number[]) => {
-                    if (typeof newValue === "number") {
-                      _setHighlightDateGranularity(newValue)
-                      if (highlightRadio === "Collection_date") {
-                        handleHighlightRadioChange()
+                    }} />
+                  </Box>
+                  <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Lineage" control={<Radio size="small" />} /><h6>Lineage</h6></div>
+                  <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Facility" control={<Radio size="small" />} /><h6>Facility</h6></div>
+                  <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Geographic_location" control={<Radio size="small" />} /><h6>Geographic Location</h6></div>
+                  <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value="Collection_date" control={<Radio size="small" />} /><h6>Collection Date</h6></div>
+                  <Box sx={{ paddingLeft: "15px" }}>
+                   <div style={{ display: "flex", flexFlow: "row", justifyContent: "space-between" }}>
+                      <span>date highlight: <b>{["year", "month", "day"][highlightDateGranularity]}</b></span>
+                      <InfoButton text="collection date granularity highlights based on year, month, or day" />
+                    </div>
+                    <Slider value={highlightDateGranularity} min={0} max={2} size="small" onChange={(event: Event, newValue: number | number[]) => {
+                      if (typeof newValue === "number") {
+                        _setHighlightDateGranularity(newValue)
+                        if (highlightRadio === "Collection_date") {
+                          handleHighlightRadioChange()
+                        }
                       }
-                    }
-                  }} /> 
-                </Box>
-                <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value={additionalHighlight} control={<Radio size="small" />} /><h5>{additionalHighlight}</h5></div>
-                <Box sx={{ paddingLeft: "15px" }}>
-                  <SvgButton label={additionalHighlight} drop={
-                    <div>{additionalHighlightForms}</div> 
-                  } />
-                </Box>
-              </RadioGroup>
-            </FormControl>
+                    }} /> 
+                  </Box>
+                  <div style={{ display: "flex", flexFlow: "row", alignItems: "center" }}><FormControlLabel value={additionalHighlight} control={<Radio size="small" />} /><h6>{additionalHighlight}</h6></div>
+                </RadioGroup>
+              </FormControl>
+              <Box sx={{ paddingLeft: "15px", paddingRight: "15px", display: "flex", flexFlow: "column" }}>{additionalHighlightForms}</Box>
+            </div>
           } />
 
           {/*========== pathogenlineage loader ==========*/}
@@ -888,6 +942,12 @@ function Epitools(props) {
               </Box>
             </div>
           } />
+          <SvgButton label="history" drop={
+            <div style={{ maxHeight: props.height ? props.height - 60 : "20px" }}>
+              {historyList}
+              <div style={{ height: "10px" }} />
+            </div>
+          } />
 
         </div>
       </div>
@@ -903,7 +963,6 @@ function Epitools(props) {
         <Phylocanvas
           nwk={nwk}
           setNwk={setNwk}
-          setUpdateTable={setUpdateTable}
           height={phyloHeight}
           clusterSize={clusterSize}
           clusterDistance={clusterDistance}
@@ -914,13 +973,16 @@ function Epitools(props) {
           exportPhylocanvasSelectionCallback={exportPhylocanvasSelectionCallback}
           setGetNwk={setGetNwk}
           canvas={getCanvas()}
-          historyLabel={historyLabel}
-          setHistoryLabel={setHistoryLabel}
           setGetCanvas={setGetCanvas}
           setGetCluster={setGetCluster}
           primaryColumn={tablePrimaryColumn}
           colorScheme={colorScheme}
           colorGroup={colorGroup}
+          colorContext={colorContext}
+          addHistory={addHistory}
+          historyLabel={historyLabel}
+          showLegend={showLegend}
+          legendTextSize={legendTextSize}
         />
 
         {/* handsontable component */}

@@ -7,6 +7,7 @@ import Chip from '@mui/material/Chip';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 function SvgButton(props) {
+
   const [visibility, setVisibility] = useState("none");
 
   // svg button canvas is 20x20 pixels
@@ -93,10 +94,8 @@ function SvgButton(props) {
         />
         <div onMouseLeave={() => {setVisibility("none")}} style={{ display: visibility, alignSelf: props.dropAlign && props.dropAlign.toLowerCase() === "right" ? "flex-end" : "flex-start" }}>
           <div style={props.dropAlign && props.dropAlign.toLowerCase() === "right" ? { transform: "translateX(-100%)", zIndex: "101", position: "absolute", minWidth: "200px" } : { zIndex: "101", position: "absolute", minWidth: "200px" }}>
-            <div style={{ position: "relative" }}>
-              <div className="DropZ" style={(props.maxHeight) ? { maxHeight: props.maxHeight } : {}}>
-                {props.drop}
-              </div>
+            <div className="DropZ" style={(props.maxHeight) ? { maxHeight: props.maxHeight } : {}}>
+              {props.drop}
             </div>
           </div>
         </div>

@@ -27,30 +27,12 @@ function PhylocanvasView(props) {
   const [textSize, setTextSize] = useState(defaultTextSize);
   const [lineWidth, setLineWidth] = useState(defaultLineWidth);
 
-  const maxHistory = 10
-  const [historyList, setHistoryList] = useState([]);
-
   // pass nwk to logic component (requires default value and cannot be empty)
   useEffect(() => {
     if (props.nwk) {
       setNwk(props.nwk)
     }
   }, [props.nwk])
-
-  // push new PhylocanvasHistory object to history
-  const addHistory = useCallback((image, nwk) => {
-    if (props.historyLabel) {
-      setHistoryList(
-        [
-          <div className="historyComponent" onClick={() => {props.setUpdateTable(true); props.setHistoryLabel(props.historyLabel); setNwk(nwk)}}>
-            <div>{props.historyLabel}</div>
-            <img src={image} height="100" width="300"></img>
-          </div> 
-  
-        ].concat(historyList).slice(0, maxHistory)
-      )
-    }
-  })
 
   // stretch orientation for scrollwheel zoom
   const orientationRef = useRef(["both", "horizontal", "vertical"])
@@ -71,7 +53,6 @@ function PhylocanvasView(props) {
       cycleOrientation()
     }
   }, [type, cycleOrientation])
-
 
   return (
     <div className="Phylocanvas">
@@ -98,19 +79,17 @@ function PhylocanvasView(props) {
         primaryColumn={props.primaryColumn}
         colorScheme={props.colorScheme}
         colorGroup={props.colorGroup}
+        colorContext={props.colorContext}
         resetTreeBool={resetTreeBool}
         setResetTreeBool={setResetTreeBool}
-        addHistory={addHistory}
+        addHistory={props.addHistory}
+        historyLabel={props.historyLabel}
+        showLegend={props.showLegend}
+        legendTextSize={props.legendTextSize}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0, zIndex: 2 }}>
-        <SvgButton label="history" dropAlign="right" drop={
-          <div style={{ maxHeight: props.height - 60 }}>
-            {historyList}
-            <div style={{ height: "10px" }} />
-          </div>
-        } />
         <SvgButton label="tree options" svg="menuContext" dropAlign="right" drop={
-          <div style={{ maxHeight: props.height - 60 }}>
+          <div style={{ maxHeight: props.height ? props.height - 60 : 250 }}>
             <h5>Toggle:</h5>
             <Box sx={{ paddingLeft: "15px", paddingRight: "15px" }}>
               <div>labels: <Switch checked={showLabels} onChange={() => {setShowLabels(!showLabels)}} /></div>

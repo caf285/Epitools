@@ -33,6 +33,7 @@
     "phylocanvas-plugin-enhanced-branch-labels": "file:my_modules/phylocanvas-plugin-enhanced-branch-labels",
     "phylocanvas-plugin-pairwise-ops": "file:my_modules/phylocanvas-plugin-pairwise-ops",
     "phylocanvas-plugin-root": "file:my_modules/phylocanvas-plugin-root",
+    "phylocanvas-plugin-legend": "file:my_modules/phylocanvas-plugin-legend",
     "phylocanvas-plugin-scalebar": "file:my_modules/phylocanvas-plugin-scalebar",
     "phylocanvas-plugin-stretch-orientation": "file:my_modules/phylocanvas-plugin-stretch-orientation",
     "phylocanvas-plugin-tree-stats": "file:my_modules/phylocanvas-plugin-tree-stats",

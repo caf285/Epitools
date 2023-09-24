@@ -1,20 +1,22 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import Phylocanvas, { utils } from "phylocanvas";
 
 import scalebar from "phylocanvas-plugin-scalebar";
+import legend from "phylocanvas-plugin-legend";
 import branchLength from "phylocanvas-plugin-branch-length";
 import enhancedBranchLabels from "phylocanvas-plugin-enhanced-branch-labels";
 import root from "phylocanvas-plugin-root";
 import pairwiseOps from "phylocanvas-plugin-pairwise-ops";
 import treeStats from "phylocanvas-plugin-tree-stats";
 import stretchOrientation from "phylocanvas-plugin-stretch-orientation";
-Phylocanvas.plugin(scalebar)
 Phylocanvas.plugin(branchLength)
 Phylocanvas.plugin(enhancedBranchLabels)
 Phylocanvas.plugin(root)
 Phylocanvas.plugin(pairwiseOps)
 Phylocanvas.plugin(treeStats)
 Phylocanvas.plugin(stretchOrientation)
+Phylocanvas.plugin(legend)
+Phylocanvas.plugin(scalebar)
 
 const { getPixelRatio } = utils.canvas;
 
@@ -45,8 +47,8 @@ function PhylocanvasLogic(props) {
       phylocanvas.current.draw()
     }
     //window.dispatchEvent(new Event('resize'))
-    console.log(props.height)
-    console.log(phylocanvas.current)
+    //console.log(props.height)
+    //console.log(phylocanvas.current)
   }, [props.height])
 
   // set data getters on component load (fills all callbacks for retrieving dynamic data)
@@ -79,29 +81,35 @@ function PhylocanvasLogic(props) {
   // labelStyle only supports ['colour', 'format', 'textSize', 'font']
   const colorPhylocanvas = useCallback(() => {
     if (phylocanvas.current) {
-      console.log(phylocanvas.current)
+      //console.log(phylocanvas.current)
       if (props.colorScheme && props.colorGroup) {
+        // set legend
+        phylocanvas.current.legend.colorScheme = props.colorScheme
+        phylocanvas.current.legend.colorContext = props.colorContext
+
         // reset all non colored nodes to empty style
-        for (let leaf of Object.keys(phylocanvas.current.branches).filter(branch => phylocanvas.current.branches[branch].leaf == true && ![].concat(...props.colorGroup).includes(branch))) {
+        for (let leaf of Object.keys(phylocanvas.current.branches).filter(branch => phylocanvas.current.branches[branch].leaf === true && ![].concat(...props.colorGroup).includes(branch))) {
           phylocanvas.current.branches[leaf].setDisplay({ leafStyle: {} })
           phylocanvas.current.branches[leaf].setDisplay({ labelStyle: {} })
         }
         for (let i = 0; i < props.colorGroup.length; i++) {
           for (let j = 0; j < props.colorGroup[i].length; j++) {
-            phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ leafStyle: { strokeStyle: "#000", fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb } })
-            if (props.colorScheme[i % props.colorScheme.length].hsp > 175) {
-              // light text
-              phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: {
-                strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
-                fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
-                textShadow: true
-              }})
-            } else {
-              // dark text
-              phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: {
-                strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
-                fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb
-              }})
+            if (props.colorGroup[i][j] !== undefined) {
+              phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ leafStyle: { strokeStyle: "#000", fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb } })
+              if (props.colorScheme[i % props.colorScheme.length].hsp > 175) {
+                // light text
+                phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: {
+                  strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
+                  fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
+                  textShadow: true
+                }})
+              } else {
+                // dark text
+                phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ labelStyle: {
+                  strokeStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb,
+                  fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb
+                }})
+              }
             }
           }
         }
@@ -109,10 +117,26 @@ function PhylocanvasLogic(props) {
       }
       phylocanvas.current.draw()
     }
-  }, [props.colorScheme, props.colorGroup])
+  }, [props.colorScheme, props.colorGroup, props.historyLabel])
+
+  useEffect(() => {
+    if (phylocanvas.current) {
+      if (props.historyLabel) {
+        phylocanvas.current.legend.label = props.historyLabel
+      }
+      if (props.showLegend !== undefined) {
+        phylocanvas.current.legend.active = props.showLegend
+      }
+      if (props.legendTextSize) {
+        phylocanvas.current.legend.fontSize = props.legendTextSize
+      }
+      phylocanvas.current.draw()
+    }
+  }, [props.historyLabel, props.showLegend, props.legendTextSize])
+
   useEffect(() => {
     colorPhylocanvas()
-  }, [colorPhylocanvas, props.colorScheme, props.colorGroup])
+  }, [colorPhylocanvas, props.colorScheme, props.colorGroup, props.colorContext])
 
   // load tree on component load and add listener for click action to export selected ids
   useEffect(() => {
@@ -162,7 +186,7 @@ function PhylocanvasLogic(props) {
     if (branchNameCallback) {
       branchNameCallback(phylocanvas.current.leaves.map(x => x["id"]))
     }
-    console.log(phylocanvas.current.canvas.canvas)
+    //console.log(phylocanvas.current.canvas.canvas)
     let img = phylocanvas.current.canvas.canvas.toDataURL("image/png")
     props.addHistory(img, nwk)
   }, [nwk])
@@ -191,9 +215,6 @@ function PhylocanvasLogic(props) {
     phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
   }, [props.type])
   useEffect(() => {
-    phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
-  }, [props.lineWidth])
-  useEffect(() => {
     phylocanvas.current.setNodeSize(props.nodeSize)
   }, [props.nodeSize])
   useEffect(() => {
@@ -206,9 +227,9 @@ function PhylocanvasLogic(props) {
   useEffect(() => {
     phylocanvas.current.showLabels = props.showLabels
     phylocanvas.current.alignLabels = props.align
-    phylocanvas.current.lineWidth = props.lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
+    phylocanvas.current.lineWidth = lineWidth * getPixelRatio(phylocanvas.current.canvas) / 2
     phylocanvas.current.draw()
-  }, [props.showLabels, props.align, props.lineWidth])
+  }, [props.showLabels, props.align, lineWidth])
 
   // for orientation of phylocanvas stretch, horizontal, vertical, or both
   useEffect(() => {
@@ -252,12 +273,12 @@ function PhylocanvasLogic(props) {
 
   useEffect(() => {
     if (setGetCluster) {
-      setGetCluster(() => () => phylocanvas.current.pairwiseOps.buildCluster)
+      setGetCluster(() => () => {return phylocanvas.current.pairwiseOps.buildCluster()})
     }
   }, [setGetCluster])
 
   return (
-    <div ref={containerRef} style={{ height: "100%", width: "100%" }}></div>
+    <div ref={containerRef} style={{ maxHeight: "100%", height: "100%", width: "100%" }}></div>
   )
 }
 

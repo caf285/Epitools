@@ -3,6 +3,7 @@
   flex-flow: column;
   align-items: flex-start;
   margin: 3px;
+  overflow-y: visible;
 }
 
 .SvgButton:hover {

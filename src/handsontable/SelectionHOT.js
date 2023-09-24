@@ -76,7 +76,7 @@ function SelectionHOT(props) {
   // handle colorscheme/group
   useEffect(() => {
     if (props.colorScheme && props.colorGroup) {
-      console.log("handsonTableColors:", props.colorScheme, props.colorGroup)
+      //console.log("handsonTableColors:", props.colorScheme, props.colorGroup)
     }   
   }, [props.colorScheme, props.colorGroup])
 

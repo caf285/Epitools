@@ -74,9 +74,11 @@ export default function plugin(decorate) {
     return tree;
   });
   decorate(Tree, 'draw', function (delegate, args) {
-    delegate.apply(this, args);
-    if (this.branchLength.active) {
-      drawBranchLength.apply(this);
-    }
+      if (this && this.maxBranchLength > 0) {
+        delegate.apply(this, args);
+        if (this.branchLength.active) {
+          drawBranchLength.apply(this);
+        }
+      }
   });
 }

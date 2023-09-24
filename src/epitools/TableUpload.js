@@ -38,7 +38,7 @@ function TableUpload(props) {
   // initialize primaryColumnList, primaryColumn, and primaryColumnLabel on file upload
   const initializePrimaryColumnCallback = useCallback(() => {
     if (fileText) {
-      console.log("upload")
+      //console.log("upload")
       setPrimaryColumn(0)
       setPrimaryColumnList([])
       if (fileText.length > 0) {
@@ -60,7 +60,7 @@ function TableUpload(props) {
   // TODO: break out callbacks to use both primaryColumn and setPrimaryColumn
   // update primaryColumnList, primaryColumn, and primaryColumnLabel on headerSwitch change
   const updatePrimaryColumnCallback = useCallback(() => {
-    console.log("update")
+    //console.log("update")
     setPrimaryColumnList([])
     if (fileText.length > 0) {
       setPrimaryColumnList(Object.values(fileText[0]).map((v, k) =>

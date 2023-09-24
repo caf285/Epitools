@@ -78,7 +78,7 @@ function drawPreLabel() {
 
 function drawLabel() {
   if (this.colour) {
-    console.log(this)
+    //console.log(this)
   }
   let ctx = this.canvas
   ctx.save()
@@ -139,7 +139,7 @@ function getColour(specifiedColour) {
 export default function plugin(decorate) {
   decorate(this, 'createTree', (delegate, args) => {
     const tree = delegate(...args);
-    console.log(this, tree)
+    //console.log(this, tree)
     const [ , config = {} ] = args;
     tree.enhancedBranchLabels = Object.assign({}, DEFAULTS, config.enhancedBranchLabels || {});
     return tree;
