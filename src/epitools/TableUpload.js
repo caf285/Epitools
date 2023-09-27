@@ -6,12 +6,16 @@ import Switch from '@mui/material/Switch';
 import Handsontable from '../handsontable/Handsontable.js';
 import 'handsontable/dist/handsontable.full.css';
 
+// mui
+import Box from "@mui/material/Box";
+
 function TableUpload(props) {
   // destructure props
   const fileText = props.fileText
   const primaryColumn = props.primaryColumn
   const setPrimaryColumn = props.setPrimaryColumn
 
+  const [contextLabel, setContextLabel] = useState("")
   const [data, setData] = useState([[]])
   const [header, setHeader] = useState([])
   const [headerSwitch, setHeaderSwitch] = useState(true)
@@ -34,6 +38,11 @@ function TableUpload(props) {
     }
     return newTable
   }
+
+  // set history label on fileName change
+  useEffect(() => {
+    setContextLabel(props.fileName)
+  }, [props.fileName])
 
   // initialize primaryColumnList, primaryColumn, and primaryColumnLabel on file upload
   const initializePrimaryColumnCallback = useCallback(() => {
@@ -98,6 +107,8 @@ function TableUpload(props) {
     <div className="TableUpload" style={{ visibility: props.visibility }}>
       <h3 style={{ textAlign: "center" }}>Table Upload Form</h3>
       <div>File Name: '{props.fileName}'</div>
+      <div>Context Label:</div>
+      <Box sx={{ paddingLeft: "15px", width: "150px" }}><input type="text" value={contextLabel} onChange={(e) => {setContextLabel(e.target.value)}} /></Box>
       <div style={{ position: "absolute", top: "16px", right: "16px", fontWeight: "bold" }}>
         <SvgButton label="X" onClick={() => props.setVisibility("hidden")} />
       </div>
@@ -124,8 +135,12 @@ function TableUpload(props) {
         />
       </div>
       <div style={{ alignSelf: "center", display: "flex", flexFlow: "row" }}>
-        <SvgButton label="Import" onClick={() => {props.importData(getTable()); props.setVisibility("hidden")}}/>
-        <SvgButton label="Cancel" onClick={() => props.setVisibility("hidden")} />
+        <SvgButton label="Import" onClick={() => {
+          props.importData(getTable())
+          props.setHistoryLabel(contextLabel)
+          props.setVisibility("hidden")
+        }}/>
+        <SvgButton label="Cancel" onClick={() => {props.setVisibility("hidden")}} />
       </div>
     </div>
   )

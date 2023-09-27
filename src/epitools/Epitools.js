@@ -71,6 +71,11 @@ function Epitools(props) {
   const [queryType, setQueryType] = useState("lineage");
   const maxHistory = 10
   const [historyLabel, setHistoryLabel] = useState("")
+  const historyLabelRef = useRef("")
+  function _setHistoryLabel(newValue) {
+    historyLabelRef.current = newValue
+    setHistoryLabel(newValue)
+  }
   const [historyList, setHistoryList] = useState([]);
   const uploadFasta = useRef("")
   const [showLegend, setShowLegend] = useState(true)
@@ -121,6 +126,7 @@ function Epitools(props) {
         setPathogen(searchParams.get("pathogen"))
       }
       if (searchParams && searchParams.get("samples")) {
+        _setHistoryLabel("URL samples")
         setUpdateTable(true)
         samplesRequest(searchParams.get("samples").split(",").map(sample => sample.toUpperCase()))
         searchParams.delete("samples")
@@ -433,6 +439,7 @@ function Epitools(props) {
   // rebuild tree from selected samples
   async function samplesRequest(data = "", url = "samples") {
     //console.log("data", data)
+    _setHistoryLabel(historyLabelRef.current + " (" + data.length + ")")
     setLoadingScreenVisibility("visible")
     await fetch(host.current + url, {
       method: 'POST',
@@ -558,11 +565,11 @@ function Epitools(props) {
   }
 
   // text file downloader
-  function downloadText(text, name, type = "text") {
+  function downloadText(text, tag, type = "text") {
     let a = document.createElement('a');
     let file = URL.createObjectURL(new Blob([text], {type: type}));
     a.href = file;
-    a.setAttribute('download', name);
+    a.setAttribute('download', historyLabelRef.current ? historyLabelRef.current.replace(/\W/g, '_') + tag : "export" + tag);
     document.body.appendChild(a);
     a.click()
     a.parentNode.removeChild(a);
@@ -582,7 +589,7 @@ function Epitools(props) {
     }
     bgCtx.drawImage(srcCanvas, 0, 0); // draw phylocanvas to dummy canvas and export
     a.href = bgCanvas.toDataURL("image/" + imageType);
-    a.setAttribute('download', "export." + imageType);
+    a.setAttribute('download',  historyLabelRef.current ? historyLabelRef.current.replace(/\W/g, '_') : "export");
     document.body.appendChild(a);
     a.click()
     a.parentNode.removeChild(a);
@@ -627,7 +634,7 @@ function Epitools(props) {
       data = sortForms(data)
       newDateRangeForms = data.filter(x => x.Count >= 4 && x.QueryType).map((v, k) => {return <button key={k} onClick={() => {
         setUpdateTable(true)
-        setHistoryLabel(queryType + ": " + v["QueryType"] + ", count: " + v["Count"])
+        _setHistoryLabel(queryType + ": " + v["QueryType"] + ", count: " + v["Count"])
         pathogenLineageRequest(pathogen, queryType, v["QueryType"], date1, date2)
       }}>{v["QueryType"]} ({v["Count"]})</button>})
     }
@@ -671,7 +678,14 @@ function Epitools(props) {
         for (let line of branchesData) {
           if (highlightRadio === "Collection_date") {
             if (line[highlightRadio] !== undefined) {
-              let highlightDate = line[highlightRadio].split("-").slice(0, highlightDateGranularityRef.current + 1).join("-")
+              let highlightParseDate = new Date(line[highlightRadio])
+              let highlightDate = []
+              // build date to YYYY-MM-DD format and reduce by granulatiry
+              if (highlightDateGranularityRef.current >= 0) {highlightDate.push(highlightParseDate.getUTCFullYear())}
+              if (highlightDateGranularityRef.current >= 1) {highlightDate.push(highlightParseDate.getUTCMonth() + 1)}
+              if (highlightDateGranularityRef.current >= 2) {highlightDate.push(highlightParseDate.getUTCDate())}
+              //highlightDate = line[highlightRadio].split("-").slice(0, highlightDateGranularityRef.current + 1).join("-")
+              highlightDate = highlightDate.join("-")
               if (!Object.keys(highlightGroup).includes(highlightDate)) {
                 highlightGroup[highlightDate] = []
               }
@@ -700,11 +714,11 @@ function Epitools(props) {
 
   // push new PhylocanvasHistory object to history
   const addHistory = useCallback((image, nwk) => {
-    if (historyLabel) {
+    if (historyLabelRef.current) {
       setHistoryList(
         [   
-          <div className="historyComponent" onClick={() => {setUpdateTable(true); setHistoryLabel(historyLabel); setNwk(nwk)}}>
-            <div>{historyLabel}</div>
+          <div className="historyComponent" onClick={() => {setUpdateTable(true); _setHistoryLabel(historyLabel); setNwk(nwk)}}>
+            <div>{historyLabelRef.current}</div>
             <img src={image} height="100" width="300"></img>
           </div> 
   
@@ -735,6 +749,7 @@ function Epitools(props) {
       <TableUpload
         primaryColumn={tablePrimaryColumn}
         setPrimaryColumn={setTablePrimaryColumn}
+        setHistoryLabel={_setHistoryLabel}
         fileName={tableUploadFileName}
         fileText={tableUploadFileText}
         visibility={tableUploadFormVisibility}
@@ -792,7 +807,7 @@ function Epitools(props) {
                   <div>Tree Export:</div>
                   <SvgButton label="PNG Image Format" onClick={() => {downloadImage("png")}} />
                   <SvgButton label="JPEG Image Format" onClick={() => {downloadImage("jpeg")}} />
-                  <SvgButton label="NWK Text Format" onClick={() => {downloadText(getNwk(), "export.nwk")}} />
+                  <SvgButton label="NWK Text Format" onClick={() => {downloadText(getNwk(), ".nwk")}} />
                   <br />
                   <div>Table Export:</div>
                   <SvgButton label="TSV Text Format"
@@ -801,7 +816,7 @@ function Epitools(props) {
                       for (var i in branchesData) {
                         exportText.push(Object.values(branchesData[i]).join("\t"))
                       }
-                      downloadText(exportText.join("\n"), "export.tsv", "text")
+                      downloadText(exportText.join("\n"), ".tsv", "text")
                     }}
                   />
                   <br />
@@ -943,9 +958,8 @@ function Epitools(props) {
             </div>
           } />
           <SvgButton label="history" drop={
-            <div style={{ maxHeight: props.height ? props.height - 60 : "20px" }}>
+            <div>
               {historyList}
-              <div style={{ height: "10px" }} />
             </div>
           } />
 
@@ -980,7 +994,7 @@ function Epitools(props) {
           colorGroup={colorGroup}
           colorContext={colorContext}
           addHistory={addHistory}
-          historyLabel={historyLabel}
+          historyLabel={historyLabelRef.current}
           showLegend={showLegend}
           legendTextSize={legendTextSize}
         />

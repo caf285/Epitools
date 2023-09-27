@@ -94,7 +94,7 @@ function PhylocanvasLogic(props) {
         }
         for (let i = 0; i < props.colorGroup.length; i++) {
           for (let j = 0; j < props.colorGroup[i].length; j++) {
-            if (props.colorGroup[i][j] !== undefined) {
+            if (phylocanvas.current.branches[props.colorGroup[i][j]] !== undefined) {
               phylocanvas.current.branches[props.colorGroup[i][j]].setDisplay({ leafStyle: { strokeStyle: "#000", fillStyle: "#" + props.colorScheme[i % props.colorScheme.length].rgb } })
               if (props.colorScheme[i % props.colorScheme.length].hsp > 175) {
                 // light text
