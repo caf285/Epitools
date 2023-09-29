@@ -86,6 +86,7 @@ function PhylocanvasView(props) {
         historyLabel={props.historyLabel}
         showLegend={props.showLegend}
         legendTextSize={props.legendTextSize}
+        handleHighlightRadioChange={props.handleHighlightRadioChange}
       />
       <div style={{ position: "absolute", display: "flex", flexFlow: "row", top: 0, right: 0, zIndex: 2 }}>
         <SvgButton label="tree options" svg="menuContext" dropAlign="right" drop={

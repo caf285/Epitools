@@ -117,7 +117,7 @@ function PhylocanvasLogic(props) {
       }
       phylocanvas.current.draw()
     }
-  }, [props.colorScheme, props.colorGroup, props.historyLabel])
+  }, [props.colorScheme, props.colorGroup, props.colorContext])
 
   useEffect(() => {
     if (phylocanvas.current) {
@@ -142,7 +142,6 @@ function PhylocanvasLogic(props) {
   useEffect(() => {
     phylocanvas.current = Phylocanvas.createTree(containerRef.current)
     phylocanvas.current.addListener("click", () => {
-      checkSelectionCallback(phylocanvas.current.leaves.map(leaf => leaf.id))
       exportSelectionCallback(phylocanvas.current.getSelectedNodeIds())
     })
   }, [exportSelectionCallback])
@@ -189,6 +188,7 @@ function PhylocanvasLogic(props) {
     //console.log(phylocanvas.current.canvas.canvas)
     let img = phylocanvas.current.canvas.canvas.toDataURL("image/png")
     props.addHistory(img, nwk)
+    props.handleHighlightRadioChange()
   }, [nwk])
 
   // return branch names on nwk change so names can be queried

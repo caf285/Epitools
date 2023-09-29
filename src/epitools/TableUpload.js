@@ -137,6 +137,7 @@ function TableUpload(props) {
       <div style={{ alignSelf: "center", display: "flex", flexFlow: "row" }}>
         <SvgButton label="Import" onClick={() => {
           props.importData(getTable())
+          props.setTableUpload(true)
           props.setHistoryLabel(contextLabel)
           props.setVisibility("hidden")
         }}/>

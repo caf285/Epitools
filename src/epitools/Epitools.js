@@ -33,6 +33,11 @@ function Epitools(props) {
 
   // phylocanvas
   const [nwk, setNwk] = useState("(A:1)B;")
+  const fastaRef = useRef("");
+  const uploadHistoryNodeRef = useRef([]);
+  const [treeUpload, setTreeUpload] = useState(false)
+  const [tableUpload, setTableUpload] = useState(false)
+
   const [phylocanvasLeafNames, setPhylocanvasLeafNames] = useState([])
   const [phyloHeight, setPhyloHeight] = useState(["300"])
   const [metadataLabels, setMetadataLabels] = useState([])
@@ -351,6 +356,7 @@ function Epitools(props) {
 
   // neighborjoin post request
   async function neighborJoinRequest(data = "") {
+    let fastaFile = data
     //const response = await fetch("/go-epitools/neighborjoin", {
     setLoadingScreenVisibility("visible")
     await fetch(host.current + "neighborjoin", {
@@ -369,7 +375,9 @@ function Epitools(props) {
         return response.text()
       })
       // uploadFasta = new fasta
-      .then(data => setNwk(data))
+      .then(data => {
+        setNwk(data)
+      })
       .catch(ERR => window.alert(ERR))
   }
 
@@ -439,15 +447,33 @@ function Epitools(props) {
   // rebuild tree from selected samples
   async function samplesRequest(data = "", url = "samples") {
     //console.log("data", data)
-    _setHistoryLabel(historyLabelRef.current + " (" + data.length + ")")
-    setLoadingScreenVisibility("visible")
-    await fetch(host.current + url, {
-      method: 'POST',
-      mode: 'cors',
-      body: JSON.stringify({
-        query: data,
+    console.log(data)
+    if (fastaRef.current !== "") {
+      console.log(fastaRef.current.length)  // fasta file
+      console.log(data) // selected samples
+      console.log(branchesData) // entire table
+
+      /* TODO!!!
+        `data` should be a list of selected sample names.
+
+        If `fastaRef.current` !== "", then it should be filled with the most current uploaded fasta.
+
+        Use `data` to parse `fastaRef.current` and remove all fasta samples not in selection. Pass the altered fasta file to `neighborJoin(newFasta)` to build the new tree.
+
+        Use `data` to parse `branchesData` removing all lines not in the selection. Pass new branchesData to handsontable with `setBranchesData(newBranchesData)`.
+
+      */
+      _setHistoryLabel(historyLabelRef.current + " (" + data.length + ")")
+    } else {
+      _setHistoryLabel(historyLabelRef.current + " (" + data.length + ")")
+      setLoadingScreenVisibility("visible")
+      await fetch(host.current + url, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          query: data,
+        })
       })
-    })
       .then(response => {
         setLoadingScreenVisibility("hidden")
         if (response.status >= 400) {
@@ -464,6 +490,7 @@ function Epitools(props) {
         }
       })
       .catch(ERR => window.alert(ERR))
+    }
   }
 
   // pathogen date range query
@@ -510,9 +537,11 @@ function Epitools(props) {
       }
       // if FASTA
       else if (file.name.toLowerCase().endsWith(".fasta")) {
-        let fasta = reader.current.result
-        uploadFasta.current = fasta
-        neighborJoinRequest(fasta);
+        let fastaFile = reader.current.result
+        uploadFasta.current = fastaFile
+        neighborJoinRequest(fastaFile);
+        setTreeUpload(true)
+        fastaRef.current = fastaFile
       }
 
       // if TSV
@@ -528,14 +557,16 @@ function Epitools(props) {
             fastaObj[header[j]].push(tsv[i][j])
           }
         }
-        let fasta = []
+        let fastaFile = []
         for (let i = 1; i < header.length; i++) {
-          fasta.push(">" + header[i])
-          fasta.push(fastaObj[header[i]].join(""))
+          fastaFile.push(">" + header[i])
+          fastaFile.push(fastaObj[header[i]].join(""))
         }
-        fasta = fasta.join("\n")
-        uploadFasta.current = fasta
-        neighborJoinRequest(fasta);
+        fastaFile = fastaFile.join("\n")
+        uploadFasta.current = fastaFile
+        neighborJoinRequest(fastaFile);
+        setTreeUpload(true)
+        fastaRef.current = fastaFile
       }
     }
     // reset for same file upload
@@ -633,7 +664,10 @@ function Epitools(props) {
     if (data) {
       data = sortForms(data)
       newDateRangeForms = data.filter(x => x.Count >= 4 && x.QueryType).map((v, k) => {return <button key={k} onClick={() => {
+        setTreeUpload(false)
+        setTableUpload(false)
         setUpdateTable(true)
+        fastaRef.current = ""
         _setHistoryLabel(queryType + ": " + v["QueryType"] + ", count: " + v["Count"])
         pathogenLineageRequest(pathogen, queryType, v["QueryType"], date1, date2)
       }}>{v["QueryType"]} ({v["Count"]})</button>})
@@ -666,12 +700,12 @@ function Epitools(props) {
   const handleHighlightRadioChange = useCallback(() => {
     if (highlightRadio) {
       //console.log(highlightRadio)
-      if (highlightRadio == "Cluster") {
+      if (highlightRadio === "Cluster") {
         let cluster = getCluster()
         //console.log("cluster", cluster)
-        if (getCluster()) {
-          setColorGroup(getCluster())
-          setColorContext(Object.keys(getCluster()).map((key) => {return "group_" + key}))
+        if (cluster) {
+          setColorGroup(cluster)
+          setColorContext(Object.keys(cluster).map((key) => {return "group_" + key}))
         }
       } else if (branchesData && branchesData.length >= 1 && Object.keys(branchesData[0]).includes(highlightRadio)) {
         let highlightGroup = {}
@@ -712,20 +746,48 @@ function Epitools(props) {
     handleHighlightRadioChange()
   }, [highlightRadio, handleHighlightRadioChange])
 
+  const addUploadHistory = useCallback(() => {
+    if (getCanvas() !== undefined) {
+      let newFasta = fastaRef.current
+      uploadHistoryNodeRef.current = [
+        <div className="historyComponent" onClick={() => {setTreeUpload(true); setTableUpload(true); neighborJoinRequest(fastaRef.current); _setHistoryLabel(historyLabel); setBranchesData(branchesData); fastaRef.current = newFasta}}>
+          <div>{historyLabelRef.current}</div>
+          <img src={getCanvas().toDataURL("image/png")} height="100" width="300"></img>
+        </div>
+      ]
+    }
+    console.log(uploadHistoryNodeRef.current, treeUpload, tableUpload)
+    if (uploadHistoryNodeRef.current !== [] && treeUpload && tableUpload) {
+      setTreeUpload(false)
+      setTableUpload(false)
+      setHistoryList(uploadHistoryNodeRef.current.concat(historyList).slice(0, maxHistory))
+    }
+  }, [treeUpload, tableUpload])
+
   // push new PhylocanvasHistory object to history
   const addHistory = useCallback((image, nwk) => {
-    if (historyLabelRef.current) {
+    if (historyLabelRef.current && fastaRef.current === "") {
+      
+      uploadHistoryNodeRef.current = []
       setHistoryList(
         [   
-          <div className="historyComponent" onClick={() => {setUpdateTable(true); _setHistoryLabel(historyLabel); setNwk(nwk)}}>
+          <div className="historyComponent" onClick={() => {setUpdateTable(true); _setHistoryLabel(historyLabel); setNwk(nwk); fastaRef.current = ""}}>
             <div>{historyLabelRef.current}</div>
             <img src={image} height="100" width="300"></img>
           </div> 
   
         ].concat(historyList).slice(0, maxHistory)
       )   
+    } else {
+      addUploadHistory()
     }   
   })
+
+  useEffect(() => {
+    if (tableUpload) {
+      addUploadHistory()
+    }
+  }, [tableUpload])
 
   //====================================================================================================( return )
   return (
@@ -755,6 +817,7 @@ function Epitools(props) {
         visibility={tableUploadFormVisibility}
         setVisibility={setTableUploadFormVisibility}
         importData={setBranchesData}
+        setTableUpload={setTableUpload}
       />
 
       {/* buttons */}
@@ -997,6 +1060,7 @@ function Epitools(props) {
           historyLabel={historyLabelRef.current}
           showLegend={showLegend}
           legendTextSize={legendTextSize}
+          handleHighlightRadioChange={handleHighlightRadioChange}
         />
 
         {/* handsontable component */}

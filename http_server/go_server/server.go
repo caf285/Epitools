@@ -508,9 +508,9 @@ func pathogenHandler(w http.ResponseWriter, r *http.Request) {
 
   if request.Key == "value" {
     log.Printf("results")
-    log.Printf("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata, IF (sequence IS NOT NULL, TRUE, FALSE) as sequence FROM epitools.pathogen")
+    log.Printf("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata, LENGTH(sequence) as sequence FROM epitools.pathogen")
     //results, err := db.Query("SELECT * FROM epitools.pathogen")
-    results, err := db.Query("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata, IF (sequence IS NOT NULL, TRUE, FALSE) as sequence FROM epitools.pathogen;")
+    results, err := db.Query("SELECT id, sample, subsample, external, pathogen, type, lineage, facility, geographic_location, collection_date, additional_metadata, LENGTH(sequence) as sequence FROM epitools.pathogen;")
     if err != nil {
       panic(err.Error()) // proper error handling instead of panic in your app
     }
